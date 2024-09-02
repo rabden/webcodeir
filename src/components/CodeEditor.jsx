@@ -18,7 +18,7 @@ const CodeEditor = () => {
   const [cssCode, setCssCode] = useState('');
   const [jsCode, setJsCode] = useState('');
   const [preview, setPreview] = useState('');
-  const [layout, setLayout] = useState('split'); // New state for layout
+  const [layout, setLayout] = useState('split');
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -47,52 +47,55 @@ const CodeEditor = () => {
     <PanelGroup direction="vertical">
       <Panel minSize={10} defaultSize={33}>
         <div className="h-full flex flex-col">
-          <div className="bg-[#2d2d2d] p-2 flex items-center">
+          <div className="bg-[#2d2d2d] p-2 flex items-center sticky top-0 z-10">
             <div className="w-4 h-4 bg-[#ff5f56] rounded-full mr-2"></div>
             <span className="text-sm font-semibold">HTML</span>
           </div>
-          <CodeMirror
-            value={htmlCode}
-            height="100%"
-            theme={dracula}
-            extensions={[html()]}
-            onChange={(value) => setHtmlCode(value)}
-            className="flex-grow"
-          />
+          <div className="flex-grow overflow-auto">
+            <CodeMirror
+              value={htmlCode}
+              height="100%"
+              theme={dracula}
+              extensions={[html()]}
+              onChange={(value) => setHtmlCode(value)}
+            />
+          </div>
         </div>
       </Panel>
       <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
       <Panel minSize={10} defaultSize={33}>
         <div className="h-full flex flex-col">
-          <div className="bg-[#2d2d2d] p-2 flex items-center">
+          <div className="bg-[#2d2d2d] p-2 flex items-center sticky top-0 z-10">
             <div className="w-4 h-4 bg-[#27c93f] rounded-full mr-2"></div>
             <span className="text-sm font-semibold">CSS</span>
           </div>
-          <CodeMirror
-            value={cssCode}
-            height="100%"
-            theme={dracula}
-            extensions={[css()]}
-            onChange={(value) => setCssCode(value)}
-            className="flex-grow"
-          />
+          <div className="flex-grow overflow-auto">
+            <CodeMirror
+              value={cssCode}
+              height="100%"
+              theme={dracula}
+              extensions={[css()]}
+              onChange={(value) => setCssCode(value)}
+            />
+          </div>
         </div>
       </Panel>
       <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
       <Panel minSize={10} defaultSize={33}>
         <div className="h-full flex flex-col">
-          <div className="bg-[#2d2d2d] p-2 flex items-center">
+          <div className="bg-[#2d2d2d] p-2 flex items-center sticky top-0 z-10">
             <div className="w-4 h-4 bg-[#ffbd2e] rounded-full mr-2"></div>
             <span className="text-sm font-semibold">JS</span>
           </div>
-          <CodeMirror
-            value={jsCode}
-            height="100%"
-            theme={dracula}
-            extensions={[javascript()]}
-            onChange={(value) => setJsCode(value)}
-            className="flex-grow"
-          />
+          <div className="flex-grow overflow-auto">
+            <CodeMirror
+              value={jsCode}
+              height="100%"
+              theme={dracula}
+              extensions={[javascript()]}
+              onChange={(value) => setJsCode(value)}
+            />
+          </div>
         </div>
       </Panel>
     </PanelGroup>
@@ -134,7 +137,7 @@ const CodeEditor = () => {
           </button>
         </div>
       </header>
-      <div className="flex-grow">
+      <div className="flex-grow overflow-hidden">
         {layout === 'split' && (
           <PanelGroup direction="horizontal" className="h-full">
             <Panel minSize={0} defaultSize={50}>
