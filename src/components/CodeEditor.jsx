@@ -6,12 +6,19 @@ import { javascript } from '@codemirror/lang-javascript';
 import { dracula } from '@uiw/codemirror-theme-dracula';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Save, Settings, Layout, ChevronDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
   const [cssCode, setCssCode] = useState('');
   const [jsCode, setJsCode] = useState('');
   const [preview, setPreview] = useState('');
+  const [layout, setLayout] = useState('split'); // New state for layout
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -36,6 +43,61 @@ const CodeEditor = () => {
     setPreview(combinedCode);
   };
 
+  const renderEditors = () => (
+    <PanelGroup direction="vertical">
+      <Panel minSize={10} defaultSize={33}>
+        <div className="h-full flex flex-col">
+          <div className="bg-[#2d2d2d] p-2 flex items-center">
+            <div className="w-4 h-4 bg-[#ff5f56] rounded-full mr-2"></div>
+            <span className="text-sm font-semibold">HTML</span>
+          </div>
+          <CodeMirror
+            value={htmlCode}
+            height="100%"
+            theme={dracula}
+            extensions={[html()]}
+            onChange={(value) => setHtmlCode(value)}
+            className="flex-grow"
+          />
+        </div>
+      </Panel>
+      <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+      <Panel minSize={10} defaultSize={33}>
+        <div className="h-full flex flex-col">
+          <div className="bg-[#2d2d2d] p-2 flex items-center">
+            <div className="w-4 h-4 bg-[#27c93f] rounded-full mr-2"></div>
+            <span className="text-sm font-semibold">CSS</span>
+          </div>
+          <CodeMirror
+            value={cssCode}
+            height="100%"
+            theme={dracula}
+            extensions={[css()]}
+            onChange={(value) => setCssCode(value)}
+            className="flex-grow"
+          />
+        </div>
+      </Panel>
+      <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+      <Panel minSize={10} defaultSize={33}>
+        <div className="h-full flex flex-col">
+          <div className="bg-[#2d2d2d] p-2 flex items-center">
+            <div className="w-4 h-4 bg-[#ffbd2e] rounded-full mr-2"></div>
+            <span className="text-sm font-semibold">JS</span>
+          </div>
+          <CodeMirror
+            value={jsCode}
+            height="100%"
+            theme={dracula}
+            extensions={[javascript()]}
+            onChange={(value) => setJsCode(value)}
+            className="flex-grow"
+          />
+        </div>
+      </Panel>
+    </PanelGroup>
+  );
+
   return (
     <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
       <header className="bg-black p-2 flex justify-between items-center">
@@ -51,79 +113,54 @@ const CodeEditor = () => {
           <button className="p-1 bg-[#3a3a3a] rounded">
             <Settings className="w-4 h-4" />
           </button>
-          <button className="p-1 bg-[#3a3a3a] rounded">
-            <Layout className="w-4 h-4" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="p-1 bg-[#3a3a3a] rounded">
+              <Layout className="w-4 h-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={() => setLayout('split')}>
+                Split View
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setLayout('preview')}>
+                Preview Only
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setLayout('code')}>
+                Code Only
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <button className="p-1 bg-[#3a3a3a] rounded">
             <ChevronDown className="w-4 h-4" />
           </button>
         </div>
       </header>
-      <PanelGroup direction="horizontal" className="flex-grow">
-        <Panel minSize={0} defaultSize={50}>
+      <div className="flex-grow">
+        {layout === 'split' && (
+          <PanelGroup direction="horizontal" className="h-full">
+            <Panel minSize={0} defaultSize={50}>
+              <iframe
+                title="preview"
+                srcDoc={preview}
+                className="w-full h-full border-none bg-white"
+                sandbox="allow-scripts"
+              />
+            </Panel>
+            <PanelResizeHandle className="w-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+            <Panel minSize={0} defaultSize={50}>
+              {renderEditors()}
+            </Panel>
+          </PanelGroup>
+        )}
+        {layout === 'preview' && (
           <iframe
             title="preview"
             srcDoc={preview}
             className="w-full h-full border-none bg-white"
             sandbox="allow-scripts"
           />
-        </Panel>
-        <PanelResizeHandle className="w-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-        <Panel minSize={0} defaultSize={50}>
-          <PanelGroup direction="vertical">
-            <Panel minSize={10} defaultSize={33}>
-              <div className="h-full flex flex-col">
-                <div className="bg-[#2d2d2d] p-2 flex items-center">
-                  <div className="w-4 h-4 bg-[#ff5f56] rounded-full mr-2"></div>
-                  <span className="text-sm font-semibold">HTML</span>
-                </div>
-                <CodeMirror
-                  value={htmlCode}
-                  height="100%"
-                  theme={dracula}
-                  extensions={[html()]}
-                  onChange={(value) => setHtmlCode(value)}
-                  className="flex-grow"
-                />
-              </div>
-            </Panel>
-            <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-            <Panel minSize={10} defaultSize={33}>
-              <div className="h-full flex flex-col">
-                <div className="bg-[#2d2d2d] p-2 flex items-center">
-                  <div className="w-4 h-4 bg-[#27c93f] rounded-full mr-2"></div>
-                  <span className="text-sm font-semibold">CSS</span>
-                </div>
-                <CodeMirror
-                  value={cssCode}
-                  height="100%"
-                  theme={dracula}
-                  extensions={[css()]}
-                  onChange={(value) => setCssCode(value)}
-                  className="flex-grow"
-                />
-              </div>
-            </Panel>
-            <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-            <Panel minSize={10} defaultSize={33}>
-              <div className="h-full flex flex-col">
-                <div className="bg-[#2d2d2d] p-2 flex items-center">
-                  <div className="w-4 h-4 bg-[#ffbd2e] rounded-full mr-2"></div>
-                  <span className="text-sm font-semibold">JS</span>
-                </div>
-                <CodeMirror
-                  value={jsCode}
-                  height="100%"
-                  theme={dracula}
-                  extensions={[javascript()]}
-                  onChange={(value) => setJsCode(value)}
-                  className="flex-grow"
-                />
-              </div>
-            </Panel>
-          </PanelGroup>
-        </Panel>
-      </PanelGroup>
+        )}
+        {layout === 'code' && renderEditors()}
+      </div>
       <footer className="bg-[#2d2d2d] p-2 flex justify-between items-center text-sm">
         <div className="flex space-x-4">
           <span>Console</span>
