@@ -7,6 +7,7 @@ import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
 import { dracula } from '@uiw/codemirror-theme-dracula';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('<h1>Hello, CodePen!</h1>');
@@ -37,9 +38,9 @@ const CodeEditor = () => {
           <PlayIcon className="mr-2 h-4 w-4" /> Run
         </Button>
       </header>
-      <div className="flex-grow flex flex-col">
-        <div className="flex-1 flex">
-          <div className="flex-1 border-r border-gray-700">
+      <PanelGroup direction="vertical" className="flex-grow">
+        <Panel defaultSize={50} minSize={30}>
+          <div className="h-full">
             <Tabs defaultValue="html" className="h-full">
               <TabsList className="bg-gray-800">
                 <TabsTrigger value="html">HTML</TabsTrigger>
@@ -75,17 +76,20 @@ const CodeEditor = () => {
               </TabsContent>
             </Tabs>
           </div>
-        </div>
-        <div className="flex-1 bg-white">
-          <h2 className="bg-gray-800 text-white p-2">Output</h2>
-          <iframe
-            title="preview"
-            srcDoc={preview}
-            className="w-full h-[calc(100%-40px)] border-none"
-            sandbox="allow-scripts"
-          />
-        </div>
-      </div>
+        </Panel>
+        <PanelResizeHandle className="h-2 bg-gray-700 hover:bg-gray-600 cursor-row-resize" />
+        <Panel minSize={20}>
+          <div className="h-full bg-white">
+            <h2 className="bg-gray-800 text-white p-2">Output</h2>
+            <iframe
+              title="preview"
+              srcDoc={preview}
+              className="w-full h-[calc(100%-32px)] border-none"
+              sandbox="allow-scripts"
+            />
+          </div>
+        </Panel>
+      </PanelGroup>
     </div>
   );
 };
