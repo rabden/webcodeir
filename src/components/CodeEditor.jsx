@@ -38,9 +38,9 @@ const CodeEditor = () => {
         </Button>
       </header>
       <PanelGroup direction="horizontal" className="flex-grow">
-        <Panel defaultSize={50} minSize={30}>
+        <Panel minSize={0} defaultSize={50}>
           <PanelGroup direction="vertical">
-            <Panel defaultSize={33}>
+            <Panel minSize={10} defaultSize={33}>
               <div className="h-full flex flex-col">
                 <div className="bg-gray-800 p-2">HTML</div>
                 <CodeMirror
@@ -53,7 +53,7 @@ const CodeEditor = () => {
               </div>
             </Panel>
             <PanelResizeHandle className="h-2 bg-gray-700 hover:bg-gray-600 cursor-row-resize" />
-            <Panel defaultSize={33}>
+            <Panel minSize={10} defaultSize={33}>
               <div className="h-full flex flex-col">
                 <div className="bg-gray-800 p-2">CSS</div>
                 <CodeMirror
@@ -66,7 +66,7 @@ const CodeEditor = () => {
               </div>
             </Panel>
             <PanelResizeHandle className="h-2 bg-gray-700 hover:bg-gray-600 cursor-row-resize" />
-            <Panel defaultSize={33}>
+            <Panel minSize={10} defaultSize={33}>
               <div className="h-full flex flex-col">
                 <div className="bg-gray-800 p-2">JS</div>
                 <CodeMirror
@@ -81,7 +81,7 @@ const CodeEditor = () => {
           </PanelGroup>
         </Panel>
         <PanelResizeHandle className="w-2 bg-gray-700 hover:bg-gray-600 cursor-col-resize" />
-        <Panel defaultSize={50} minSize={30}>
+        <Panel minSize={0} defaultSize={50}>
           <div className="h-full bg-white">
             <h2 className="bg-gray-800 text-white p-2">Output</h2>
             <iframe
