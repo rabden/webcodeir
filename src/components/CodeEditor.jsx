@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayIcon } from "lucide-react";
 import CodeMirror from '@uiw/react-codemirror';
 import { html } from '@codemirror/lang-html';
@@ -39,15 +38,11 @@ const CodeEditor = () => {
         </Button>
       </header>
       <PanelGroup direction="vertical" className="flex-grow">
-        <Panel defaultSize={50} minSize={30}>
-          <div className="h-full">
-            <Tabs defaultValue="html" className="h-full">
-              <TabsList className="bg-gray-800">
-                <TabsTrigger value="html">HTML</TabsTrigger>
-                <TabsTrigger value="css">CSS</TabsTrigger>
-                <TabsTrigger value="js">JS</TabsTrigger>
-              </TabsList>
-              <TabsContent value="html" className="h-[calc(100%-40px)]">
+        <Panel defaultSize={60}>
+          <PanelGroup direction="horizontal">
+            <Panel defaultSize={33}>
+              <div className="h-full flex flex-col">
+                <div className="bg-gray-800 p-2">HTML</div>
                 <CodeMirror
                   value={htmlCode}
                   height="100%"
@@ -55,8 +50,12 @@ const CodeEditor = () => {
                   extensions={[html()]}
                   onChange={(value) => setHtmlCode(value)}
                 />
-              </TabsContent>
-              <TabsContent value="css" className="h-[calc(100%-40px)]">
+              </div>
+            </Panel>
+            <PanelResizeHandle className="w-2 bg-gray-700 hover:bg-gray-600 cursor-col-resize" />
+            <Panel defaultSize={33}>
+              <div className="h-full flex flex-col">
+                <div className="bg-gray-800 p-2">CSS</div>
                 <CodeMirror
                   value={cssCode}
                   height="100%"
@@ -64,8 +63,12 @@ const CodeEditor = () => {
                   extensions={[css()]}
                   onChange={(value) => setCssCode(value)}
                 />
-              </TabsContent>
-              <TabsContent value="js" className="h-[calc(100%-40px)]">
+              </div>
+            </Panel>
+            <PanelResizeHandle className="w-2 bg-gray-700 hover:bg-gray-600 cursor-col-resize" />
+            <Panel defaultSize={33}>
+              <div className="h-full flex flex-col">
+                <div className="bg-gray-800 p-2">JS</div>
                 <CodeMirror
                   value={jsCode}
                   height="100%"
@@ -73,12 +76,12 @@ const CodeEditor = () => {
                   extensions={[javascript()]}
                   onChange={(value) => setJsCode(value)}
                 />
-              </TabsContent>
-            </Tabs>
-          </div>
+              </div>
+            </Panel>
+          </PanelGroup>
         </Panel>
         <PanelResizeHandle className="h-2 bg-gray-700 hover:bg-gray-600 cursor-row-resize" />
-        <Panel minSize={20}>
+        <Panel defaultSize={40}>
           <div className="h-full bg-white">
             <h2 className="bg-gray-800 text-white p-2">Output</h2>
             <iframe
