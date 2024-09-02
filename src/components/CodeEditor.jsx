@@ -5,11 +5,12 @@ import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
 import { dracula } from '@uiw/codemirror-theme-dracula';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { Save, Settings, Layout, ChevronDown } from 'lucide-react';
 
 const CodeEditor = () => {
-  const [htmlCode, setHtmlCode] = useState('<h1>Hello, CodePen!</h1>');
-  const [cssCode, setCssCode] = useState('body {\n  font-family: "Inter", sans-serif;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n  margin: 0;\n  background-color: #f0f0f0;\n}\n\nh1 {\n  color: #333;\n  font-size: 2.5rem;\n  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);\n}');
-  const [jsCode, setJsCode] = useState('console.log("Hello from JavaScript!");');
+  const [htmlCode, setHtmlCode] = useState('');
+  const [cssCode, setCssCode] = useState('');
+  const [jsCode, setJsCode] = useState('');
   const [preview, setPreview] = useState('');
 
   useEffect(() => {
@@ -36,16 +37,46 @@ const CodeEditor = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-100 text-gray-800">
-      <header className="bg-gradient-to-r from-purple-500 to-indigo-600 p-4 shadow-lg">
-        <h1 className="text-2xl font-bold text-white">Modern CodePen Clone</h1>
+    <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
+      <header className="bg-black p-2 flex justify-between items-center">
+        <div className="flex items-center space-x-2">
+          <div className="w-6 h-6 bg-white rounded-sm"></div>
+          <h1 className="text-lg font-semibold">Untitled</h1>
+        </div>
+        <div className="flex items-center space-x-2">
+          <button className="px-3 py-1 bg-[#3a3a3a] rounded">
+            <Save className="w-4 h-4" />
+            <span className="ml-1">Save</span>
+          </button>
+          <button className="p-1 bg-[#3a3a3a] rounded">
+            <Settings className="w-4 h-4" />
+          </button>
+          <button className="p-1 bg-[#3a3a3a] rounded">
+            <Layout className="w-4 h-4" />
+          </button>
+          <button className="p-1 bg-[#3a3a3a] rounded">
+            <ChevronDown className="w-4 h-4" />
+          </button>
+        </div>
       </header>
       <PanelGroup direction="horizontal" className="flex-grow">
-        <Panel minSize={10} defaultSize={50}>
+        <Panel minSize={0} defaultSize={50}>
+          <iframe
+            title="preview"
+            srcDoc={preview}
+            className="w-full h-full border-none bg-white"
+            sandbox="allow-scripts"
+          />
+        </Panel>
+        <PanelResizeHandle className="w-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+        <Panel minSize={0} defaultSize={50}>
           <PanelGroup direction="vertical">
             <Panel minSize={10} defaultSize={33}>
-              <div className="h-full flex flex-col rounded-lg overflow-hidden shadow-md m-2">
-                <div className="bg-gray-200 p-2 font-semibold">HTML</div>
+              <div className="h-full flex flex-col">
+                <div className="bg-[#2d2d2d] p-2 flex items-center">
+                  <div className="w-4 h-4 bg-[#ff5f56] rounded-full mr-2"></div>
+                  <span className="text-sm font-semibold">HTML</span>
+                </div>
                 <CodeMirror
                   value={htmlCode}
                   height="100%"
@@ -56,10 +87,13 @@ const CodeEditor = () => {
                 />
               </div>
             </Panel>
-            <PanelResizeHandle className="h-2 bg-gray-300 hover:bg-gray-400 transition-colors duration-200 cursor-row-resize" />
+            <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
             <Panel minSize={10} defaultSize={33}>
-              <div className="h-full flex flex-col rounded-lg overflow-hidden shadow-md m-2">
-                <div className="bg-gray-200 p-2 font-semibold">CSS</div>
+              <div className="h-full flex flex-col">
+                <div className="bg-[#2d2d2d] p-2 flex items-center">
+                  <div className="w-4 h-4 bg-[#27c93f] rounded-full mr-2"></div>
+                  <span className="text-sm font-semibold">CSS</span>
+                </div>
                 <CodeMirror
                   value={cssCode}
                   height="100%"
@@ -70,10 +104,13 @@ const CodeEditor = () => {
                 />
               </div>
             </Panel>
-            <PanelResizeHandle className="h-2 bg-gray-300 hover:bg-gray-400 transition-colors duration-200 cursor-row-resize" />
+            <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
             <Panel minSize={10} defaultSize={33}>
-              <div className="h-full flex flex-col rounded-lg overflow-hidden shadow-md m-2">
-                <div className="bg-gray-200 p-2 font-semibold">JS</div>
+              <div className="h-full flex flex-col">
+                <div className="bg-[#2d2d2d] p-2 flex items-center">
+                  <div className="w-4 h-4 bg-[#ffbd2e] rounded-full mr-2"></div>
+                  <span className="text-sm font-semibold">JS</span>
+                </div>
                 <CodeMirror
                   value={jsCode}
                   height="100%"
@@ -86,19 +123,17 @@ const CodeEditor = () => {
             </Panel>
           </PanelGroup>
         </Panel>
-        <PanelResizeHandle className="w-2 bg-gray-300 hover:bg-gray-400 transition-colors duration-200 cursor-col-resize" />
-        <Panel minSize={0} defaultSize={50}>
-          <div className="h-full bg-white rounded-lg overflow-hidden shadow-md m-2">
-            <h2 className="bg-gradient-to-r from-green-400 to-blue-500 text-white p-2 font-semibold">Output</h2>
-            <iframe
-              title="preview"
-              srcDoc={preview}
-              className="w-full h-[calc(100%-40px)] border-none"
-              sandbox="allow-scripts"
-            />
-          </div>
-        </Panel>
       </PanelGroup>
+      <footer className="bg-[#2d2d2d] p-2 flex justify-between items-center text-sm">
+        <div className="flex space-x-4">
+          <span>Console</span>
+          <span>Assets</span>
+          <span>Shortcuts</span>
+        </div>
+        <div>
+          {/* Add any additional footer content here */}
+        </div>
+      </footer>
     </div>
   );
 };
