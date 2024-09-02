@@ -37,9 +37,9 @@ const CodeEditor = () => {
           <PlayIcon className="mr-2 h-4 w-4" /> Run
         </Button>
       </header>
-      <PanelGroup direction="vertical" className="flex-grow">
-        <Panel defaultSize={60}>
-          <PanelGroup direction="horizontal">
+      <PanelGroup direction="horizontal" className="flex-grow">
+        <Panel defaultSize={50} minSize={30}>
+          <PanelGroup direction="vertical">
             <Panel defaultSize={33}>
               <div className="h-full flex flex-col">
                 <div className="bg-gray-800 p-2">HTML</div>
@@ -52,7 +52,7 @@ const CodeEditor = () => {
                 />
               </div>
             </Panel>
-            <PanelResizeHandle className="w-2 bg-gray-700 hover:bg-gray-600 cursor-col-resize" />
+            <PanelResizeHandle className="h-2 bg-gray-700 hover:bg-gray-600 cursor-row-resize" />
             <Panel defaultSize={33}>
               <div className="h-full flex flex-col">
                 <div className="bg-gray-800 p-2">CSS</div>
@@ -65,7 +65,7 @@ const CodeEditor = () => {
                 />
               </div>
             </Panel>
-            <PanelResizeHandle className="w-2 bg-gray-700 hover:bg-gray-600 cursor-col-resize" />
+            <PanelResizeHandle className="h-2 bg-gray-700 hover:bg-gray-600 cursor-row-resize" />
             <Panel defaultSize={33}>
               <div className="h-full flex flex-col">
                 <div className="bg-gray-800 p-2">JS</div>
@@ -80,8 +80,8 @@ const CodeEditor = () => {
             </Panel>
           </PanelGroup>
         </Panel>
-        <PanelResizeHandle className="h-2 bg-gray-700 hover:bg-gray-600 cursor-row-resize" />
-        <Panel defaultSize={40}>
+        <PanelResizeHandle className="w-2 bg-gray-700 hover:bg-gray-600 cursor-col-resize" />
+        <Panel defaultSize={50} minSize={30}>
           <div className="h-full bg-white">
             <h2 className="bg-gray-800 text-white p-2">Output</h2>
             <iframe
