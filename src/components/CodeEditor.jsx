@@ -9,7 +9,7 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save, FileCode2 } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import AssetsManager from './AssetsManager';
@@ -27,6 +27,7 @@ const CodeEditor = () => {
   });
   const [showSettings, setShowSettings] = useState(false);
   const [showSavedCodes, setShowSavedCodes] = useState(false);
+  const [showAssetsManager, setShowAssetsManager] = useState(false);
   const [settings, setSettings] = useState({
     editorTheme: 'dracula',
     fontSize: 14,
@@ -196,6 +197,12 @@ const CodeEditor = () => {
             Saved Codes
           </button>
           <button
+            onClick={() => setShowAssetsManager(!showAssetsManager)}
+            className="p-2 rounded-full hover:bg-gray-800"
+          >
+            <FileCode2 className="w-5 h-5" />
+          </button>
+          <button
             onClick={() => setShowSettings(!showSettings)}
             className="p-2 rounded-full hover:bg-gray-800"
           >
@@ -223,10 +230,6 @@ const CodeEditor = () => {
               {renderEditor('css', cssCode, setCssCode, 'css')}
               <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
               {renderEditor('js', jsCode, setJsCode, 'js')}
-              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-              <Panel minSize={5} defaultSize={20}>
-                <AssetsManager assets={assets} setAssets={setAssets} />
-              </Panel>
             </PanelGroup>
           </Panel>
         </PanelGroup>
@@ -249,6 +252,13 @@ const CodeEditor = () => {
             setAssets(code.assets || assets);
             setShowSavedCodes(false);
           }}
+        />
+      )}
+      {showAssetsManager && (
+        <AssetsManager
+          assets={assets}
+          setAssets={setAssets}
+          onClose={() => setShowAssetsManager(false)}
         />
       )}
     </div>
