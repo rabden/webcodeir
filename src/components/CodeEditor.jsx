@@ -9,10 +9,9 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save, FileCode2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
-import AssetsManager from './AssetsManager';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -27,7 +26,6 @@ const CodeEditor = () => {
   });
   const [showSettings, setShowSettings] = useState(false);
   const [showSavedCodes, setShowSavedCodes] = useState(false);
-  const [showAssetsManager, setShowAssetsManager] = useState(false);
   const [settings, setSettings] = useState({
     editorTheme: 'dracula',
     fontSize: 14,
@@ -40,29 +38,6 @@ const CodeEditor = () => {
     highlightActiveLine: true,
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
-  const [assets, setAssets] = useState([
-    { name: 'Bootstrap CSS', type: 'link', url: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css', enabled: false },
-    { name: 'Bootstrap JS', type: 'script', url: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', enabled: false },
-    { name: 'Font Awesome', type: 'link', url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', enabled: false },
-    { name: 'jQuery', type: 'script', url: 'https://code.jquery.com/jquery-3.6.0.min.js', enabled: false },
-    { name: 'Animate.css', type: 'link', url: 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css', enabled: false },
-    // New assets
-    { name: 'Tailwind CSS', type: 'link', url: 'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css', enabled: false },
-    { name: 'Vue.js', type: 'script', url: 'https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js', enabled: false },
-    { name: 'React', type: 'script', url: 'https://unpkg.com/react@17/umd/react.development.js', enabled: false },
-    { name: 'React DOM', type: 'script', url: 'https://unpkg.com/react-dom@17/umd/react-dom.development.js', enabled: false },
-    { name: 'Alpine.js', type: 'script', url: 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js', enabled: false },
-    { name: 'Lodash', type: 'script', url: 'https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js', enabled: false },
-    { name: 'Axios', type: 'script', url: 'https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js', enabled: false },
-    { name: 'Moment.js', type: 'script', url: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js', enabled: false },
-    { name: 'Chart.js', type: 'script', url: 'https://cdn.jsdelivr.net/npm/chart.js', enabled: false },
-    { name: 'Normalize.css', type: 'link', url: 'https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css', enabled: false },
-    { name: 'Bulma CSS', type: 'link', url: 'https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css', enabled: false },
-    { name: 'Three.js', type: 'script', url: 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', enabled: false },
-    { name: 'D3.js', type: 'script', url: 'https://d3js.org/d3.v7.min.js', enabled: false },
-    { name: 'Anime.js', type: 'script', url: 'https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js', enabled: false },
-    { name: 'Materialize CSS', type: 'link', url: 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css', enabled: false },
-  ]);
 
   const themes = {
     dracula: dracula,
@@ -81,24 +56,16 @@ const CodeEditor = () => {
     }, 300);
 
     return () => clearTimeout(debounce);
-  }, [htmlCode, cssCode, jsCode, settings.autoSave, assets]);
+  }, [htmlCode, cssCode, jsCode, settings.autoSave]);
 
   useEffect(() => {
     loadFromLocalStorage();
   }, []);
 
   const updatePreview = () => {
-    const enabledAssets = assets.filter(asset => asset.enabled);
-    const assetTags = enabledAssets.map(asset => 
-      asset.type === 'link' 
-        ? `<link rel="stylesheet" href="${asset.url}">`
-        : `<script src="${asset.url}"></script>`
-    ).join('\n');
-
     const combinedCode = `
       <html>
         <head>
-          ${assetTags}
           <style>${cssCode}</style>
         </head>
         <body>
@@ -115,19 +82,18 @@ const CodeEditor = () => {
   };
 
   const saveToLocalStorage = () => {
-    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName, assets }));
+    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName }));
   };
 
   const loadFromLocalStorage = () => {
     const savedState = localStorage.getItem('codeEditorState');
     if (savedState) {
-      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName, assets: savedAssets } = JSON.parse(savedState);
+      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
       setHtmlCode(htmlCode);
       setCssCode(cssCode);
       setJsCode(jsCode);
       setSettings(savedSettings);
       setCurrentCodeName(currentCodeName || 'Untitled');
-      setAssets(savedAssets || assets);
     }
   };
 
@@ -139,7 +105,6 @@ const CodeEditor = () => {
       html: htmlCode,
       css: cssCode,
       js: jsCode,
-      assets: assets,
       date: new Date().toISOString(),
     };
     savedCodes.push(newSavedCode);
@@ -213,12 +178,6 @@ const CodeEditor = () => {
             Saved Codes
           </button>
           <button
-            onClick={() => setShowAssetsManager(!showAssetsManager)}
-            className="p-2 rounded-full hover:bg-gray-800"
-          >
-            <FileCode2 className="w-5 h-5" />
-          </button>
-          <button
             onClick={() => setShowSettings(!showSettings)}
             className="p-2 rounded-full hover:bg-gray-800"
           >
@@ -265,16 +224,8 @@ const CodeEditor = () => {
             setCssCode(code.css);
             setJsCode(code.js);
             setCurrentCodeName(code.name);
-            setAssets(code.assets || assets);
             setShowSavedCodes(false);
           }}
-        />
-      )}
-      {showAssetsManager && (
-        <AssetsManager
-          assets={assets}
-          setAssets={setAssets}
-          onClose={() => setShowAssetsManager(false)}
         />
       )}
     </div>
