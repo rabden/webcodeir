@@ -7,20 +7,19 @@ import ColorTab from './asset-tabs/ColorTab';
 import LibraryTab from './asset-tabs/LibraryTab';
 
 const AssetsManager = ({ assets, setAssets, onClose }) => {
-  const [activeTab, setActiveTab] = useState('photos');
+  const [activeTab, setActiveTab] = useState('images');
 
   const tabs = [
-    { id: 'packages', label: 'Packages' },
-    { id: 'photos', label: 'Photos' },
+    { id: 'images', label: 'Images' },
     { id: 'icons', label: 'Icons' },
     { id: 'fonts', label: 'Fonts' },
-    { id: 'colors', label: 'Colors' },
-    { id: 'patterns', label: 'Patterns' },
+    { id: 'colors', label: 'Colors & Gradients' },
+    { id: 'libraries', label: 'Libraries' },
   ];
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'photos':
+      case 'images':
         return <ImageTab />;
       case 'icons':
         return <IconTab />;
@@ -28,45 +27,40 @@ const AssetsManager = ({ assets, setAssets, onClose }) => {
         return <FontTab />;
       case 'colors':
         return <ColorTab />;
-      case 'packages':
+      case 'libraries':
         return <LibraryTab assets={assets} setAssets={setAssets} />;
-      case 'patterns':
-        return <div>Patterns tab content</div>;
       default:
         return null;
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-[#1e1e1e] flex flex-col z-50">
-      <div className="flex justify-between items-center p-4 bg-[#1e1e1e] border-b border-gray-700">
-        <h2 className="text-2xl font-bold text-white">Assets</h2>
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-95 flex flex-col z-50">
+      <div className="flex justify-between items-center p-4 bg-gray-800">
+        <h2 className="text-2xl font-bold text-white">Asset Manager</h2>
         <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-700 transition-colors">
           <X className="w-6 h-6 text-white" />
         </button>
       </div>
-      <div className="flex-grow flex overflow-hidden">
-        <div className="w-48 bg-[#252526] p-4 overflow-y-auto">
-          <div className="mb-4">
-            <h3 className="text-white mb-2">Your Files</h3>
-            <span className="bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded">PRO</span>
-          </div>
-          <h4 className="text-gray-400 mb-2">FREE RESOURCES</h4>
-          <ul className="space-y-2">
+      <div className="flex-grow flex flex-col">
+        <div className="bg-gray-800 p-2">
+          <div className="flex space-x-2">
             {tabs.map((tab) => (
-              <li
+              <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`cursor-pointer p-2 rounded ${
-                  activeTab === tab.id ? 'bg-[#37373d] text-white' : 'text-gray-400 hover:bg-[#2a2d2e]'
+                className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${
+                  activeTab === tab.id
+                    ? 'bg-gray-700 text-white'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white'
                 }`}
               >
                 {tab.label}
-              </li>
+              </button>
             ))}
-          </ul>
+          </div>
         </div>
-        <div className="flex-grow bg-[#1e1e1e] p-4 overflow-y-auto">
+        <div className="flex-grow bg-gray-700 p-4 overflow-y-auto">
           {renderTabContent()}
         </div>
       </div>

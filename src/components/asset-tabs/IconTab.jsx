@@ -1,64 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 
 const IconTab = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [icons, setIcons] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const searchIcons = async () => {
-    setLoading(true);
-    // Simulating API call with setTimeout
-    setTimeout(() => {
-      const mockIcons = Array.from({ length: 60 }, (_, i) => ({
-        name: `icon-${i + 1}`,
-        svg: `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><rect width="24" height="24" /></svg>`
-      }));
-      setIcons(mockIcons.filter(icon => icon.name.includes(searchQuery.toLowerCase())));
-      setLoading(false);
-    }, 500);
+    try {
+      const response = await fetch(`https://api.iconify.design/search?query=${searchQuery}&limit=30`);
+      const data = await response.json();
+      setIcons(data.icons);
+    } catch (error) {
+      console.error('Error fetching icons:', error);
+    }
   };
-
-  useEffect(() => {
-    searchIcons();
-  }, []);
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl text-white">Icons from <span className="text-blue-400">Font Awesome</span>. Click to copy an inline &lt;svg&gt;</h2>
       <div className="flex items-center space-x-2">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search icons..."
-          className="flex-grow px-4 py-2 rounded bg-[#3a3a3a] text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-grow px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={searchIcons}
-          className="px-4 py-2 bg-[#3a3a3a] text-white rounded hover:bg-[#4a4a4a] transition-colors"
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
         >
-          Search
+          <Search className="w-5 h-5" />
         </button>
       </div>
-      {loading ? (
-        <p className="text-white">Loading icons...</p>
-      ) : (
-        <div className="grid grid-cols-12 gap-2">
-          {icons.map((icon) => (
-            <div
-              key={icon.name}
-              className="bg-[#3a3a3a] p-2 rounded cursor-pointer hover:bg-[#4a4a4a] transition-colors"
-              onClick={() => navigator.clipboard.writeText(icon.svg)}
-            >
-              <div dangerouslySetInnerHTML={{ __html: icon.svg }} className="text-white" />
-            </div>
-          ))}
-        </div>
-      )}
-      {!loading && icons.length === 0 && (
-        <p className="text-white text-center">No icons found. Try a different search query.</p>
-      )}
+      <div className="grid grid-cols-6 gap-4">
+        {icons.map((icon) => (
+          <div key={icon.name} className="flex flex-col items-center">
+            <img src={`https://api.iconify.design/${icon.prefix}:${icon.name}.svg`} alt={icon.name} className="w-12 h-12" />
+            <span className="text-xs text-gray-300 mt-1 truncate w-full text-center">{icon.name}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
