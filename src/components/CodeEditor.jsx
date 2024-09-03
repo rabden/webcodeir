@@ -6,12 +6,6 @@ import { javascript } from '@codemirror/lang-javascript';
 import { dracula } from '@uiw/codemirror-theme-dracula';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -84,6 +78,9 @@ const CodeEditor = () => {
           <div className="w-6 h-6 bg-white rounded-sm"></div>
           <h1 className="text-lg font-semibold">Untitled</h1>
         </div>
+        <div className="text-sm">
+          Preview width: {previewWidth}px
+        </div>
       </header>
       <div className="flex-grow overflow-hidden">
         <PanelGroup direction="horizontal" className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
@@ -95,18 +92,9 @@ const CodeEditor = () => {
               sandbox="allow-scripts"
             />
           </Panel>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <PanelResizeHandle className="w-4 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-                  <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-                </PanelResizeHandle>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="bg-black text-white px-2 py-1 text-xs rounded">
-                Preview width: {previewWidth}px
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+            <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+          </PanelResizeHandle>
           <Panel minSize={0} defaultSize={50}>
             <PanelGroup direction="vertical">
               {renderEditor('html', htmlCode, setHtmlCode, 'html')}
