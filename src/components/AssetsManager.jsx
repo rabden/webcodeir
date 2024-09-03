@@ -1,74 +1,67 @@
 import React, { useState } from 'react';
-import { Plus, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import ImageTab from './asset-tabs/ImageTab';
+import IconTab from './asset-tabs/IconTab';
+import FontTab from './asset-tabs/FontTab';
+import ColorTab from './asset-tabs/ColorTab';
+import LibraryTab from './asset-tabs/LibraryTab';
 
 const AssetsManager = ({ assets, setAssets, onClose }) => {
-  const [newAssetUrl, setNewAssetUrl] = useState('');
-  const [newAssetType, setNewAssetType] = useState('link');
+  const [activeTab, setActiveTab] = useState('images');
 
-  const toggleAsset = (index) => {
-    const updatedAssets = [...assets];
-    updatedAssets[index].enabled = !updatedAssets[index].enabled;
-    setAssets(updatedAssets);
-  };
+  const tabs = [
+    { id: 'images', label: 'Images' },
+    { id: 'icons', label: 'Icons' },
+    { id: 'fonts', label: 'Fonts' },
+    { id: 'colors', label: 'Colors & Gradients' },
+    { id: 'libraries', label: 'Libraries' },
+  ];
 
-  const addNewAsset = () => {
-    if (newAssetUrl) {
-      setAssets([...assets, { name: newAssetUrl, type: newAssetType, url: newAssetUrl, enabled: true }]);
-      setNewAssetUrl('');
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'images':
+        return <ImageTab />;
+      case 'icons':
+        return <IconTab />;
+      case 'fonts':
+        return <FontTab />;
+      case 'colors':
+        return <ColorTab />;
+      case 'libraries':
+        return <LibraryTab assets={assets} setAssets={setAssets} />;
+      default:
+        return null;
     }
   };
 
-  const removeAsset = (index) => {
-    const updatedAssets = assets.filter((_, i) => i !== index);
-    setAssets(updatedAssets);
-  };
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-[600px] max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-white">Assets Manager</h2>
-          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="space-y-4">
-          {assets.map((asset, index) => (
-            <div key={index} className="flex items-center justify-between">
-              <label className="flex items-center space-x-2 text-white">
-                <input
-                  type="checkbox"
-                  checked={asset.enabled}
-                  onChange={() => toggleAsset(index)}
-                  className="form-checkbox h-4 w-4 text-blue-600"
-                />
-                <span>{asset.name}</span>
-              </label>
-              <button onClick={() => removeAsset(index)} className="text-red-500 hover:text-red-700">
-                <X size={16} />
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-95 flex flex-col z-50">
+      <div className="flex justify-between items-center p-4 bg-gray-800">
+        <h2 className="text-2xl font-bold text-white">Asset Manager</h2>
+        <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-700 transition-colors">
+          <X className="w-6 h-6 text-white" />
+        </button>
+      </div>
+      <div className="flex-grow flex flex-col">
+        <div className="bg-gray-800 p-2">
+          <div className="flex space-x-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${
+                  activeTab === tab.id
+                    ? 'bg-gray-700 text-white'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white'
+                }`}
+              >
+                {tab.label}
               </button>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-        <div className="mt-4 flex space-x-2">
-          <input
-            type="text"
-            value={newAssetUrl}
-            onChange={(e) => setNewAssetUrl(e.target.value)}
-            placeholder="Enter asset URL"
-            className="flex-grow px-2 py-1 bg-gray-700 text-white rounded"
-          />
-          <select
-            value={newAssetType}
-            onChange={(e) => setNewAssetType(e.target.value)}
-            className="px-2 py-1 bg-gray-700 text-white rounded"
-          >
-            <option value="link">Link</option>
-            <option value="script">Script</option>
-          </select>
-          <button onClick={addNewAsset} className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
-            <Plus size={16} />
-          </button>
+        <div className="flex-grow bg-gray-700 p-4 overflow-y-auto">
+          {renderTabContent()}
         </div>
       </div>
     </div>
