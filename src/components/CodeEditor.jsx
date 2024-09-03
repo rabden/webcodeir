@@ -21,7 +21,24 @@ import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language';
 
 const CodeEditor = () => {
-  // ... (existing state declarations)
+  const [htmlCode, setHtmlCode] = useState('');
+  const [cssCode, setCssCode] = useState('');
+  const [jsCode, setJsCode] = useState('');
+  const [output, setOutput] = useState('');
+  const [collapsedPanels, setCollapsedPanels] = useState({ html: false, css: false, js: false });
+  const [showSettings, setShowSettings] = useState(false);
+  const [showSavedCodes, setShowSavedCodes] = useState(false);
+  const [settings, setSettings] = useState({
+    editorTheme: 'dracula',
+    fontSize: 14,
+    autoSave: true,
+    tabSize: 2,
+    lineNumbers: true,
+    wordWrap: true,
+    indentWithTabs: true,
+    autoCloseBrackets: 'always',
+    highlightActiveLine: true,
+  });
 
   const themes = {
     dracula: dracula,
@@ -31,7 +48,25 @@ const CodeEditor = () => {
     monokai: monokai,
   };
 
-  // ... (existing useEffect hooks)
+  useEffect(() => {
+    const savedSettings = JSON.parse(localStorage.getItem('editorSettings'));
+    if (savedSettings) {
+      setSettings(savedSettings);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('editorSettings', JSON.stringify(settings));
+  }, [settings]);
+
+  useEffect(() => {
+    if (settings.autoSave) {
+      const timer = setTimeout(() => {
+        updateOutput();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [htmlCode, cssCode, jsCode, settings.autoSave]);
 
   const createLanguageExtensions = (language) => {
     const languageSupport = language === 'html' ? html() : language === 'css' ? css() : javascript();
@@ -101,10 +136,94 @@ const CodeEditor = () => {
     </Panel>
   );
 
-  // ... (rest of the component remains unchanged)
+  const togglePanel = (panel) => {
+    setCollapsedPanels(prev => ({ ...prev, [panel]: !prev[panel] }));
+  };
+
+  const updateOutput = () => {
+    const combinedOutput = `
+      <html>
+        <head>
+          <style>${cssCode}</style>
+        </head>
+        <body>
+          ${htmlCode}
+          <script>${jsCode}</script>
+        </body>
+      </html>
+    `;
+    setOutput(combinedOutput);
+  };
+
+  const handleSave = () => {
+    const savedCodes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
+    const newCode = {
+      id: Date.now(),
+      name: `Code ${savedCodes.length + 1}`,
+      html: htmlCode,
+      css: cssCode,
+      js: jsCode,
+    };
+    savedCodes.push(newCode);
+    localStorage.setItem('savedCodes', JSON.stringify(savedCodes));
+  };
+
+  const handleLoad = (code) => {
+    setHtmlCode(code.html);
+    setCssCode(code.css);
+    setJsCode(code.js);
+    setShowSavedCodes(false);
+  };
 
   return (
-    // ... (existing JSX structure)
+    <div className="h-screen flex flex-col bg-gray-900 text-white">
+      <div className="flex justify-between items-center p-4 bg-gray-800">
+        <h1 className="text-2xl font-bold">Code Editor</h1>
+        <div className="flex space-x-4">
+          <button onClick={() => setShowSettings(true)} className="p-2 rounded hover:bg-gray-700 transition-colors">
+            <SettingsIcon className="w-5 h-5" />
+          </button>
+          <button onClick={handleSave} className="p-2 rounded hover:bg-gray-700 transition-colors">
+            <Save className="w-5 h-5" />
+          </button>
+          <button onClick={() => setShowSavedCodes(true)} className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 transition-colors">
+            Load Saved Code
+          </button>
+        </div>
+      </div>
+      <div className="flex-grow flex">
+        <div className="w-1/2 h-full">
+          <PanelGroup direction="vertical">
+            {renderEditor('html', htmlCode, setHtmlCode, 'html')}
+            <PanelResizeHandle className="h-2 bg-gray-700 hover:bg-gray-600 transition-colors" />
+            {renderEditor('css', cssCode, setCssCode, 'css')}
+            <PanelResizeHandle className="h-2 bg-gray-700 hover:bg-gray-600 transition-colors" />
+            {renderEditor('js', jsCode, setJsCode, 'js')}
+          </PanelGroup>
+        </div>
+        <div className="w-1/2 h-full border-l border-gray-700">
+          <iframe
+            title="output"
+            srcDoc={output}
+            className="w-full h-full"
+            sandbox="allow-scripts"
+          />
+        </div>
+      </div>
+      {showSettings && (
+        <Settings
+          settings={settings}
+          setSettings={setSettings}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
+      {showSavedCodes && (
+        <SavedCodes
+          onClose={() => setShowSavedCodes(false)}
+          onLoad={handleLoad}
+        />
+      )}
+    </div>
   );
 };
 
