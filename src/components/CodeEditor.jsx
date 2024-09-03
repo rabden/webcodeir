@@ -3,13 +3,12 @@ import CodeMirror from '@uiw/react-codemirror';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
-import { dracula } from '@uiw/codemirror-theme-dracula';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save, FileCode2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save, FileCode2, Maximize, Minimize } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import AssetsManager from './AssetsManager';
@@ -28,8 +27,9 @@ const CodeEditor = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showSavedCodes, setShowSavedCodes] = useState(false);
   const [showAssetsManager, setShowAssetsManager] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [settings, setSettings] = useState({
-    editorTheme: 'dracula',
+    editorTheme: 'vscodeDark',
     fontSize: 14,
     autoSave: true,
     tabSize: 2,
@@ -46,7 +46,6 @@ const CodeEditor = () => {
     { name: 'Font Awesome', type: 'link', url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', enabled: false },
     { name: 'jQuery', type: 'script', url: 'https://code.jquery.com/jquery-3.6.0.min.js', enabled: false },
     { name: 'Animate.css', type: 'link', url: 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css', enabled: false },
-    // New assets
     { name: 'Tailwind CSS', type: 'link', url: 'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css', enabled: false },
     { name: 'Vue.js', type: 'script', url: 'https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js', enabled: false },
     { name: 'React', type: 'script', url: 'https://unpkg.com/react@17/umd/react.development.js', enabled: false },
@@ -65,7 +64,6 @@ const CodeEditor = () => {
   ]);
 
   const themes = {
-    dracula: dracula,
     vscodeDark: vscodeDark,
     solarizedDark: solarizedDark,
     githubDark: githubDark,
@@ -147,15 +145,27 @@ const CodeEditor = () => {
     alert('Code saved successfully!');
   };
 
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    }
+  };
+
   const renderEditor = (language, code, setCode, panel) => (
     <Panel minSize={5} defaultSize={33} collapsible={true}>
       <div className="h-full flex flex-col">
-        <div className="bg-[#2d2d2d] p-2 flex items-center justify-between sticky top-0 z-10">
+        <div className="bg-[#1e1e1e] p-2 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center">
             <div className={`w-4 h-4 rounded-full mr-2 ${language === 'html' ? 'bg-[#ff5f56]' : language === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
             <span className="text-sm font-semibold">{language.toUpperCase()}</span>
           </div>
-          <button onClick={() => togglePanel(panel)} className="p-1 hover:bg-[#3a3a3a] rounded">
+          <button onClick={() => togglePanel(panel)} className="p-1 hover:bg-[#2d2d2d] rounded transition-colors duration-200">
             {collapsedPanels[panel] ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
         </div>
@@ -186,43 +196,49 @@ const CodeEditor = () => {
 
   return (
     <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
-      <header className="bg-black p-2 flex justify-between items-center">
+      <header className="bg-[#252526] p-2 flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          <div className="w-6 h-6 bg-white rounded-sm"></div>
+          <div className="w-6 h-6 bg-[#0078d4] rounded-sm"></div>
           <input
             type="text"
             value={currentCodeName}
             onChange={(e) => setCurrentCodeName(e.target.value)}
             className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white"
           />
-          <div className="text-sm ml-4">
+          <div className="text-sm ml-4 text-gray-400">
             Preview width: {previewWidth}px
           </div>
         </div>
         <div className="flex items-center space-x-2">
           <button
             onClick={saveCurrentCode}
-            className="p-2 rounded-full hover:bg-gray-800"
+            className="p-2 rounded-full hover:bg-[#3c3c3c] transition-colors duration-200"
           >
             <Save className="w-5 h-5" />
           </button>
           <button
             onClick={() => setShowSavedCodes(!showSavedCodes)}
-            className="p-2 rounded-full hover:bg-gray-800"
+            className="p-2 rounded-full hover:bg-[#3c3c3c] transition-colors duration-200"
           >
             Saved Codes
           </button>
           <button
             onClick={() => setShowAssetsManager(!showAssetsManager)}
-            className="p-2 rounded-full hover:bg-gray-800"
+            className="p-2 rounded-full hover:bg-[#3c3c3c] transition-colors duration-200"
           >
             <FileCode2 className="w-5 h-5" />
           </button>
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="p-2 rounded-full hover:bg-gray-800"
+            className="p-2 rounded-full hover:bg-[#3c3c3c] transition-colors duration-200"
           >
             <SettingsIcon className="w-5 h-5" />
+          </button>
+          <button
+            onClick={toggleFullscreen}
+            className="p-2 rounded-full hover:bg-[#3c3c3c] transition-colors duration-200"
+          >
+            {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
           </button>
         </div>
       </header>
@@ -236,15 +252,15 @@ const CodeEditor = () => {
               sandbox="allow-scripts"
             />
           </Panel>
-          <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-            <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+          <PanelResizeHandle className="w-2 bg-[#2d2d2d] hover:bg-[#3c3c3c] transition-colors duration-200 relative group">
+            <div className="absolute inset-y-0 left-1/2 w-0.5 bg-[#4a4a4a] group-hover:bg-[#6a6a6a] transition-colors duration-200"></div>
           </PanelResizeHandle>
           <Panel minSize={0} defaultSize={50}>
             <PanelGroup direction="vertical">
               {renderEditor('html', htmlCode, setHtmlCode, 'html')}
-              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              <PanelResizeHandle className="h-1 bg-[#2d2d2d] hover:bg-[#3c3c3c] transition-colors duration-200" />
               {renderEditor('css', cssCode, setCssCode, 'css')}
-              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              <PanelResizeHandle className="h-1 bg-[#2d2d2d] hover:bg-[#3c3c3c] transition-colors duration-200" />
               {renderEditor('js', jsCode, setJsCode, 'js')}
             </PanelGroup>
           </Panel>
