@@ -98,10 +98,12 @@ const CodeEditor = () => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+                <PanelResizeHandle className="w-4 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+                  <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+                </PanelResizeHandle>
               </TooltipTrigger>
-              <TooltipContent side="top">
-                <p>Preview width: {previewWidth}px</p>
+              <TooltipContent side="top" className="bg-black text-white px-2 py-1 text-xs rounded">
+                Preview width: {previewWidth}px
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
