@@ -53,7 +53,7 @@ const CodeEditor = () => {
   };
 
   const renderEditor = (language, code, setCode, panel) => (
-    <Panel minSize={0} defaultSize={33} collapsible={true}>
+    <Panel minSize={5} defaultSize={33} collapsible={true}>
       <div className="h-full flex flex-col">
         <div className="bg-[#2d2d2d] p-2 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center">
@@ -64,17 +64,15 @@ const CodeEditor = () => {
             {collapsedPanels[panel] ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
         </div>
-        {!collapsedPanels[panel] && (
-          <div className="flex-grow overflow-auto">
-            <CodeMirror
-              value={code}
-              height="100%"
-              theme={dracula}
-              extensions={[language === 'html' ? html() : language === 'css' ? css() : javascript()]}
-              onChange={(value) => setCode(value)}
-            />
-          </div>
-        )}
+        <div className={`flex-grow overflow-auto transition-all duration-300 ${collapsedPanels[panel] ? 'h-0' : 'h-auto'}`}>
+          <CodeMirror
+            value={code}
+            height="100%"
+            theme={dracula}
+            extensions={[language === 'html' ? html() : language === 'css' ? css() : javascript()]}
+            onChange={(value) => setCode(value)}
+          />
+        </div>
       </div>
     </Panel>
   );
