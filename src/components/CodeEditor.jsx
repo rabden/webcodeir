@@ -12,6 +12,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
+import { autocompletion } from '@codemirror/autocomplete';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -129,7 +130,10 @@ const CodeEditor = () => {
             value={code}
             height="100%"
             theme={themes[settings.editorTheme]}
-            extensions={[language === 'html' ? html() : language === 'css' ? css() : javascript()]}
+            extensions={[
+              language === 'html' ? html() : language === 'css' ? css() : javascript(),
+              autocompletion()
+            ]}
             onChange={(value) => setCode(value)}
             style={{ fontSize: `${settings.fontSize}px` }}
             basicSetup={{
