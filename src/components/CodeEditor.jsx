@@ -33,6 +33,7 @@ const CodeEditor = () => {
     autoCloseBrackets: 'always',
     highlightActiveLine: true,
   });
+  const [currentCodeName, setCurrentCodeName] = useState('Untitled');
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -69,17 +70,18 @@ const CodeEditor = () => {
   };
 
   const saveToLocalStorage = () => {
-    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings }));
+    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName }));
   };
 
   const loadFromLocalStorage = () => {
     const savedState = localStorage.getItem('codeEditorState');
     if (savedState) {
-      const { htmlCode, cssCode, jsCode, settings: savedSettings } = JSON.parse(savedState);
+      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
       setHtmlCode(htmlCode);
       setCssCode(cssCode);
       setJsCode(jsCode);
       setSettings(savedSettings);
+      setCurrentCodeName(currentCodeName || 'Untitled');
     }
   };
 
@@ -87,7 +89,7 @@ const CodeEditor = () => {
     const savedCodes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
     const newSavedCode = {
       id: Date.now(),
-      name: `Code ${savedCodes.length + 1}`,
+      name: currentCodeName,
       html: htmlCode,
       css: cssCode,
       js: jsCode,
@@ -140,7 +142,12 @@ const CodeEditor = () => {
       <header className={`${settings.theme === 'dark' ? 'bg-black' : 'bg-gray-200'} p-2 flex justify-between items-center`}>
         <div className="flex items-center space-x-2">
           <div className={`w-6 h-6 ${settings.theme === 'dark' ? 'bg-white' : 'bg-black'} rounded-sm`}></div>
-          <h1 className="text-lg font-semibold">Untitled</h1>
+          <input
+            type="text"
+            value={currentCodeName}
+            onChange={(e) => setCurrentCodeName(e.target.value)}
+            className={`text-lg font-semibold bg-transparent border-none focus:outline-none ${settings.theme === 'dark' ? 'text-white' : 'text-black'}`}
+          />
           <div className="text-sm ml-4">
             Preview width: {previewWidth}px
           </div>
@@ -204,6 +211,7 @@ const CodeEditor = () => {
             setHtmlCode(code.html);
             setCssCode(code.css);
             setJsCode(code.js);
+            setCurrentCodeName(code.name);
             setShowSavedCodes(false);
           }}
           theme={settings.theme}
