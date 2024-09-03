@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 
-const SavedCodes = ({ onClose, onLoad, theme }) => {
+const SavedCodes = ({ onClose, onLoad }) => {
   const [savedCodes, setSavedCodes] = useState([]);
   const [expandedCode, setExpandedCode] = useState(null);
 
@@ -44,44 +44,44 @@ const SavedCodes = ({ onClose, onLoad, theme }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className={`bg-${theme === 'dark' ? 'gray-800' : 'white'} p-6 rounded-lg shadow-lg w-[600px] max-h-[90vh] overflow-y-auto`}>
+      <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-[600px] max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>Saved Codes</h2>
-          <button onClick={onClose} className={`p-1 rounded-full ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`}>
-            <X className="w-5 h-5" />
+          <h2 className="text-xl font-bold text-white">Saved Codes</h2>
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
+            <X className="w-5 h-5 text-white" />
           </button>
         </div>
         {savedCodes.length === 0 ? (
-          <p className={`text-center ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>No saved codes yet.</p>
+          <p className="text-center text-gray-400">No saved codes yet.</p>
         ) : (
           <ul className="space-y-4">
             {savedCodes.map((code) => (
-              <li key={code.id} className={`p-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
+              <li key={code.id} className="p-4 rounded bg-gray-700">
                 <div className="flex items-center justify-between mb-2">
                   <input
                     type="text"
                     value={code.name}
                     onChange={(e) => handleRename(code.id, e.target.value)}
-                    className={`flex-grow mr-2 px-2 py-1 rounded ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}
+                    className="flex-grow mr-2 px-2 py-1 rounded bg-gray-800 text-white"
                   />
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => onLoad(code)}
-                      className={`px-2 py-1 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+                      className="px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white"
                     >
                       Load
                     </button>
                     <button
                       onClick={() => handleDelete(code.id)}
-                      className={`p-1 rounded ${theme === 'dark' ? 'hover:bg-red-700' : 'hover:bg-red-100'}`}
+                      className="p-1 rounded hover:bg-red-700"
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </button>
                     <button
                       onClick={() => toggleExpand(code.id)}
-                      className={`p-1 rounded ${theme === 'dark' ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                      className="p-1 rounded hover:bg-gray-600"
                     >
-                      {expandedCode === code.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      {expandedCode === code.id ? <ChevronUp className="w-4 h-4 text-white" /> : <ChevronDown className="w-4 h-4 text-white" />}
                     </button>
                   </div>
                 </div>
@@ -90,7 +90,7 @@ const SavedCodes = ({ onClose, onLoad, theme }) => {
                     <iframe
                       srcDoc={generatePreviewCode(code.html, code.css, code.js)}
                       title={`Preview of ${code.name}`}
-                      className="w-full aspect-video rounded border"
+                      className="w-full aspect-video rounded border border-gray-600"
                       sandbox="allow-scripts"
                     />
                   </div>
