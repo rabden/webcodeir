@@ -1,30 +1,29 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
 import { dracula } from '@uiw/codemirror-theme-dracula';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
+import { Save, Settings, Layout, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
   const [cssCode, setCssCode] = useState('');
   const [jsCode, setJsCode] = useState('');
   const [preview, setPreview] = useState('');
+  const [layout, setLayout] = useState('split');
   const [collapsedPanels, setCollapsedPanels] = useState({
     html: false,
     css: false,
     js: false,
   });
-  const [previewWidth, setPreviewWidth] = useState(0);
-  const previewPanelRef = useRef(null);
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -33,12 +32,6 @@ const CodeEditor = () => {
 
     return () => clearTimeout(debounce);
   }, [htmlCode, cssCode, jsCode]);
-
-  useEffect(() => {
-    if (previewPanelRef.current) {
-      setPreviewWidth(previewPanelRef.current.clientWidth);
-    }
-  }, []);
 
   const updatePreview = () => {
     const combinedCode = `
@@ -57,12 +50,6 @@ const CodeEditor = () => {
 
   const togglePanel = (panel) => {
     setCollapsedPanels(prev => ({ ...prev, [panel]: !prev[panel] }));
-  };
-
-  const handleResize = () => {
-    if (previewPanelRef.current) {
-      setPreviewWidth(previewPanelRef.current.clientWidth);
-    }
   };
 
   const renderEditor = (language, code, setCode, panel) => (
@@ -97,25 +84,46 @@ const CodeEditor = () => {
           <div className="w-6 h-6 bg-white rounded-sm"></div>
           <h1 className="text-lg font-semibold">Untitled</h1>
         </div>
+        <div className="flex items-center space-x-2">
+          <button className="px-3 py-1 bg-[#3a3a3a] rounded">
+            <Save className="w-4 h-4" />
+            <span className="ml-1">Save</span>
+          </button>
+          <button className="p-1 bg-[#3a3a3a] rounded">
+            <Settings className="w-4 h-4" />
+          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="p-1 bg-[#3a3a3a] rounded">
+              <Layout className="w-4 h-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={() => setLayout('split')}>
+                Split View
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setLayout('preview')}>
+                Preview Only
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setLayout('code')}>
+                Code Only
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <button className="p-1 bg-[#3a3a3a] rounded">
+            <ChevronDown className="w-4 h-4" />
+          </button>
+        </div>
       </header>
       <div className="flex-grow overflow-hidden">
-        <TooltipProvider>
-          <PanelGroup direction="horizontal" className="h-full" onLayout={handleResize}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Panel minSize={0} defaultSize={50} ref={previewPanelRef}>
-                  <iframe
-                    title="preview"
-                    srcDoc={preview}
-                    className="w-full h-full border-none bg-white"
-                    sandbox="allow-scripts"
-                  />
-                </Panel>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Preview Width: {previewWidth}px</p>
-              </TooltipContent>
-            </Tooltip>
+        {layout === 'split' && (
+          <PanelGroup direction="horizontal" className="h-full">
+            <Panel minSize={0} defaultSize={50}>
+              <iframe
+                title="preview"
+                srcDoc={preview}
+                className="w-full h-full border-none bg-white"
+                sandbox="allow-scripts"
+              />
+            </Panel>
             <PanelResizeHandle className="w-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
             <Panel minSize={0} defaultSize={50}>
               <PanelGroup direction="vertical">
@@ -127,8 +135,35 @@ const CodeEditor = () => {
               </PanelGroup>
             </Panel>
           </PanelGroup>
-        </TooltipProvider>
+        )}
+        {layout === 'preview' && (
+          <iframe
+            title="preview"
+            srcDoc={preview}
+            className="w-full h-full border-none bg-white"
+            sandbox="allow-scripts"
+          />
+        )}
+        {layout === 'code' && (
+          <PanelGroup direction="vertical">
+            {renderEditor('html', htmlCode, setHtmlCode, 'html')}
+            <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+            {renderEditor('css', cssCode, setCssCode, 'css')}
+            <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+            {renderEditor('js', jsCode, setJsCode, 'js')}
+          </PanelGroup>
+        )}
       </div>
+      <footer className="bg-[#2d2d2d] p-2 flex justify-between items-center text-sm">
+        <div className="flex space-x-4">
+          <span>Console</span>
+          <span>Assets</span>
+          <span>Shortcuts</span>
+        </div>
+        <div>
+          {/* Add any additional footer content here */}
+        </div>
+      </footer>
     </div>
   );
 };
