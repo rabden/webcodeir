@@ -45,8 +45,8 @@ const AssetsManager = ({ assets, setAssets, onClose }) => {
           <X className="w-6 h-6 text-white" />
         </button>
       </div>
-      <div className="flex-grow flex">
-        <div className="w-48 bg-[#252526] p-4">
+      <div className="flex-grow flex overflow-hidden">
+        <div className="w-48 bg-[#252526] p-4 overflow-y-auto">
           <div className="mb-4">
             <h3 className="text-white mb-2">Your Files</h3>
             <span className="bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded">PRO</span>

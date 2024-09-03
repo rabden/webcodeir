@@ -4,14 +4,19 @@ import { Search } from 'lucide-react';
 const IconTab = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [icons, setIcons] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const searchIcons = async () => {
-    // For this example, we'll use a mock array of icons
-    const mockIcons = Array.from({ length: 60 }, (_, i) => ({
-      name: `icon-${i + 1}`,
-      svg: `<svg viewBox="0 0 24 24" width="24" height="24"><rect width="24" height="24" fill="white"/></svg>`
-    }));
-    setIcons(mockIcons);
+    setLoading(true);
+    // Simulating API call with setTimeout
+    setTimeout(() => {
+      const mockIcons = Array.from({ length: 60 }, (_, i) => ({
+        name: `icon-${i + 1}`,
+        svg: `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><rect width="24" height="24" /></svg>`
+      }));
+      setIcons(mockIcons.filter(icon => icon.name.includes(searchQuery.toLowerCase())));
+      setLoading(false);
+    }, 500);
   };
 
   useEffect(() => {
@@ -36,17 +41,24 @@ const IconTab = () => {
           Search
         </button>
       </div>
-      <div className="grid grid-cols-12 gap-2">
-        {icons.map((icon) => (
-          <div
-            key={icon.name}
-            className="bg-[#3a3a3a] p-2 rounded cursor-pointer hover:bg-[#4a4a4a] transition-colors"
-            onClick={() => navigator.clipboard.writeText(icon.svg)}
-          >
-            <div dangerouslySetInnerHTML={{ __html: icon.svg }} />
-          </div>
-        ))}
-      </div>
+      {loading ? (
+        <p className="text-white">Loading icons...</p>
+      ) : (
+        <div className="grid grid-cols-12 gap-2">
+          {icons.map((icon) => (
+            <div
+              key={icon.name}
+              className="bg-[#3a3a3a] p-2 rounded cursor-pointer hover:bg-[#4a4a4a] transition-colors"
+              onClick={() => navigator.clipboard.writeText(icon.svg)}
+            >
+              <div dangerouslySetInnerHTML={{ __html: icon.svg }} className="text-white" />
+            </div>
+          ))}
+        </div>
+      )}
+      {!loading && icons.length === 0 && (
+        <p className="text-white text-center">No icons found. Try a different search query.</p>
+      )}
     </div>
   );
 };
