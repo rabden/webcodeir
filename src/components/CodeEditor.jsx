@@ -5,7 +5,7 @@ import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
 import { dracula } from '@uiw/codemirror-theme-dracula';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Save, Settings, Layout, ChevronDown } from 'lucide-react';
+import { Save, Settings, Layout, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +19,11 @@ const CodeEditor = () => {
   const [jsCode, setJsCode] = useState('');
   const [preview, setPreview] = useState('');
   const [layout, setLayout] = useState('split');
+  const [collapsedPanels, setCollapsedPanels] = useState({
+    html: false,
+    css: false,
+    js: false,
+  });
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -43,62 +48,35 @@ const CodeEditor = () => {
     setPreview(combinedCode);
   };
 
-  const renderEditors = () => (
-    <PanelGroup direction="vertical">
-      <Panel minSize={10} defaultSize={33}>
-        <div className="h-full flex flex-col">
-          <div className="bg-[#2d2d2d] p-2 flex items-center sticky top-0 z-10">
-            <div className="w-4 h-4 bg-[#ff5f56] rounded-full mr-2"></div>
-            <span className="text-sm font-semibold">HTML</span>
+  const togglePanel = (panel) => {
+    setCollapsedPanels(prev => ({ ...prev, [panel]: !prev[panel] }));
+  };
+
+  const renderEditor = (language, code, setCode, panel) => (
+    <Panel minSize={0} defaultSize={33} collapsible={true}>
+      <div className="h-full flex flex-col">
+        <div className="bg-[#2d2d2d] p-2 flex items-center justify-between sticky top-0 z-10">
+          <div className="flex items-center">
+            <div className={`w-4 h-4 rounded-full mr-2 ${language === 'html' ? 'bg-[#ff5f56]' : language === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
+            <span className="text-sm font-semibold">{language.toUpperCase()}</span>
           </div>
+          <button onClick={() => togglePanel(panel)} className="p-1 hover:bg-[#3a3a3a] rounded">
+            {collapsedPanels[panel] ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+        </div>
+        {!collapsedPanels[panel] && (
           <div className="flex-grow overflow-auto">
             <CodeMirror
-              value={htmlCode}
+              value={code}
               height="100%"
               theme={dracula}
-              extensions={[html()]}
-              onChange={(value) => setHtmlCode(value)}
+              extensions={[language === 'html' ? html() : language === 'css' ? css() : javascript()]}
+              onChange={(value) => setCode(value)}
             />
           </div>
-        </div>
-      </Panel>
-      <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-      <Panel minSize={10} defaultSize={33}>
-        <div className="h-full flex flex-col">
-          <div className="bg-[#2d2d2d] p-2 flex items-center sticky top-0 z-10">
-            <div className="w-4 h-4 bg-[#27c93f] rounded-full mr-2"></div>
-            <span className="text-sm font-semibold">CSS</span>
-          </div>
-          <div className="flex-grow overflow-auto">
-            <CodeMirror
-              value={cssCode}
-              height="100%"
-              theme={dracula}
-              extensions={[css()]}
-              onChange={(value) => setCssCode(value)}
-            />
-          </div>
-        </div>
-      </Panel>
-      <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-      <Panel minSize={10} defaultSize={33}>
-        <div className="h-full flex flex-col">
-          <div className="bg-[#2d2d2d] p-2 flex items-center sticky top-0 z-10">
-            <div className="w-4 h-4 bg-[#ffbd2e] rounded-full mr-2"></div>
-            <span className="text-sm font-semibold">JS</span>
-          </div>
-          <div className="flex-grow overflow-auto">
-            <CodeMirror
-              value={jsCode}
-              height="100%"
-              theme={dracula}
-              extensions={[javascript()]}
-              onChange={(value) => setJsCode(value)}
-            />
-          </div>
-        </div>
-      </Panel>
-    </PanelGroup>
+        )}
+      </div>
+    </Panel>
   );
 
   return (
@@ -150,7 +128,13 @@ const CodeEditor = () => {
             </Panel>
             <PanelResizeHandle className="w-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
             <Panel minSize={0} defaultSize={50}>
-              {renderEditors()}
+              <PanelGroup direction="vertical">
+                {renderEditor('html', htmlCode, setHtmlCode, 'html')}
+                <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+                {renderEditor('css', cssCode, setCssCode, 'css')}
+                <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+                {renderEditor('js', jsCode, setJsCode, 'js')}
+              </PanelGroup>
             </Panel>
           </PanelGroup>
         )}
@@ -162,7 +146,15 @@ const CodeEditor = () => {
             sandbox="allow-scripts"
           />
         )}
-        {layout === 'code' && renderEditors()}
+        {layout === 'code' && (
+          <PanelGroup direction="vertical">
+            {renderEditor('html', htmlCode, setHtmlCode, 'html')}
+            <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+            {renderEditor('css', cssCode, setCssCode, 'css')}
+            <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+            {renderEditor('js', jsCode, setJsCode, 'js')}
+          </PanelGroup>
+        )}
       </div>
       <footer className="bg-[#2d2d2d] p-2 flex justify-between items-center text-sm">
         <div className="flex space-x-4">
