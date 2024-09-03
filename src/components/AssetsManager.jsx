@@ -35,21 +35,21 @@ const AssetsManager = ({ assets, setAssets, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-95 flex flex-col z-50">
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-95 flex flex-col z-50 overflow-hidden">
       <div className="flex justify-between items-center p-4 bg-gray-800">
         <h2 className="text-2xl font-bold text-white">Asset Manager</h2>
         <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-700 transition-colors">
           <X className="w-6 h-6 text-white" />
         </button>
       </div>
-      <div className="flex-grow flex flex-col">
+      <div className="flex-grow flex flex-col overflow-hidden">
         <div className="bg-gray-800 p-2">
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-gray-700 text-white'
                     : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white'

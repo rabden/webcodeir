@@ -4,15 +4,30 @@ import { Search } from 'lucide-react';
 const ImageTab = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const searchImages = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const response = await fetch(`https://api.unsplash.com/search/photos?query=${searchQuery}&client_id=YOUR_UNSPLASH_ACCESS_KEY`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch images');
+      }
       const data = await response.json();
       setImages(data.results);
     } catch (error) {
       console.error('Error fetching images:', error);
+      setError('Failed to load images. Please try again.');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const copyImageLink = (url) => {
+    navigator.clipboard.writeText(url);
+    alert('Image link copied to clipboard!');
   };
 
   return (
@@ -32,13 +47,15 @@ const ImageTab = () => {
           <Search className="w-5 h-5" />
         </button>
       </div>
+      {loading && <p className="text-white">Loading...</p>}
+      {error && <p className="text-red-500">{error}</p>}
       <div className="grid grid-cols-3 gap-4">
         {images.map((image) => (
           <div key={image.id} className="relative group">
             <img src={image.urls.small} alt={image.alt_description} className="w-full h-48 object-cover rounded" />
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <button
-                onClick={() => navigator.clipboard.writeText(image.urls.full)}
+                onClick={() => copyImageLink(image.urls.full)}
                 className="px-3 py-1 bg-white text-black rounded text-sm font-medium hover:bg-gray-200 transition-colors"
               >
                 Copy Link
