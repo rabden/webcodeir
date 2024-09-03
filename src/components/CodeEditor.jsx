@@ -5,8 +5,9 @@ import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
 import { dracula } from '@uiw/codemirror-theme-dracula';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save } from 'lucide-react';
 import Settings from './Settings';
+import SavedCodes from './SavedCodes';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -20,6 +21,7 @@ const CodeEditor = () => {
     js: false,
   });
   const [showSettings, setShowSettings] = useState(false);
+  const [showSavedCodes, setShowSavedCodes] = useState(false);
   const [settings, setSettings] = useState({
     theme: 'dark',
     fontSize: 14,
@@ -81,6 +83,21 @@ const CodeEditor = () => {
     }
   };
 
+  const saveCurrentCode = () => {
+    const savedCodes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
+    const newSavedCode = {
+      id: Date.now(),
+      name: `Code ${savedCodes.length + 1}`,
+      html: htmlCode,
+      css: cssCode,
+      js: jsCode,
+      date: new Date().toISOString(),
+    };
+    savedCodes.push(newSavedCode);
+    localStorage.setItem('savedCodes', JSON.stringify(savedCodes));
+    alert('Code saved successfully!');
+  };
+
   const renderEditor = (language, code, setCode, panel) => (
     <Panel minSize={5} defaultSize={33} collapsible={true}>
       <div className="h-full flex flex-col">
@@ -128,12 +145,26 @@ const CodeEditor = () => {
             Preview width: {previewWidth}px
           </div>
         </div>
-        <button
-          onClick={() => setShowSettings(!showSettings)}
-          className={`p-2 rounded-full ${settings.theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-300'}`}
-        >
-          <SettingsIcon className="w-5 h-5" />
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={saveCurrentCode}
+            className={`p-2 rounded-full ${settings.theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-300'}`}
+          >
+            <Save className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setShowSavedCodes(!showSavedCodes)}
+            className={`p-2 rounded-full ${settings.theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-300'}`}
+          >
+            Saved Codes
+          </button>
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className={`p-2 rounded-full ${settings.theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-300'}`}
+          >
+            <SettingsIcon className="w-5 h-5" />
+          </button>
+        </div>
       </header>
       <div className="flex-grow overflow-hidden">
         <PanelGroup direction="horizontal" className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
@@ -164,6 +195,18 @@ const CodeEditor = () => {
           settings={settings}
           setSettings={setSettings}
           onClose={() => setShowSettings(false)}
+        />
+      )}
+      {showSavedCodes && (
+        <SavedCodes
+          onClose={() => setShowSavedCodes(false)}
+          onLoad={(code) => {
+            setHtmlCode(code.html);
+            setCssCode(code.css);
+            setJsCode(code.js);
+            setShowSavedCodes(false);
+          }}
+          theme={settings.theme}
         />
       )}
     </div>
