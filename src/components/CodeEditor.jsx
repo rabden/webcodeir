@@ -24,6 +24,12 @@ const CodeEditor = () => {
     theme: 'dark',
     fontSize: 14,
     autoSave: true,
+    tabSize: 2,
+    lineNumbers: true,
+    wordWrap: false,
+    indentWithTabs: true,
+    autoCloseBrackets: 'always',
+    highlightActiveLine: true,
   });
 
   useEffect(() => {
@@ -95,6 +101,17 @@ const CodeEditor = () => {
             extensions={[language === 'html' ? html() : language === 'css' ? css() : javascript()]}
             onChange={(value) => setCode(value)}
             style={{ fontSize: `${settings.fontSize}px` }}
+            basicSetup={{
+              lineNumbers: settings.lineNumbers,
+              foldGutter: false,
+              dropCursor: false,
+              allowMultipleSelections: false,
+              indentOnInput: false,
+              tabSize: settings.tabSize,
+              highlightActiveLine: settings.highlightActiveLine,
+            }}
+            indentWithTab={settings.indentWithTabs}
+            autoCloseBrackets={settings.autoCloseBrackets === 'always'}
           />
         </div>
       </div>
