@@ -4,6 +4,10 @@ import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
 import { dracula } from '@uiw/codemirror-theme-dracula';
+import { vscodeDark } from '@uiw/codemirror-theme-vscode';
+import { solarizedDark } from '@uiw/codemirror-theme-solarized';
+import { githubDark } from '@uiw/codemirror-theme-github';
+import { monokaiTheme } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save } from 'lucide-react';
 import Settings from './Settings';
@@ -23,7 +27,7 @@ const CodeEditor = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showSavedCodes, setShowSavedCodes] = useState(false);
   const [settings, setSettings] = useState({
-    theme: 'dark',
+    editorTheme: 'dracula',
     fontSize: 14,
     autoSave: true,
     tabSize: 2,
@@ -100,6 +104,23 @@ const CodeEditor = () => {
     alert('Code saved successfully!');
   };
 
+  const getTheme = () => {
+    switch (settings.editorTheme) {
+      case 'vscode':
+        return vscodeDark;
+      case 'dracula':
+        return dracula;
+      case 'solarized':
+        return solarizedDark;
+      case 'github':
+        return githubDark;
+      case 'monokai':
+        return monokaiTheme;
+      default:
+        return dracula;
+    }
+  };
+
   const renderEditor = (language, code, setCode, panel) => (
     <Panel minSize={5} defaultSize={33} collapsible={true}>
       <div className="h-full flex flex-col">
@@ -116,7 +137,7 @@ const CodeEditor = () => {
           <CodeMirror
             value={code}
             height="100%"
-            theme={dracula}
+            theme={getTheme()}
             extensions={[language === 'html' ? html() : language === 'css' ? css() : javascript()]}
             onChange={(value) => setCode(value)}
             style={{ fontSize: `${settings.fontSize}px` }}
@@ -138,15 +159,15 @@ const CodeEditor = () => {
   );
 
   return (
-    <div className={`h-screen flex flex-col ${settings.theme === 'dark' ? 'bg-[#1e1e1e] text-white' : 'bg-white text-black'}`}>
-      <header className={`${settings.theme === 'dark' ? 'bg-black' : 'bg-gray-200'} p-2 flex justify-between items-center`}>
+    <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
+      <header className="bg-black p-2 flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          <div className={`w-6 h-6 ${settings.theme === 'dark' ? 'bg-white' : 'bg-black'} rounded-sm`}></div>
+          <div className="w-6 h-6 bg-white rounded-sm"></div>
           <input
             type="text"
             value={currentCodeName}
             onChange={(e) => setCurrentCodeName(e.target.value)}
-            className={`text-lg font-semibold bg-transparent border-none focus:outline-none ${settings.theme === 'dark' ? 'text-white' : 'text-black'}`}
+            className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white"
           />
           <div className="text-sm ml-4">
             Preview width: {previewWidth}px
@@ -155,19 +176,19 @@ const CodeEditor = () => {
         <div className="flex items-center space-x-2">
           <button
             onClick={saveCurrentCode}
-            className={`p-2 rounded-full ${settings.theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-300'}`}
+            className="p-2 rounded-full hover:bg-gray-800"
           >
             <Save className="w-5 h-5" />
           </button>
           <button
             onClick={() => setShowSavedCodes(!showSavedCodes)}
-            className={`p-2 rounded-full ${settings.theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-300'}`}
+            className="p-2 rounded-full hover:bg-gray-800"
           >
             Saved Codes
           </button>
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className={`p-2 rounded-full ${settings.theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-300'}`}
+            className="p-2 rounded-full hover:bg-gray-800"
           >
             <SettingsIcon className="w-5 h-5" />
           </button>
@@ -214,7 +235,6 @@ const CodeEditor = () => {
             setCurrentCodeName(code.name);
             setShowSavedCodes(false);
           }}
-          theme={settings.theme}
         />
       )}
     </div>
