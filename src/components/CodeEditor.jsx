@@ -9,38 +9,36 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save, Terminal } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
-import { autocompletion } from '@codemirror/autocomplete';
-import Console from './Console';
+import { autocompletion, completionKeymap } from '@codemirror/autocomplete';
+import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
+import { lintKeymap } from '@codemirror/lint';
+import { indentOnInput } from '@codemirror/language';
+import { EditorState } from '@codemirror/state';
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
   const [cssCode, setCssCode] = useState('');
   const [jsCode, setJsCode] = useState('');
-  const [preview, setPreview] = useState('');
-  const [previewWidth, setPreviewWidth] = useState(0);
-  const [collapsedPanels, setCollapsedPanels] = useState({
-    html: false,
-    css: false,
-    js: false,
-  });
+  const [output, setOutput] = useState('');
+  const [collapsedPanels, setCollapsedPanels] = useState({ html: false, css: false, js: false });
   const [showSettings, setShowSettings] = useState(false);
   const [showSavedCodes, setShowSavedCodes] = useState(false);
-  const [showConsole, setShowConsole] = useState(false);
   const [settings, setSettings] = useState({
     editorTheme: 'dracula',
     fontSize: 14,
     autoSave: true,
     tabSize: 2,
     lineNumbers: true,
-    wordWrap: false,
+    wordWrap: true,
     indentWithTabs: true,
     autoCloseBrackets: 'always',
     highlightActiveLine: true,
   });
-  const [currentCodeName, setCurrentCodeName] = useState('Untitled');
 
   const themes = {
     dracula: dracula,
@@ -51,68 +49,63 @@ const CodeEditor = () => {
   };
 
   useEffect(() => {
-    const debounce = setTimeout(() => {
-      updatePreview();
-      if (settings.autoSave) {
-        saveToLocalStorage();
-      }
-    }, 300);
-
-    return () => clearTimeout(debounce);
-  }, [htmlCode, cssCode, jsCode, settings.autoSave]);
-
-  useEffect(() => {
-    loadFromLocalStorage();
+    const savedSettings = JSON.parse(localStorage.getItem('editorSettings'));
+    if (savedSettings) {
+      setSettings(savedSettings);
+    }
   }, []);
 
-  const updatePreview = () => {
-    const combinedCode = `
-      <html>
-        <head>
-          <style>${cssCode}</style>
-        </head>
-        <body>
-          ${htmlCode}
-          <script>${jsCode}</script>
-        </body>
-      </html>
-    `;
-    setPreview(combinedCode);
-  };
+  useEffect(() => {
+    localStorage.setItem('editorSettings', JSON.stringify(settings));
+  }, [settings]);
 
-  const togglePanel = (panel) => {
-    setCollapsedPanels(prev => ({ ...prev, [panel]: !prev[panel] }));
-  };
-
-  const saveToLocalStorage = () => {
-    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName }));
-  };
-
-  const loadFromLocalStorage = () => {
-    const savedState = localStorage.getItem('codeEditorState');
-    if (savedState) {
-      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
-      setHtmlCode(htmlCode);
-      setCssCode(cssCode);
-      setJsCode(jsCode);
-      setSettings(savedSettings);
-      setCurrentCodeName(currentCodeName || 'Untitled');
+  useEffect(() => {
+    if (settings.autoSave) {
+      const timer = setTimeout(() => {
+        updateOutput();
+      }, 1000);
+      return () => clearTimeout(timer);
     }
+  }, [htmlCode, cssCode, jsCode, settings.autoSave]);
+
+  const createLanguageExtensions = (language) => {
+    const languageSupport = language === 'html' ? html() : language === 'css' ? css() : javascript();
+    return [
+      languageSupport,
+      autocompletion(),
+      closeBrackets(),
+      indentOnInput(),
+      syntaxHighlighting(defaultHighlightStyle),
+      EditorState.tabSize.of(settings.tabSize),
+      EditorState.phrases.of({
+        "Ctrl-Space": "Trigger autocompletion",
+        "Ctrl-/": "Toggle comment",
+        "Cmd-/": "Toggle comment",
+        "Shift-Alt-A": "Toggle block comment",
+      }),
+    ];
   };
 
-  const saveCurrentCode = () => {
-    const savedCodes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
-    const newSavedCode = {
-      id: Date.now(),
-      name: currentCodeName,
-      html: htmlCode,
-      css: cssCode,
-      js: jsCode,
-      date: new Date().toISOString(),
-    };
-    savedCodes.push(newSavedCode);
-    localStorage.setItem('savedCodes', JSON.stringify(savedCodes));
-    alert('Code saved successfully!');
+  const editorSetup = {
+    lineNumbers: settings.lineNumbers,
+    foldGutter: true,
+    dropCursor: true,
+    allowMultipleSelections: true,
+    indentOnInput: true,
+    bracketMatching: true,
+    closeBrackets: settings.autoCloseBrackets === 'always',
+    autocompletion: true,
+    rectangularSelection: true,
+    crosshairCursor: true,
+    highlightActiveLine: settings.highlightActiveLine,
+    highlightSelectionMatches: true,
+    closeBracketsKeymap: true,
+    defaultKeymap: true,
+    searchKeymap: true,
+    historyKeymap: true,
+    foldKeymap: true,
+    completionKeymap: true,
+    lintKeymap: true,
   };
 
   const renderEditor = (language, code, setCode, panel) => (
@@ -132,94 +125,90 @@ const CodeEditor = () => {
             value={code}
             height="100%"
             theme={themes[settings.editorTheme]}
-            extensions={[
-              language === 'html' ? html() : language === 'css' ? css() : javascript(),
-              autocompletion()
-            ]}
+            extensions={createLanguageExtensions(language)}
             onChange={(value) => setCode(value)}
             style={{ fontSize: `${settings.fontSize}px` }}
-            basicSetup={{
-              lineNumbers: settings.lineNumbers,
-              foldGutter: false,
-              dropCursor: false,
-              allowMultipleSelections: false,
-              indentOnInput: false,
-              tabSize: settings.tabSize,
-              highlightActiveLine: settings.highlightActiveLine,
-            }}
+            basicSetup={editorSetup}
             indentWithTab={settings.indentWithTabs}
-            autoCloseBrackets={settings.autoCloseBrackets === 'always'}
           />
         </div>
       </div>
     </Panel>
   );
 
+  const togglePanel = (panel) => {
+    setCollapsedPanels(prev => ({ ...prev, [panel]: !prev[panel] }));
+  };
+
+  const updateOutput = () => {
+    const combinedOutput = `
+      <html>
+        <head>
+          <style>${cssCode}</style>
+        </head>
+        <body>
+          ${htmlCode}
+          <script>${jsCode}</script>
+        </body>
+      </html>
+    `;
+    setOutput(combinedOutput);
+  };
+
+  const handleSave = () => {
+    const savedCodes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
+    const newCode = {
+      id: Date.now(),
+      name: `Code ${savedCodes.length + 1}`,
+      html: htmlCode,
+      css: cssCode,
+      js: jsCode,
+    };
+    savedCodes.push(newCode);
+    localStorage.setItem('savedCodes', JSON.stringify(savedCodes));
+  };
+
+  const handleLoad = (code) => {
+    setHtmlCode(code.html);
+    setCssCode(code.css);
+    setJsCode(code.js);
+    setShowSavedCodes(false);
+  };
+
   return (
-    <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
-      <header className="bg-black p-2 flex justify-between items-center">
-        <div className="flex items-center space-x-2">
-          <div className="w-6 h-6 bg-white rounded-sm"></div>
-          <input
-            type="text"
-            value={currentCodeName}
-            onChange={(e) => setCurrentCodeName(e.target.value)}
-            className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white"
-          />
-          <div className="text-sm ml-4">
-            Preview width: {previewWidth}px
-          </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={saveCurrentCode}
-            className="p-2 rounded-full hover:bg-gray-800"
-          >
-            <Save className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => setShowSavedCodes(!showSavedCodes)}
-            className="p-2 rounded-full hover:bg-gray-800"
-          >
-            Saved Codes
-          </button>
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="p-2 rounded-full hover:bg-gray-800"
-          >
+    <div className="h-screen flex flex-col bg-gray-900 text-white">
+      <div className="flex justify-between items-center p-4 bg-gray-800">
+        <h1 className="text-2xl font-bold">Code Editor</h1>
+        <div className="flex space-x-4">
+          <button onClick={() => setShowSettings(true)} className="p-2 rounded hover:bg-gray-700 transition-colors">
             <SettingsIcon className="w-5 h-5" />
           </button>
-          <button
-            onClick={() => setShowConsole(!showConsole)}
-            className="p-2 rounded-full hover:bg-gray-800"
-          >
-            <Terminal className="w-5 h-5" />
+          <button onClick={handleSave} className="p-2 rounded hover:bg-gray-700 transition-colors">
+            <Save className="w-5 h-5" />
+          </button>
+          <button onClick={() => setShowSavedCodes(true)} className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 transition-colors">
+            Load Saved Code
           </button>
         </div>
-      </header>
-      <div className="flex-grow overflow-hidden">
-        <PanelGroup direction="horizontal" className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
-          <Panel minSize={0} defaultSize={50}>
-            <iframe
-              title="preview"
-              srcDoc={preview}
-              className="w-full h-full border-none bg-white"
-              sandbox="allow-scripts"
-            />
-          </Panel>
-          <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-            <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-          </PanelResizeHandle>
-          <Panel minSize={0} defaultSize={50}>
-            <PanelGroup direction="vertical">
-              {renderEditor('html', htmlCode, setHtmlCode, 'html')}
-              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-              {renderEditor('css', cssCode, setCssCode, 'css')}
-              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-              {renderEditor('js', jsCode, setJsCode, 'js')}
-            </PanelGroup>
-          </Panel>
-        </PanelGroup>
+      </div>
+      <div className="flex-grow flex">
+        <div className="w-1/2 h-full">
+          <PanelGroup direction="vertical">
+            {renderEditor('html', htmlCode, setHtmlCode, 'html')}
+            <PanelResizeHandle className="h-2 bg-gray-700 hover:bg-gray-600 transition-colors" />
+            {renderEditor('css', cssCode, setCssCode, 'css')}
+            <PanelResizeHandle className="h-2 bg-gray-700 hover:bg-gray-600 transition-colors" />
+            {renderEditor('js', jsCode, setJsCode, 'js')}
+          </PanelGroup>
+        </div>
+        <div className="w-1/2 h-full border-l border-gray-700">
+          <iframe
+            title="output"
+            srcDoc={output}
+            className="w-full h-full"
+            sandbox="allow-scripts"
+          />
+        </div>
       </div>
       {showSettings && (
         <Settings
@@ -231,16 +220,9 @@ const CodeEditor = () => {
       {showSavedCodes && (
         <SavedCodes
           onClose={() => setShowSavedCodes(false)}
-          onLoad={(code) => {
-            setHtmlCode(code.html);
-            setCssCode(code.css);
-            setJsCode(code.js);
-            setCurrentCodeName(code.name);
-            setShowSavedCodes(false);
-          }}
+          onLoad={handleLoad}
         />
       )}
-      <Console show={showConsole} onClose={() => setShowConsole(false)} />
     </div>
   );
 };
