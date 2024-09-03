@@ -46,6 +46,22 @@ const CodeEditor = () => {
     { name: 'Font Awesome', type: 'link', url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', enabled: false },
     { name: 'jQuery', type: 'script', url: 'https://code.jquery.com/jquery-3.6.0.min.js', enabled: false },
     { name: 'Animate.css', type: 'link', url: 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css', enabled: false },
+    // New assets
+    { name: 'Tailwind CSS', type: 'link', url: 'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css', enabled: false },
+    { name: 'Vue.js', type: 'script', url: 'https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js', enabled: false },
+    { name: 'React', type: 'script', url: 'https://unpkg.com/react@17/umd/react.development.js', enabled: false },
+    { name: 'React DOM', type: 'script', url: 'https://unpkg.com/react-dom@17/umd/react-dom.development.js', enabled: false },
+    { name: 'Alpine.js', type: 'script', url: 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js', enabled: false },
+    { name: 'Lodash', type: 'script', url: 'https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js', enabled: false },
+    { name: 'Axios', type: 'script', url: 'https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js', enabled: false },
+    { name: 'Moment.js', type: 'script', url: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js', enabled: false },
+    { name: 'Chart.js', type: 'script', url: 'https://cdn.jsdelivr.net/npm/chart.js', enabled: false },
+    { name: 'Normalize.css', type: 'link', url: 'https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css', enabled: false },
+    { name: 'Bulma CSS', type: 'link', url: 'https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css', enabled: false },
+    { name: 'Three.js', type: 'script', url: 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', enabled: false },
+    { name: 'D3.js', type: 'script', url: 'https://d3js.org/d3.v7.min.js', enabled: false },
+    { name: 'Anime.js', type: 'script', url: 'https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js', enabled: false },
+    { name: 'Materialize CSS', type: 'link', url: 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css', enabled: false },
   ]);
 
   const themes = {
