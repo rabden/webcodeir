@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 
 const ImageTab = () => {
@@ -6,6 +6,12 @@ const ImageTab = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (searchQuery) {
+      searchImages();
+    }
+  }, [searchQuery]);
 
   const searchImages = async () => {
     setLoading(true);
@@ -16,7 +22,7 @@ const ImageTab = () => {
         throw new Error('Failed to fetch images');
       }
       const data = await response.json();
-      setImages(data.results);
+      setImages(data.results || []);
     } catch (error) {
       console.error('Error fetching images:', error);
       setError('Failed to load images. Please try again.');

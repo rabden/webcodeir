@@ -22,7 +22,7 @@ const FontTab = () => {
         throw new Error('Failed to fetch fonts');
       }
       const data = await response.json();
-      setFonts(data.items.slice(0, 20));
+      setFonts(data.items || []);
     } catch (error) {
       console.error('Error fetching fonts:', error);
       setError('Failed to load fonts. Please try again.');
