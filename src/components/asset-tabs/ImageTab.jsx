@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, RefreshCw } from 'lucide-react';
 
 const ImageTab = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -15,21 +15,32 @@ const ImageTab = () => {
     }
   };
 
+  useEffect(() => {
+    searchImages();
+  }, []);
+
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl text-white">Photos from <span className="text-blue-400">Unsplash</span>. Click to Copy.</h2>
+        <button className="bg-[#3a3a3a] text-white px-4 py-2 rounded flex items-center space-x-2">
+          <RefreshCw className="w-4 h-4" />
+          <span>See more</span>
+        </button>
+      </div>
       <div className="flex items-center space-x-2">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search images..."
-          className="flex-grow px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Search Unsplash..."
+          className="flex-grow px-4 py-2 rounded bg-[#3a3a3a] text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={searchImages}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-[#3a3a3a] text-white rounded hover:bg-[#4a4a4a] transition-colors"
         >
-          <Search className="w-5 h-5" />
+          Search
         </button>
       </div>
       <div className="grid grid-cols-3 gap-4">
