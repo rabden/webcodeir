@@ -12,6 +12,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
+import AssetsManager from './AssetsManager';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -38,6 +39,13 @@ const CodeEditor = () => {
     highlightActiveLine: true,
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
+  const [assets, setAssets] = useState([
+    { name: 'Bootstrap CSS', type: 'link', url: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css', enabled: false },
+    { name: 'Bootstrap JS', type: 'script', url: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', enabled: false },
+    { name: 'Font Awesome', type: 'link', url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', enabled: false },
+    { name: 'jQuery', type: 'script', url: 'https://code.jquery.com/jquery-3.6.0.min.js', enabled: false },
+    { name: 'Animate.css', type: 'link', url: 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css', enabled: false },
+  ]);
 
   const themes = {
     dracula: dracula,
@@ -56,16 +64,24 @@ const CodeEditor = () => {
     }, 300);
 
     return () => clearTimeout(debounce);
-  }, [htmlCode, cssCode, jsCode, settings.autoSave]);
+  }, [htmlCode, cssCode, jsCode, settings.autoSave, assets]);
 
   useEffect(() => {
     loadFromLocalStorage();
   }, []);
 
   const updatePreview = () => {
+    const enabledAssets = assets.filter(asset => asset.enabled);
+    const assetTags = enabledAssets.map(asset => 
+      asset.type === 'link' 
+        ? `<link rel="stylesheet" href="${asset.url}">`
+        : `<script src="${asset.url}"></script>`
+    ).join('\n');
+
     const combinedCode = `
       <html>
         <head>
+          ${assetTags}
           <style>${cssCode}</style>
         </head>
         <body>
@@ -82,18 +98,19 @@ const CodeEditor = () => {
   };
 
   const saveToLocalStorage = () => {
-    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName }));
+    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName, assets }));
   };
 
   const loadFromLocalStorage = () => {
     const savedState = localStorage.getItem('codeEditorState');
     if (savedState) {
-      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
+      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName, assets: savedAssets } = JSON.parse(savedState);
       setHtmlCode(htmlCode);
       setCssCode(cssCode);
       setJsCode(jsCode);
       setSettings(savedSettings);
       setCurrentCodeName(currentCodeName || 'Untitled');
+      setAssets(savedAssets || assets);
     }
   };
 
@@ -105,6 +122,7 @@ const CodeEditor = () => {
       html: htmlCode,
       css: cssCode,
       js: jsCode,
+      assets: assets,
       date: new Date().toISOString(),
     };
     savedCodes.push(newSavedCode);
@@ -205,6 +223,10 @@ const CodeEditor = () => {
               {renderEditor('css', cssCode, setCssCode, 'css')}
               <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
               {renderEditor('js', jsCode, setJsCode, 'js')}
+              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              <Panel minSize={5} defaultSize={20}>
+                <AssetsManager assets={assets} setAssets={setAssets} />
+              </Panel>
             </PanelGroup>
           </Panel>
         </PanelGroup>
@@ -224,6 +246,7 @@ const CodeEditor = () => {
             setCssCode(code.css);
             setJsCode(code.js);
             setCurrentCodeName(code.name);
+            setAssets(code.assets || assets);
             setShowSavedCodes(false);
           }}
         />
