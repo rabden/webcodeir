@@ -5,7 +5,8 @@ import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
 import { dracula } from '@uiw/codemirror-theme-dracula';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon } from 'lucide-react';
+import Settings from './Settings';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -18,14 +19,27 @@ const CodeEditor = () => {
     css: false,
     js: false,
   });
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useState({
+    theme: 'dark',
+    fontSize: 14,
+    autoSave: true,
+  });
 
   useEffect(() => {
     const debounce = setTimeout(() => {
       updatePreview();
+      if (settings.autoSave) {
+        saveToLocalStorage();
+      }
     }, 300);
 
     return () => clearTimeout(debounce);
-  }, [htmlCode, cssCode, jsCode]);
+  }, [htmlCode, cssCode, jsCode, settings.autoSave]);
+
+  useEffect(() => {
+    loadFromLocalStorage();
+  }, []);
 
   const updatePreview = () => {
     const combinedCode = `
@@ -44,6 +58,21 @@ const CodeEditor = () => {
 
   const togglePanel = (panel) => {
     setCollapsedPanels(prev => ({ ...prev, [panel]: !prev[panel] }));
+  };
+
+  const saveToLocalStorage = () => {
+    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings }));
+  };
+
+  const loadFromLocalStorage = () => {
+    const savedState = localStorage.getItem('codeEditorState');
+    if (savedState) {
+      const { htmlCode, cssCode, jsCode, settings: savedSettings } = JSON.parse(savedState);
+      setHtmlCode(htmlCode);
+      setCssCode(cssCode);
+      setJsCode(jsCode);
+      setSettings(savedSettings);
+    }
   };
 
   const renderEditor = (language, code, setCode, panel) => (
@@ -65,6 +94,7 @@ const CodeEditor = () => {
             theme={dracula}
             extensions={[language === 'html' ? html() : language === 'css' ? css() : javascript()]}
             onChange={(value) => setCode(value)}
+            style={{ fontSize: `${settings.fontSize}px` }}
           />
         </div>
       </div>
@@ -72,15 +102,21 @@ const CodeEditor = () => {
   );
 
   return (
-    <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
-      <header className="bg-black p-2 flex justify-between items-center">
+    <div className={`h-screen flex flex-col ${settings.theme === 'dark' ? 'bg-[#1e1e1e] text-white' : 'bg-white text-black'}`}>
+      <header className={`${settings.theme === 'dark' ? 'bg-black' : 'bg-gray-200'} p-2 flex justify-between items-center`}>
         <div className="flex items-center space-x-2">
-          <div className="w-6 h-6 bg-white rounded-sm"></div>
+          <div className={`w-6 h-6 ${settings.theme === 'dark' ? 'bg-white' : 'bg-black'} rounded-sm`}></div>
           <h1 className="text-lg font-semibold">Untitled</h1>
+          <div className="text-sm ml-4">
+            Preview width: {previewWidth}px
+          </div>
         </div>
-        <div className="text-sm">
-          Preview width: {previewWidth}px
-        </div>
+        <button
+          onClick={() => setShowSettings(!showSettings)}
+          className={`p-2 rounded-full ${settings.theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-300'}`}
+        >
+          <SettingsIcon className="w-5 h-5" />
+        </button>
       </header>
       <div className="flex-grow overflow-hidden">
         <PanelGroup direction="horizontal" className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
@@ -106,6 +142,13 @@ const CodeEditor = () => {
           </Panel>
         </PanelGroup>
       </div>
+      {showSettings && (
+        <Settings
+          settings={settings}
+          setSettings={setSettings}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
     </div>
   );
 };
