@@ -1,7 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 
-const Settings = ({ settings, setSettings, onClose }) => {
+const Settings = ({ settings, setSettings, onClose, themes }) => {
   const handleChange = (key, value) => {
     setSettings({ ...settings, [key]: value });
   };
@@ -23,11 +23,11 @@ const Settings = ({ settings, setSettings, onClose }) => {
               onChange={(e) => handleChange('editorTheme', e.target.value)}
               className="w-full p-2 rounded bg-gray-700 text-white border border-gray-300"
             >
-              <option value="dracula">Dracula</option>
-              <option value="vscodeDark">VS Code Dark</option>
-              <option value="solarizedDark">Solarized Dark</option>
-              <option value="githubDark">GitHub Dark</option>
-              <option value="monokai">Monokai</option>
+              {themes.map((theme) => (
+                <option key={theme} value={theme}>
+                  {theme.charAt(0).toUpperCase() + theme.slice(1)}
+                </option>
+              ))}
             </select>
           </div>
           <div>
