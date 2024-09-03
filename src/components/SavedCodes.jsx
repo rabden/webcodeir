@@ -28,6 +28,20 @@ const SavedCodes = ({ onClose, onLoad, theme }) => {
     setExpandedCode(expandedCode === id ? null : id);
   };
 
+  const generatePreviewCode = (html, css, js) => {
+    return `
+      <html>
+        <head>
+          <style>${css}</style>
+        </head>
+        <body>
+          ${html}
+          <script>${js}</script>
+        </body>
+      </html>
+    `;
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className={`bg-${theme === 'dark' ? 'gray-800' : 'white'} p-6 rounded-lg shadow-lg w-[600px] max-h-[90vh] overflow-y-auto`}>
@@ -72,10 +86,13 @@ const SavedCodes = ({ onClose, onLoad, theme }) => {
                   </div>
                 </div>
                 {expandedCode === code.id && (
-                  <div className={`mt-2 p-2 rounded ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'}`}>
-                    <pre className={`text-xs overflow-x-auto ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                      <code>{code.html}</code>
-                    </pre>
+                  <div className="mt-2">
+                    <iframe
+                      srcDoc={generatePreviewCode(code.html, code.css, code.js)}
+                      title={`Preview of ${code.name}`}
+                      className="w-full aspect-video rounded border"
+                      sandbox="allow-scripts"
+                    />
                   </div>
                 )}
               </li>
