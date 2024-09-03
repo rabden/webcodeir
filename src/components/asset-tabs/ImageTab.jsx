@@ -9,9 +9,10 @@ const ImageTab = () => {
     try {
       const response = await fetch(`https://api.unsplash.com/search/photos?query=${searchQuery}&client_id=YOUR_UNSPLASH_ACCESS_KEY`);
       const data = await response.json();
-      setImages(data.results);
+      setImages(data.results || []);
     } catch (error) {
       console.error('Error fetching images:', error);
+      setImages([]);
     }
   };
 
@@ -44,19 +45,23 @@ const ImageTab = () => {
         </button>
       </div>
       <div className="grid grid-cols-3 gap-4">
-        {images.map((image) => (
-          <div key={image.id} className="relative group">
-            <img src={image.urls.small} alt={image.alt_description} className="w-full h-48 object-cover rounded" />
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <button
-                onClick={() => navigator.clipboard.writeText(image.urls.full)}
-                className="px-3 py-1 bg-white text-black rounded text-sm font-medium hover:bg-gray-200 transition-colors"
-              >
-                Copy Link
-              </button>
+        {images && images.length > 0 ? (
+          images.map((image) => (
+            <div key={image.id} className="relative group">
+              <img src={image.urls.small} alt={image.alt_description} className="w-full h-48 object-cover rounded" />
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={() => navigator.clipboard.writeText(image.urls.full)}
+                  className="px-3 py-1 bg-white text-black rounded text-sm font-medium hover:bg-gray-200 transition-colors"
+                >
+                  Copy Link
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p className="text-white col-span-3 text-center">No images found. Try a different search query.</p>
+        )}
       </div>
     </div>
   );
