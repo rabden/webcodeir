@@ -39,6 +39,11 @@ const CodeEditor = () => {
     highlightActiveLine: true,
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
+  const [dropdownOpen, setDropdownOpen] = useState({
+    html: false,
+    css: false,
+    js: false,
+  });
 
   const themes = {
     dracula: dracula,
@@ -113,6 +118,36 @@ const CodeEditor = () => {
     alert('Code saved successfully!');
   };
 
+  const toggleDropdown = (panel) => {
+    setDropdownOpen(prev => ({ ...prev, [panel]: !prev[panel] }));
+  };
+
+  const handleDropdownAction = (action, panel) => {
+    switch (action) {
+      case 'format':
+        // Implement formatting logic
+        break;
+      case 'analyze':
+        // Implement analysis logic
+        break;
+      case 'maximize':
+        // Implement maximize logic
+        break;
+      case 'minimize':
+        togglePanel(panel);
+        break;
+      case 'foldAll':
+        // Implement fold all logic
+        break;
+      case 'unfoldAll':
+        // Implement unfold all logic
+        break;
+      default:
+        break;
+    }
+    setDropdownOpen(prev => ({ ...prev, [panel]: false }));
+  };
+
   const renderEditor = (language, code, setCode, panel) => (
     <Panel minSize={5} defaultSize={33} collapsible={true}>
       <div className="h-full flex flex-col">
@@ -121,9 +156,73 @@ const CodeEditor = () => {
             <div className={`w-4 h-4 rounded-full mr-2 ${language === 'html' ? 'bg-[#ff5f56]' : language === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
             <span className="text-sm font-semibold">{language.toUpperCase()}</span>
           </div>
-          <button onClick={() => togglePanel(panel)} className="p-1 hover:bg-[#3a3a3a] rounded">
-            {collapsedPanels[panel] ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </button>
+          <div className="flex items-center">
+            <div className="relative">
+              <button
+                onClick={() => toggleDropdown(panel)}
+                className="p-1 hover:bg-[#3a3a3a] rounded"
+              >
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              {dropdownOpen[panel] && (
+                <div className="absolute right-0 mt-2 w-48 bg-[#2d2d2d] rounded-md shadow-lg z-20">
+                  <ul className="py-1">
+                    <li>
+                      <button
+                        onClick={() => handleDropdownAction('format', panel)}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
+                      >
+                        Format {language.toUpperCase()}
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => handleDropdownAction('analyze', panel)}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
+                      >
+                        Analyze {language.toUpperCase()}
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => handleDropdownAction('maximize', panel)}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
+                      >
+                        Maximize {language.toUpperCase()} Editor
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => handleDropdownAction('minimize', panel)}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
+                      >
+                        Minimize {language.toUpperCase()} Editor
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => handleDropdownAction('foldAll', panel)}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
+                      >
+                        Fold All
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => handleDropdownAction('unfoldAll', panel)}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
+                      >
+                        Unfold All
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+            <button onClick={() => togglePanel(panel)} className="p-1 hover:bg-[#3a3a3a] rounded ml-2">
+              {collapsedPanels[panel] ? <ChevronRight className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
         <div className={`flex-grow overflow-auto transition-all duration-300 ${collapsedPanels[panel] ? 'h-0' : 'h-auto'}`}>
           <CodeMirror
