@@ -9,13 +9,14 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Settings as SettingsIcon, Save, BookOpen, Type } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
 import { autocompletion } from '@codemirror/autocomplete';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { EditorView } from '@codemirror/view';
+import { Drawer } from "@/components/ui/drawer";
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -43,6 +44,7 @@ const CodeEditor = () => {
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -143,6 +145,7 @@ const CodeEditor = () => {
             onChange={(value) => setCode(value)}
             style={{
               height: '100%',
+              fontSize: `${settings.fontSize}px`,
             }}
             className="h-full"
             basicSetup={{
@@ -241,6 +244,28 @@ const CodeEditor = () => {
     }
   };
 
+  const renderMobileMenu = () => (
+    <Drawer open={showMobileMenu} onOpenChange={setShowMobileMenu}>
+      <div className="p-4 bg-gray-800 text-white">
+        <h2 className="text-xl font-bold mb-4">Menu</h2>
+        <div className="space-y-4">
+          <button onClick={() => { saveCurrentCode(); setShowMobileMenu(false); }} className="w-full text-left py-2 px-4 hover:bg-gray-700 rounded">
+            Save Code
+          </button>
+          <button onClick={() => { setShowSavedCodes(true); setShowMobileMenu(false); }} className="w-full text-left py-2 px-4 hover:bg-gray-700 rounded">
+            Saved Codes
+          </button>
+          <button onClick={() => { setShowFontPanel(true); setShowMobileMenu(false); }} className="w-full text-left py-2 px-4 hover:bg-gray-700 rounded">
+            Font Library
+          </button>
+          <button onClick={() => { setShowSettings(true); setShowMobileMenu(false); }} className="w-full text-left py-2 px-4 hover:bg-gray-700 rounded">
+            Settings
+          </button>
+        </div>
+      </div>
+    </Drawer>
+  );
+
   return (
     <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
       <header className="bg-black p-2 flex justify-between items-center">
@@ -258,65 +283,74 @@ const CodeEditor = () => {
             </div>
           )}
         </div>
-        <div className="flex items-center space-x-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={saveCurrentCode}
-                  className="p-2 rounded-full hover:bg-gray-800"
-                >
-                  <Save className="w-5 h-5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Save current code</p>
-              </TooltipContent>
-            </Tooltip>
+        {isMobile ? (
+          <button
+            onClick={() => setShowMobileMenu(true)}
+            className="p-2 rounded-full hover:bg-gray-800"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        ) : (
+          <div className="flex items-center space-x-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={saveCurrentCode}
+                    className="p-2 rounded-full hover:bg-gray-800"
+                  >
+                    <Save className="w-5 h-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Save current code</p>
+                </TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => setShowSavedCodes(!showSavedCodes)}
-                  className="p-2 rounded-full hover:bg-gray-800"
-                >
-                  <BookOpen className="w-5 h-5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Saved Codes</p>
-              </TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setShowSavedCodes(!showSavedCodes)}
+                    className="p-2 rounded-full hover:bg-gray-800"
+                  >
+                    <BookOpen className="w-5 h-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Saved Codes</p>
+                </TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => setShowFontPanel(!showFontPanel)}
-                  className="p-2 rounded-full hover:bg-gray-800"
-                >
-                  <Type className="w-5 h-5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Font Library</p>
-              </TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setShowFontPanel(!showFontPanel)}
+                    className="p-2 rounded-full hover:bg-gray-800"
+                  >
+                    <Type className="w-5 h-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Font Library</p>
+                </TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => setShowSettings(!showSettings)}
-                  className="p-2 rounded-full hover:bg-gray-800"
-                >
-                  <SettingsIcon className="w-5 h-5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Settings</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setShowSettings(!showSettings)}
+                    className="p-2 rounded-full hover:bg-gray-800"
+                  >
+                    <SettingsIcon className="w-5 h-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Settings</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        )}
       </header>
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
@@ -326,6 +360,7 @@ const CodeEditor = () => {
           settings={settings}
           setSettings={setSettings}
           onClose={() => setShowSettings(false)}
+          isMobile={isMobile}
         />
       )}
       {showSavedCodes && (
@@ -338,11 +373,13 @@ const CodeEditor = () => {
             setCurrentCodeName(code.name);
             setShowSavedCodes(false);
           }}
+          isMobile={isMobile}
         />
       )}
       {showFontPanel && (
-        <FontPanel onClose={() => setShowFontPanel(false)} />
+        <FontPanel onClose={() => setShowFontPanel(false)} isMobile={isMobile} />
       )}
+      {renderMobileMenu()}
     </div>
   );
 };
