@@ -12,6 +12,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Settings as SettingsIcon, Save } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
+import FontPanel from './FontPanel';
 import { autocompletion } from '@codemirror/autocomplete';
 
 const CodeEditor = () => {
@@ -22,6 +23,7 @@ const CodeEditor = () => {
   const [previewWidth, setPreviewWidth] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [showSavedCodes, setShowSavedCodes] = useState(false);
+  const [showFontPanel, setShowFontPanel] = useState(false);
   const [settings, setSettings] = useState({
     editorTheme: 'dracula',
     fontSize: 14,
@@ -32,7 +34,7 @@ const CodeEditor = () => {
     indentWithTabs: true,
     autoCloseBrackets: 'always',
     highlightActiveLine: true,
-    layout: 'horizontal', // New setting for layout
+    layout: 'horizontal',
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
 
@@ -135,7 +137,6 @@ const CodeEditor = () => {
               highlightActiveLine: settings.highlightActiveLine,
             }}
             indentWithTab={settings.indentWithTabs}
-            autoCloseBrackets={settings.autoCloseBrackets === 'always'}
           />
         </div>
       </div>
@@ -225,6 +226,12 @@ const CodeEditor = () => {
             Saved Codes
           </button>
           <button
+            onClick={() => setShowFontPanel(!showFontPanel)}
+            className="p-2 rounded-full hover:bg-gray-800"
+          >
+            Fonts
+          </button>
+          <button
             onClick={() => setShowSettings(!showSettings)}
             className="p-2 rounded-full hover:bg-gray-800"
           >
@@ -253,6 +260,19 @@ const CodeEditor = () => {
             setShowSavedCodes(false);
           }}
         />
+      )}
+      {showFontPanel && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#1e1e1e] p-6 rounded-lg shadow-lg w-3/4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-white">Font Panel</h2>
+              <button onClick={() => setShowFontPanel(false)} className="text-white hover:text-gray-300">
+                Close
+              </button>
+            </div>
+            <FontPanel />
+          </div>
+        </div>
       )}
     </div>
   );
