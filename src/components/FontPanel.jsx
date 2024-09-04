@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, Copy, Check } from 'lucide-react';
+import { X, Search, Copy, Check, Eye, EyeOff } from 'lucide-react';
 
 const fonts = [
   { name: 'Lato', sample: 'The quick brown fox jumps over the lazy dog' },
@@ -17,12 +17,18 @@ const fonts = [
   { name: 'Quicksand', sample: 'The quick brown fox jumps over the lazy dog' },
   { name: 'Fira Sans', sample: 'The quick brown fox jumps over the lazy dog' },
   { name: 'Cabin', sample: 'The quick brown fox jumps over the lazy dog' },
+  { name: 'Rubik', sample: 'The quick brown fox jumps over the lazy dog' },
+  { name: 'Work Sans', sample: 'The quick brown fox jumps over the lazy dog' },
+  { name: 'Noto Sans', sample: 'The quick brown fox jumps over the lazy dog' },
+  { name: 'Mulish', sample: 'The quick brown fox jumps over the lazy dog' },
+  { name: 'Inter', sample: 'The quick brown fox jumps over the lazy dog' },
 ];
 
 const FontPanel = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedStates, setCopiedStates] = useState({});
   const [filteredFonts, setFilteredFonts] = useState(fonts);
+  const [showPreview, setShowPreview] = useState({});
 
   useEffect(() => {
     const results = fonts.filter(font =>
@@ -39,9 +45,13 @@ const FontPanel = ({ onClose }) => {
     }, 2000);
   };
 
+  const togglePreview = (fontName) => {
+    setShowPreview({ ...showPreview, [fontName]: !showPreview[fontName] });
+  };
+
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-95 flex items-center justify-center z-50">
-      <div className="w-full max-w-4xl h-full max-h-[90vh] bg-gray-800 rounded-lg shadow-xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-95 flex items-center justify-center z-50 overflow-hidden">
+      <div className="w-full max-w-6xl h-full max-h-[90vh] bg-gray-800 rounded-lg shadow-xl overflow-hidden flex flex-col">
         <div className="p-6 flex justify-between items-center border-b border-gray-700">
           <h2 className="text-3xl font-bold text-white">Font Library</h2>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-700 transition-colors">
@@ -63,8 +73,20 @@ const FontPanel = ({ onClose }) => {
         <div className="flex-grow overflow-y-auto p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredFonts.map((font) => (
             <div key={font.name} className="bg-gray-700 rounded-lg p-6 flex flex-col">
-              <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: font.name }}>{font.name}</h3>
-              <p className="text-gray-300 mb-4" style={{ fontFamily: font.name }}>{font.sample}</p>
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-xl font-bold text-white" style={{ fontFamily: font.name }}>{font.name}</h3>
+                <button
+                  onClick={() => togglePreview(font.name)}
+                  className="p-2 rounded hover:bg-gray-600 transition-colors"
+                >
+                  {showPreview[font.name] ? <EyeOff className="w-5 h-5 text-white" /> : <Eye className="w-5 h-5 text-white" />}
+                </button>
+              </div>
+              {showPreview[font.name] && (
+                <div className="mb-4 bg-gray-800 p-3 rounded">
+                  <p className="text-gray-300" style={{ fontFamily: font.name }}>{font.sample}</p>
+                </div>
+              )}
               <div className="mt-auto space-y-2">
                 {['link', 'import', 'font-family'].map((type) => (
                   <button
