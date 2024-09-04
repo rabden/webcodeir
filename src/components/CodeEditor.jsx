@@ -236,7 +236,7 @@ const CodeEditor = () => {
             onChange={(value) => setCode(value)}
             style={{
               fontSize: `${settings.fontSize}px`,
-              height: 'calc(100% - 30vh)',
+              height: '100%',
               overflowX: 'hidden',
             }}
             basicSetup={{
@@ -251,7 +251,6 @@ const CodeEditor = () => {
             indentWithTab={settings.indentWithTabs}
             autoCloseBrackets={settings.autoCloseBrackets === 'always'}
           />
-          <div style={{ height: '30vh' }}></div>
         </div>
       </div>
     </Panel>
