@@ -139,7 +139,7 @@ const CodeEditor = () => {
             extensions={[
               language === 'html' ? html() : language === 'css' ? css() : javascript(),
               autocompletion(),
-              settings.wordWrap && EditorView.lineWrapping,
+              EditorView.lineWrapping,
               EditorView.theme({
                 "&": {
                   fontSize: `${settings.fontSize}px`,
@@ -170,7 +170,6 @@ const CodeEditor = () => {
               bracketMatching: settings.matchBrackets,
             }}
             indentWithTab={settings.indentWithTabs}
-            autoCloseBrackets={settings.autoCloseBrackets === 'always'}
           />
         </div>
       </div>
