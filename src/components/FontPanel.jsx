@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, Copy, Check } from 'lucide-react';
+import { ChevronDown, ChevronUp, Copy, Check } from 'lucide-react';
 
 const fonts = [
   { name: 'Lato', sample: 'The quick brown fox jumps over the lazy dog' },
@@ -28,46 +28,59 @@ const FontPanel = () => {
   };
 
   return (
-    <div className="bg-gray-900 text-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-6">Popular Google Fonts</h2>
-      {fonts.map((font) => (
-        <div key={font.name} className="mb-6 border-b border-gray-700 pb-6 last:border-b-0 last:pb-0">
-          <div 
-            className="flex justify-between items-center cursor-pointer" 
-            onClick={() => toggleFont(font.name)}
-          >
-            <h3 className="text-xl font-bold" style={{ fontFamily: font.name }}>{font.name}</h3>
-            <ChevronDown className={`w-5 h-5 transition-transform ${expandedFont === font.name ? 'transform rotate-180' : ''}`} />
-          </div>
-          <p className="my-3 text-gray-300" style={{ fontFamily: font.name }}>{font.sample}</p>
-          {expandedFont === font.name && (
-            <div className="mt-4 space-y-3">
-              {['link', 'import', 'font-family'].map((type) => (
-                <button
-                  key={type}
-                  className="flex items-center space-x-2 text-sm bg-gray-800 hover:bg-gray-700 transition-colors px-3 py-2 rounded-md w-full"
-                  onClick={() => copyToClipboard(
-                    type === 'link' 
-                      ? `<link href="https://fonts.googleapis.com/css?family=${font.name.replace(' ', '+')}" rel="stylesheet">`
-                      : type === 'import'
-                      ? `@import url('https://fonts.googleapis.com/css?family=${font.name.replace(' ', '+')}');`
-                      : `font-family: '${font.name}', sans-serif;`,
-                    font.name,
-                    type
-                  )}
-                >
-                  {copiedStates[font.name + type] ? (
-                    <Check className="w-4 h-4 text-green-500" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                  <span>{copiedStates[font.name + type] ? 'Copied!' : `Copy ${type}`}</span>
-                </button>
-              ))}
+    <div className="w-full h-full p-6 overflow-y-auto bg-gray-900">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold text-white">Popular Google Fonts</h2>
+      </div>
+      <ul className="space-y-6">
+        {fonts.map((font) => (
+          <li key={font.name} className="p-6 rounded-lg bg-gray-800 shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-white" style={{ fontFamily: font.name }}>{font.name}</h3>
+              <button
+                onClick={() => toggleFont(font.name)}
+                className="p-2 rounded hover:bg-gray-700 transition-colors"
+              >
+                {expandedFont === font.name ? <ChevronUp className="w-5 h-5 text-white" /> : <ChevronDown className="w-5 h-5 text-white" />}
+              </button>
             </div>
-          )}
-        </div>
-      ))}
+            <p className="text-gray-300 mb-4" style={{ fontFamily: font.name }}>{font.sample}</p>
+            {expandedFont === font.name && (
+              <div className="mt-4 space-y-4">
+                {['link', 'import', 'font-family'].map((type) => (
+                  <div key={type} className="flex items-center justify-between">
+                    <span className="text-gray-400">{type}:</span>
+                    <button
+                      onClick={() => copyToClipboard(
+                        type === 'link' 
+                          ? `<link href="https://fonts.googleapis.com/css?family=${font.name.replace(' ', '+')}" rel="stylesheet">`
+                          : type === 'import'
+                          ? `@import url('https://fonts.googleapis.com/css?family=${font.name.replace(' ', '+')}');`
+                          : `font-family: '${font.name}', sans-serif;`,
+                        font.name,
+                        type
+                      )}
+                      className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center space-x-2"
+                    >
+                      {copiedStates[font.name + type] ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          <span>Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          <span>Copy</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
