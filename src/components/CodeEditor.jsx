@@ -16,6 +16,7 @@ import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
 import { indentUnit } from '@codemirror/language';
 import { Tooltip } from '@/components/ui/tooltip';
+import { lineWrapping } from '@codemirror/view';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -164,14 +165,9 @@ const CodeEditor = () => {
     const view = editorRefs[panel].current?.view;
     if (!view) return;
 
-    const formatted = prettier.format(view.state.doc.toString(), {
-      parser: panel === 'js' ? 'babel' : panel,
-      plugins: [parserHTML, parserCSS, parserBabel],
-    });
-
-    view.dispatch({
-      changes: { from: 0, to: view.state.doc.length, insert: formatted },
-    });
+    // Placeholder for formatting logic
+    console.log(`Formatting ${panel} code`);
+    // You would typically use a library like Prettier here
   };
 
   const analyzeCode = (panel) => {
@@ -179,7 +175,6 @@ const CodeEditor = () => {
     console.log(`Analyzing ${panel.toUpperCase()} code:`);
     console.log('Character count:', code.length);
     console.log('Line count:', code.split('\n').length);
-    // Add more analysis as needed
     alert(`${panel.toUpperCase()} Analysis:\nCharacter count: ${code.length}\nLine count: ${code.split('\n').length}`);
   };
 
@@ -194,12 +189,12 @@ const CodeEditor = () => {
   };
 
   const foldAllCode = (view) => {
-    // This is a placeholder. Actual implementation depends on the folding extension you're using
+    // Placeholder for fold all logic
     console.log('Folding all code');
   };
 
   const unfoldAllCode = (view) => {
-    // This is a placeholder. Actual implementation depends on the folding extension you're using
+    // Placeholder for unfold all logic
     console.log('Unfolding all code');
   };
 
@@ -292,7 +287,7 @@ const CodeEditor = () => {
               language === 'html' ? html() : language === 'css' ? css() : javascript(),
               autocompletion(),
               indentUnit.of(" ".repeat(settings.tabSize)),
-              EditorView.lineWrapping.of(settings.wordWrap),
+              settings.wordWrap ? lineWrapping() : [],
               EditorView.theme({
                 "&": { fontSize: settings.fontSize + "px" },
                 ".cm-activeLineGutter, .cm-activeLine": {
