@@ -37,6 +37,11 @@ const CodeEditor = () => {
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
   const [showEditorSettings, setShowEditorSettings] = useState({ html: false, css: false, js: false });
+  const [editorStates, setEditorStates] = useState({
+    html: { isMaximized: false, foldAll: false },
+    css: { isMaximized: false, foldAll: false },
+    js: { isMaximized: false, foldAll: false },
+  });
 
   const themes = {
     dracula: dracula,
@@ -70,13 +75,51 @@ const CodeEditor = () => {
   };
 
   const saveCurrentCode = () => {
-    // Instead of saving to localStorage, we'll just log the action for now
     console.log('Code saved:', { name: currentCodeName, html: htmlCode, css: cssCode, js: jsCode });
     alert('Code saved successfully! (Note: This is a mock save as localStorage is not available)');
   };
 
+  const handleEditorAction = (language, action) => {
+    switch (action) {
+      case 'format':
+        console.log(`Formatting ${language} code`);
+        // Implement formatting logic here
+        break;
+      case 'analyze':
+        console.log(`Analyzing ${language} code`);
+        // Implement analysis logic here
+        break;
+      case 'maximize':
+        setEditorStates(prev => ({
+          ...prev,
+          [language]: { ...prev[language], isMaximized: true }
+        }));
+        break;
+      case 'minimize':
+        setEditorStates(prev => ({
+          ...prev,
+          [language]: { ...prev[language], isMaximized: false }
+        }));
+        break;
+      case 'foldAll':
+        setEditorStates(prev => ({
+          ...prev,
+          [language]: { ...prev[language], foldAll: true }
+        }));
+        break;
+      case 'unfoldAll':
+        setEditorStates(prev => ({
+          ...prev,
+          [language]: { ...prev[language], foldAll: false }
+        }));
+        break;
+      default:
+        console.log(`Unknown action: ${action}`);
+    }
+  };
+
   const renderEditor = (language, code, setCode) => (
-    <Panel minSize={5} defaultSize={33}>
+    <Panel minSize={5} defaultSize={33} style={{ display: editorStates[language].isMaximized ? 'block' : 'flex' }}>
       <div className="h-full flex flex-col">
         <div className="bg-[#2d2d2d] p-2 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center">
@@ -103,7 +146,7 @@ const CodeEditor = () => {
             style={{ fontSize: `${settings.fontSize}px` }}
             basicSetup={{
               lineNumbers: settings.lineNumbers,
-              foldGutter: false,
+              foldGutter: true,
               dropCursor: false,
               allowMultipleSelections: false,
               indentOnInput: false,
@@ -119,6 +162,7 @@ const CodeEditor = () => {
         <EditorSettings
           onClose={() => setShowEditorSettings({ ...showEditorSettings, [language]: false })}
           language={language}
+          onAction={(action) => handleEditorAction(language, action)}
         />
       )}
     </Panel>
