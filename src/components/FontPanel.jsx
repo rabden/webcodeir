@@ -28,28 +28,25 @@ const FontPanel = () => {
   };
 
   return (
-    <div className="w-full h-full p-6 overflow-y-auto bg-gray-900">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-white">Popular Google Fonts</h2>
-      </div>
-      <ul className="space-y-6">
+    <div className="w-full h-full p-6 overflow-y-auto bg-[#1e1e1e] text-white">
+      <h2 className="text-2xl font-bold mb-6">Some popular fonts from <span className="text-blue-400">Google Fonts</span>.</h2>
+      <ul className="space-y-4">
         {fonts.map((font) => (
-          <li key={font.name} className="p-6 rounded-lg bg-gray-800 shadow-lg">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-white" style={{ fontFamily: font.name }}>{font.name}</h3>
-              <button
-                onClick={() => toggleFont(font.name)}
-                className="p-2 rounded hover:bg-gray-700 transition-colors"
-              >
-                {expandedFont === font.name ? <ChevronUp className="w-5 h-5 text-white" /> : <ChevronDown className="w-5 h-5 text-white" />}
+          <li key={font.name} className="bg-[#2d2d2d] rounded-lg overflow-hidden">
+            <div className="p-4 flex items-center justify-between cursor-pointer" onClick={() => toggleFont(font.name)}>
+              <div>
+                <h3 className="text-2xl font-bold" style={{ fontFamily: font.name }}>{font.name}</h3>
+                <p className="text-lg mt-2" style={{ fontFamily: font.name }}>{font.sample}</p>
+              </div>
+              <button className="p-2 rounded-full bg-[#3a3a3a] hover:bg-[#4a4a4a] transition-colors">
+                {expandedFont === font.name ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
               </button>
             </div>
-            <p className="text-gray-300 mb-4" style={{ fontFamily: font.name }}>{font.sample}</p>
             {expandedFont === font.name && (
-              <div className="mt-4 space-y-4">
+              <div className="bg-[#252525] p-4 space-y-2">
                 {['link', 'import', 'font-family'].map((type) => (
                   <div key={type} className="flex items-center justify-between">
-                    <span className="text-gray-400">{type}:</span>
+                    <span className="text-sm text-gray-400">Copy {type}:</span>
                     <button
                       onClick={() => copyToClipboard(
                         type === 'link' 
@@ -60,7 +57,7 @@ const FontPanel = () => {
                         font.name,
                         type
                       )}
-                      className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center space-x-2"
+                      className="px-3 py-1 rounded bg-[#3a3a3a] hover:bg-[#4a4a4a] text-sm transition-colors flex items-center space-x-1"
                     >
                       {copiedStates[font.name + type] ? (
                         <>
