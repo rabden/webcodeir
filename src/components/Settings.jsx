@@ -124,6 +124,49 @@ const Settings = ({ settings, setSettings, onClose }) => {
             <option value="vertical">Editors on Left</option>
           </select>
         </div>
+        <div>
+          <label className="block mb-2 text-white">Cursor Style</label>
+          <select
+            value={settings.cursorStyle}
+            onChange={(e) => handleChange('cursorStyle', e.target.value)}
+            className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="line">Line</option>
+            <option value="block">Block</option>
+            <option value="underline">Underline</option>
+          </select>
+        </div>
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="matchBrackets"
+            checked={settings.matchBrackets}
+            onChange={(e) => handleChange('matchBrackets', e.target.checked)}
+            className="mr-2"
+          />
+          <label htmlFor="matchBrackets" className="text-white">Match Brackets</label>
+        </div>
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="minimap"
+            checked={settings.minimap}
+            onChange={(e) => handleChange('minimap', e.target.checked)}
+            className="mr-2"
+          />
+          <label htmlFor="minimap" className="text-white">Show Minimap</label>
+        </div>
+        <div>
+          <label className="block mb-2 text-white">Scroll Speed</label>
+          <input
+            type="range"
+            min="1"
+            max="10"
+            value={settings.scrollSpeed}
+            onChange={(e) => handleChange('scrollSpeed', parseInt(e.target.value))}
+            className="w-full"
+          />
+        </div>
       </div>
     </div>
   );

@@ -6,7 +6,10 @@ import { Button } from "@/components/ui/button";
 const fonts = [
   'Lato', 'Open Sans', 'Roboto', 'Merriweather', 'Montserrat', 'Raleway', 'Lora', 'Poppins',
   'Playfair Display', 'Source Sans Pro', 'Nunito', 'Oswald', 'Quicksand', 'Fira Sans',
-  'Cabin', 'Arvo', 'Bitter', 'Crimson Text', 'Exo 2', 'Josefin Sans'
+  'Cabin', 'Arvo', 'Bitter', 'Crimson Text', 'Exo 2', 'Josefin Sans', 'Ubuntu', 'Roboto Slab',
+  'Noto Sans', 'Droid Sans', 'PT Sans', 'Rubik', 'Work Sans', 'Mulish', 'Nunito Sans',
+  'Barlow', 'Inter', 'Karla', 'Libre Franklin', 'Manrope', 'DM Sans', 'Archivo', 'Comfortaa',
+  'Prompt', 'IBM Plex Sans', 'Catamaran', 'Heebo', 'Overpass', 'Asap', 'Noto Serif'
 ];
 
 const FontPanel = ({ onClose }) => {
