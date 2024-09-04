@@ -49,17 +49,10 @@ const CodeEditor = () => {
   useEffect(() => {
     const debounce = setTimeout(() => {
       updatePreview();
-      if (settings.autoSave) {
-        saveToLocalStorage();
-      }
     }, 300);
 
     return () => clearTimeout(debounce);
-  }, [htmlCode, cssCode, jsCode, settings.autoSave]);
-
-  useEffect(() => {
-    loadFromLocalStorage();
-  }, []);
+  }, [htmlCode, cssCode, jsCode]);
 
   const updatePreview = () => {
     const combinedCode = `
@@ -76,35 +69,10 @@ const CodeEditor = () => {
     setPreview(combinedCode);
   };
 
-  const saveToLocalStorage = () => {
-    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName }));
-  };
-
-  const loadFromLocalStorage = () => {
-    const savedState = localStorage.getItem('codeEditorState');
-    if (savedState) {
-      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
-      setHtmlCode(htmlCode);
-      setCssCode(cssCode);
-      setJsCode(jsCode);
-      setSettings(savedSettings);
-      setCurrentCodeName(currentCodeName || 'Untitled');
-    }
-  };
-
   const saveCurrentCode = () => {
-    const savedCodes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
-    const newSavedCode = {
-      id: Date.now(),
-      name: currentCodeName,
-      html: htmlCode,
-      css: cssCode,
-      js: jsCode,
-      date: new Date().toISOString(),
-    };
-    savedCodes.push(newSavedCode);
-    localStorage.setItem('savedCodes', JSON.stringify(savedCodes));
-    alert('Code saved successfully!');
+    // Instead of saving to localStorage, we'll just log the action for now
+    console.log('Code saved:', { name: currentCodeName, html: htmlCode, css: cssCode, js: jsCode });
+    alert('Code saved successfully! (Note: This is a mock save as localStorage is not available)');
   };
 
   const renderEditor = (language, code, setCode) => (
