@@ -3,11 +3,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
-import { dracula } from '@uiw/codemirror-theme-dracula';
-import { vscodeDark } from '@uiw/codemirror-theme-vscode';
-import { solarizedDark } from '@uiw/codemirror-theme-solarized';
-import { githubDark } from '@uiw/codemirror-theme-github';
-import { monokai } from '@uiw/codemirror-theme-monokai';
+import { dracula, vscodeDark, solarizedDark, githubDark, monokai } from '@uiw/codemirror-theme-dracula';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, X } from 'lucide-react';
 import Settings from './Settings';
@@ -172,17 +168,30 @@ const CodeEditor = () => {
   };
 
   const renderLayout = () => {
+    const editorPanel = (
+      <PanelGroup direction="vertical">
+        {renderEditor('html', htmlCode, setHtmlCode)}
+        <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+        {renderEditor('css', cssCode, setCssCode)}
+        <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+        {renderEditor('js', jsCode, setJsCode)}
+      </PanelGroup>
+    );
+
+    const previewPanel = (
+      <iframe
+        title="preview"
+        srcDoc={preview}
+        className="w-full h-full border-none bg-white"
+        sandbox="allow-scripts"
+      />
+    );
+
     if (isMobile) {
       return (
         <PanelGroup direction="vertical" className="h-full">
           <Panel minSize={0} maxSize={100} defaultSize={100 - previewSize}>
-            <PanelGroup direction="vertical">
-              {renderEditor('html', htmlCode, setHtmlCode)}
-              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-              {renderEditor('css', cssCode, setCssCode)}
-              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-              {renderEditor('js', jsCode, setJsCode)}
-            </PanelGroup>
+            {editorPanel}
           </Panel>
           <PanelResizeHandle
             className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group"
@@ -192,38 +201,38 @@ const CodeEditor = () => {
             <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
           </PanelResizeHandle>
           <Panel minSize={0} maxSize={100} defaultSize={previewSize}>
-            <iframe
-              title="preview"
-              srcDoc={preview}
-              className="w-full h-full border-none bg-white"
-              sandbox="allow-scripts"
-            />
+            {previewPanel}
           </Panel>
         </PanelGroup>
       );
     } else {
       return (
-        <PanelGroup direction="horizontal" className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
-          <Panel minSize={0} defaultSize={50}>
-            <iframe
-              title="preview"
-              srcDoc={preview}
-              className="w-full h-full border-none bg-white"
-              sandbox="allow-scripts"
-            />
-          </Panel>
-          <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-            <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-          </PanelResizeHandle>
-          <Panel minSize={0} defaultSize={50}>
-            <PanelGroup direction="vertical">
-              {renderEditor('html', htmlCode, setHtmlCode)}
-              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-              {renderEditor('css', cssCode, setCssCode)}
-              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-              {renderEditor('js', jsCode, setJsCode)}
-            </PanelGroup>
-          </Panel>
+        <PanelGroup direction={settings.layout === 'horizontal' ? 'horizontal' : 'vertical'} className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
+          {settings.layout === 'horizontal' ? (
+            <>
+              <Panel minSize={0} defaultSize={50}>
+                {previewPanel}
+              </Panel>
+              <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+                <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+              </PanelResizeHandle>
+              <Panel minSize={0} defaultSize={50}>
+                {editorPanel}
+              </Panel>
+            </>
+          ) : (
+            <>
+              <Panel minSize={0} defaultSize={50}>
+                {editorPanel}
+              </Panel>
+              <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+                <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+              </PanelResizeHandle>
+              <Panel minSize={0} defaultSize={50}>
+                {previewPanel}
+              </Panel>
+            </>
+          )}
         </PanelGroup>
       );
     }
