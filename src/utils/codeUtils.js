@@ -1,4 +1,4 @@
-import prettier from 'prettier';
+import prettier from 'prettier/standalone';
 import parserHtml from 'prettier/parser-html';
 import parserCss from 'prettier/parser-postcss';
 import parserBabel from 'prettier/parser-babel';

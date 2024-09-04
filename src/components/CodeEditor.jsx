@@ -123,7 +123,6 @@ const CodeEditor = () => {
               highlightActiveLine: settings.highlightActiveLine,
             }}
             indentWithTab={settings.indentWithTabs}
-            autoCloseBrackets={settings.autoCloseBrackets === 'always'}
           />
         </div>
       </div>
