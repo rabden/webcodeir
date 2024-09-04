@@ -34,7 +34,6 @@ const CodeEditor = () => {
     lineNumbers: true,
     wordWrap: false,
     indentWithTabs: true,
-    autoCloseBrackets: 'always',
     highlightActiveLine: true,
     layout: 'horizontal',
     cursorStyle: 'line',
@@ -140,19 +139,6 @@ const CodeEditor = () => {
               language === 'html' ? html() : language === 'css' ? css() : javascript(),
               autocompletion(),
               EditorView.lineWrapping,
-              EditorView.theme({
-                "&": {
-                  fontSize: `${settings.fontSize}px`,
-                },
-                ".cm-cursor": {
-                  borderLeft: settings.cursorStyle === 'line' ? '1px solid #fff' : 'none',
-                  backgroundColor: settings.cursorStyle === 'block' ? 'rgba(255,255,255,0.5)' : 'transparent',
-                  borderBottom: settings.cursorStyle === 'underline' ? '2px solid #fff' : 'none',
-                },
-                ".cm-matchingBracket": {
-                  backgroundColor: settings.matchBrackets ? 'rgba(255,255,255,0.3)' : 'transparent',
-                },
-              }),
             ]}
             onChange={(value) => setCode(value)}
             style={{
@@ -267,7 +253,7 @@ const CodeEditor = () => {
             className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white max-w-[150px] sm:max-w-none"
           />
           {!isMobile && (
-            <div className="text-sm ml-4">
+            <div className="text-sm ml-4 hidden sm:block">
               Preview width: {previewWidth}px
             </div>
           )}
