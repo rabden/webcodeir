@@ -1,22 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, Copy, Check } from 'lucide-react';
+import { X, Search, MoreVertical, Check } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 
 const fonts = [
-  { name: 'Lato', sample: 'The quick brown fox jumps over the lazy dog' },
-  { name: 'Open Sans', sample: 'The quick brown fox jumps over the lazy dog' },
-  { name: 'Roboto', sample: 'The quick brown fox jumps over the lazy dog' },
-  { name: 'Merriweather', sample: 'The quick brown fox jumps over the lazy dog' },
-  { name: 'Montserrat', sample: 'The quick brown fox jumps over the lazy dog' },
-  { name: 'Raleway', sample: 'The quick brown fox jumps over the lazy dog' },
-  { name: 'Lora', sample: 'The quick brown fox jumps over the lazy dog' },
-  { name: 'Poppins', sample: 'The quick brown fox jumps over the lazy dog' },
-  { name: 'Playfair Display', sample: 'The quick brown fox jumps over the lazy dog' },
-  { name: 'Source Sans Pro', sample: 'The quick brown fox jumps over the lazy dog' },
-  { name: 'Nunito', sample: 'The quick brown fox jumps over the lazy dog' },
-  { name: 'Oswald', sample: 'The quick brown fox jumps over the lazy dog' },
-  { name: 'Quicksand', sample: 'The quick brown fox jumps over the lazy dog' },
-  { name: 'Fira Sans', sample: 'The quick brown fox jumps over the lazy dog' },
-  { name: 'Cabin', sample: 'The quick brown fox jumps over the lazy dog' },
+  { name: 'Lato' },
+  { name: 'Open Sans' },
+  { name: 'Roboto' },
+  { name: 'Merriweather' },
+  { name: 'Montserrat' },
+  { name: 'Raleway' },
+  { name: 'Lora' },
+  { name: 'Poppins' },
+  { name: 'Playfair Display' },
+  { name: 'Source Sans Pro' },
+  { name: 'Nunito' },
+  { name: 'Oswald' },
+  { name: 'Quicksand' },
+  { name: 'Fira Sans' },
+  { name: 'Cabin' },
+  { name: 'Arvo' },
+  { name: 'Bitter' },
+  { name: 'Crimson Text' },
+  { name: 'Exo 2' },
+  { name: 'Josefin Sans' },
 ];
 
 const FontPanel = ({ onClose }) => {
@@ -40,32 +47,41 @@ const FontPanel = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-95 flex items-center justify-center z-50">
-      <div className="w-full max-w-4xl h-full max-h-[90vh] bg-gray-800 rounded-lg shadow-xl overflow-hidden flex flex-col">
-        <div className="p-6 flex justify-between items-center border-b border-gray-700">
-          <h2 className="text-3xl font-bold text-white">Font Library</h2>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-700 transition-colors">
-            <X className="w-6 h-6 text-white" />
-          </button>
+    <div className="fixed inset-y-0 left-0 bg-gray-800 w-96 shadow-lg z-50 flex flex-col">
+      <div className="p-6 flex justify-between items-center border-b border-gray-700">
+        <h2 className="text-xl font-bold text-white">Font Library</h2>
+        <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+      <div className="p-6">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search fonts..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full p-2 pl-8 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-400" />
         </div>
-        <div className="p-6">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search fonts..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-3 pl-10 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-          </div>
-        </div>
-        <div className="flex-grow overflow-y-auto p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredFonts.map((font) => (
-            <div key={font.name} className="bg-gray-700 rounded-lg p-6 flex flex-col">
-              <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: font.name }}>{font.name}</h3>
-              <p className="text-gray-300 mb-4" style={{ fontFamily: font.name }}>{font.sample}</p>
-              <div className="mt-auto space-y-2">
+      </div>
+      <div className="flex-grow overflow-y-auto p-6 space-y-4">
+        {filteredFonts.map((font) => (
+          <div key={font.name} className="bg-gray-700 rounded-lg p-4 flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: font.name }}>{font.name}</h3>
+              <p className="text-sm text-gray-300" style={{ fontFamily: font.name }}>
+                ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
+              </p>
+            </div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-56 bg-gray-700 border-gray-600">
                 {['link', 'import', 'font-family'].map((type) => (
                   <button
                     key={type}
@@ -78,7 +94,7 @@ const FontPanel = ({ onClose }) => {
                       font.name,
                       type
                     )}
-                    className="w-full px-3 py-2 rounded bg-gray-600 hover:bg-gray-500 text-sm transition-colors flex items-center justify-center space-x-2"
+                    className="w-full px-2 py-2 text-left hover:bg-gray-600 text-sm transition-colors flex items-center space-x-2"
                   >
                     {copiedStates[font.name + type] ? (
                       <>
@@ -86,17 +102,14 @@ const FontPanel = ({ onClose }) => {
                         <span className="text-green-500">Copied!</span>
                       </>
                     ) : (
-                      <>
-                        <Copy className="w-4 h-4 text-white" />
-                        <span className="text-white">Copy {type}</span>
-                      </>
+                      <span className="text-white">Copy {type}</span>
                     )}
                   </button>
                 ))}
-              </div>
-            </div>
-          ))}
-        </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+        ))}
       </div>
     </div>
   );
