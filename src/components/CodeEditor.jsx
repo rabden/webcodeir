@@ -13,6 +13,13 @@ import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save } 
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import { autocompletion } from '@codemirror/autocomplete';
+import { EditorView } from '@codemirror/view';
+import { indentUnit } from '@codemirror/language';
+import { foldGutter, indentOnInput, bracketMatching, HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
+import { lintKeymap } from '@codemirror/lint';
+import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -123,29 +130,44 @@ const CodeEditor = () => {
   };
 
   const handleDropdownAction = (action, panel) => {
+    const editorRef = {
+      html: htmlCode,
+      css: cssCode,
+      js: jsCode
+    };
+    const setEditorRef = {
+      html: setHtmlCode,
+      css: setCssCode,
+      js: setJsCode
+    };
+
     switch (action) {
       case 'format':
-        // Implement formatting logic
-        console.log(`Formatting ${panel}`);
+        // Implement formatting logic (this is a simple example, you might want to use a proper formatter)
+        setEditorRef[panel](editorRef[panel].split(';').join(';\n'));
         break;
       case 'analyze':
-        // Implement analysis logic
-        console.log(`Analyzing ${panel}`);
+        // Implement analysis logic (this is a placeholder, you might want to implement actual code analysis)
+        alert(`Analyzing ${panel.toUpperCase()} code:\nLines: ${editorRef[panel].split('\n').length}\nCharacters: ${editorRef[panel].length}`);
         break;
       case 'maximize':
         // Implement maximize logic
-        console.log(`Maximizing ${panel} editor`);
+        setCollapsedPanels({
+          html: panel !== 'html',
+          css: panel !== 'css',
+          js: panel !== 'js'
+        });
         break;
       case 'minimize':
         togglePanel(panel);
         break;
       case 'foldAll':
-        // Implement fold all logic
-        console.log(`Folding all in ${panel}`);
+        // Folding all code is not directly supported in CodeMirror 6, but you can collapse the panel
+        setCollapsedPanels(prev => ({ ...prev, [panel]: true }));
         break;
       case 'unfoldAll':
-        // Implement unfold all logic
-        console.log(`Unfolding all in ${panel}`);
+        // Unfolding all code is not directly supported in CodeMirror 6, but you can expand the panel
+        setCollapsedPanels(prev => ({ ...prev, [panel]: false }));
         break;
       default:
         break;
@@ -236,24 +258,39 @@ const CodeEditor = () => {
             theme={themes[settings.editorTheme]}
             extensions={[
               language === 'html' ? html() : language === 'css' ? css() : javascript(),
-              autocompletion()
+              autocompletion(),
+              EditorView.lineWrapping,
+              indentUnit.of(' '.repeat(settings.tabSize)),
+              foldGutter(),
+              indentOnInput(),
+              bracketMatching(),
+              closeBrackets(),
+              highlightSelectionMatches(),
+              history(),
+              EditorView.updateListener.of((update) => {
+                if (update.docChanged) {
+                  setCode(update.state.doc.toString());
+                }
+              }),
+              EditorView.theme({
+                '&': { fontSize: `${settings.fontSize}px` },
+                '.cm-gutters': { display: settings.lineNumbers ? 'flex' : 'none' },
+                '.cm-activeLineGutter, .cm-activeLine': { backgroundColor: settings.highlightActiveLine ? '#2c313a' : 'transparent' },
+              }),
             ]}
-            onChange={(value) => setCode(value)}
-            style={{
-              fontSize: `${settings.fontSize}px`,
-              height: '100%',
-            }}
             basicSetup={{
               lineNumbers: settings.lineNumbers,
-              foldGutter: false,
-              dropCursor: false,
-              allowMultipleSelections: false,
-              indentOnInput: false,
-              tabSize: settings.tabSize,
+              foldGutter: true,
+              dropCursor: true,
+              allowMultipleSelections: true,
+              indentOnInput: true,
+              bracketMatching: true,
+              closeBrackets: settings.autoCloseBrackets === 'always',
+              autocompletion: true,
               highlightActiveLine: settings.highlightActiveLine,
+              highlightSelectionMatches: true,
+              history: true,
             }}
-            indentWithTab={settings.indentWithTabs}
-            autoCloseBrackets={settings.autoCloseBrackets === 'always'}
           />
         </div>
       </div>
