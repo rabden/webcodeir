@@ -130,7 +130,7 @@ const CodeEditor = () => {
             extensions={[
               language === 'html' ? html() : language === 'css' ? css() : javascript(),
               autocompletion(),
-              EditorView.lineWrapping.of(settings.wordWrap),
+              EditorView.lineWrapping,
               EditorView.theme({
                 "&": {
                   fontSize: `${settings.fontSize}px`,
