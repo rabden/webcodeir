@@ -9,7 +9,7 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Settings as SettingsIcon, Save } from 'lucide-react';
+import { Settings as SettingsIcon, Save, Layout } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import { autocompletion } from '@codemirror/autocomplete';
@@ -34,6 +34,7 @@ const CodeEditor = () => {
     highlightActiveLine: true,
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
+  const [layout, setLayout] = useState('vertical'); // New state for layout
 
   const themes = {
     dracula: dracula,
@@ -74,18 +75,19 @@ const CodeEditor = () => {
   };
 
   const saveToLocalStorage = () => {
-    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName }));
+    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName, layout }));
   };
 
   const loadFromLocalStorage = () => {
     const savedState = localStorage.getItem('codeEditorState');
     if (savedState) {
-      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
+      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName, layout: savedLayout } = JSON.parse(savedState);
       setHtmlCode(htmlCode);
       setCssCode(cssCode);
       setJsCode(jsCode);
       setSettings(savedSettings);
       setCurrentCodeName(currentCodeName || 'Untitled');
+      setLayout(savedLayout || 'vertical');
     }
   };
 
@@ -105,40 +107,53 @@ const CodeEditor = () => {
   };
 
   const renderEditor = (language, code, setCode) => (
-    <Panel minSize={5} defaultSize={33}>
-      <div className="h-full flex flex-col">
-        <div className="bg-[#2d2d2d] p-2 flex items-center justify-between sticky top-0 z-10">
-          <div className="flex items-center">
-            <div className={`w-4 h-4 rounded-full mr-2 ${language === 'html' ? 'bg-[#ff5f56]' : language === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
-            <span className="text-sm font-semibold">{language.toUpperCase()}</span>
-          </div>
-        </div>
-        <div className="flex-grow overflow-auto">
-          <CodeMirror
-            value={code}
-            height="100%"
-            theme={themes[settings.editorTheme]}
-            extensions={[
-              language === 'html' ? html() : language === 'css' ? css() : javascript(),
-              autocompletion()
-            ]}
-            onChange={(value) => setCode(value)}
-            style={{ fontSize: `${settings.fontSize}px` }}
-            basicSetup={{
-              lineNumbers: settings.lineNumbers,
-              foldGutter: false,
-              dropCursor: false,
-              allowMultipleSelections: false,
-              indentOnInput: false,
-              tabSize: settings.tabSize,
-              highlightActiveLine: settings.highlightActiveLine,
-            }}
-            indentWithTab={settings.indentWithTabs}
-            autoCloseBrackets={settings.autoCloseBrackets === 'always'}
-          />
+    <div className="h-full flex flex-col">
+      <div className="bg-[#2d2d2d] p-2 flex items-center justify-between sticky top-0 z-10">
+        <div className="flex items-center">
+          <div className={`w-4 h-4 rounded-full mr-2 ${language === 'html' ? 'bg-[#ff5f56]' : language === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
+          <span className="text-sm font-semibold">{language.toUpperCase()}</span>
         </div>
       </div>
-    </Panel>
+      <div className="flex-grow overflow-auto">
+        <CodeMirror
+          value={code}
+          height="100%"
+          theme={themes[settings.editorTheme]}
+          extensions={[
+            language === 'html' ? html() : language === 'css' ? css() : javascript(),
+            autocompletion()
+          ]}
+          onChange={(value) => setCode(value)}
+          style={{ fontSize: `${settings.fontSize}px` }}
+          basicSetup={{
+            lineNumbers: settings.lineNumbers,
+            foldGutter: false,
+            dropCursor: false,
+            allowMultipleSelections: false,
+            indentOnInput: false,
+            tabSize: settings.tabSize,
+            highlightActiveLine: settings.highlightActiveLine,
+          }}
+          indentWithTab={settings.indentWithTabs}
+          autoCloseBrackets={settings.autoCloseBrackets === 'always'}
+        />
+      </div>
+    </div>
+  );
+
+  const LayoutSelector = () => (
+    <div className="flex items-center space-x-2">
+      <Layout className="w-5 h-5" />
+      <select
+        value={layout}
+        onChange={(e) => setLayout(e.target.value)}
+        className="bg-gray-700 text-white border border-gray-600 rounded px-2 py-1"
+      >
+        <option value="vertical">Vertical</option>
+        <option value="horizontal">Horizontal</option>
+        <option value="grid">Grid</option>
+      </select>
+    </div>
   );
 
   return (
@@ -156,7 +171,8 @@ const CodeEditor = () => {
             Preview width: {previewWidth}px
           </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-4">
+          <LayoutSelector />
           <button
             onClick={saveCurrentCode}
             className="p-2 rounded-full hover:bg-gray-800"
@@ -178,28 +194,69 @@ const CodeEditor = () => {
         </div>
       </header>
       <div className="flex-grow overflow-hidden">
-        <PanelGroup direction="horizontal" className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
-          <Panel minSize={0} defaultSize={50}>
-            <iframe
-              title="preview"
-              srcDoc={preview}
-              className="w-full h-full border-none bg-white"
-              sandbox="allow-scripts"
-            />
-          </Panel>
-          <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-            <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-          </PanelResizeHandle>
-          <Panel minSize={0} defaultSize={50}>
-            <PanelGroup direction="vertical">
-              {renderEditor('html', htmlCode, setHtmlCode)}
-              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-              {renderEditor('css', cssCode, setCssCode)}
-              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-              {renderEditor('js', jsCode, setJsCode)}
-            </PanelGroup>
-          </Panel>
-        </PanelGroup>
+        {layout === 'vertical' && (
+          <PanelGroup direction="horizontal" className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
+            <Panel minSize={0} defaultSize={50}>
+              <iframe
+                title="preview"
+                srcDoc={preview}
+                className="w-full h-full border-none bg-white"
+                sandbox="allow-scripts"
+              />
+            </Panel>
+            <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+              <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+            </PanelResizeHandle>
+            <Panel minSize={0} defaultSize={50}>
+              <PanelGroup direction="vertical">
+                <Panel>{renderEditor('html', htmlCode, setHtmlCode)}</Panel>
+                <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+                <Panel>{renderEditor('css', cssCode, setCssCode)}</Panel>
+                <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+                <Panel>{renderEditor('js', jsCode, setJsCode)}</Panel>
+              </PanelGroup>
+            </Panel>
+          </PanelGroup>
+        )}
+        {layout === 'horizontal' && (
+          <PanelGroup direction="vertical" className="h-full">
+            <Panel minSize={0} defaultSize={50}>
+              <iframe
+                title="preview"
+                srcDoc={preview}
+                className="w-full h-full border-none bg-white"
+                sandbox="allow-scripts"
+              />
+            </Panel>
+            <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+              <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+            </PanelResizeHandle>
+            <Panel minSize={0} defaultSize={50}>
+              <PanelGroup direction="horizontal">
+                <Panel>{renderEditor('html', htmlCode, setHtmlCode)}</Panel>
+                <PanelResizeHandle className="w-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+                <Panel>{renderEditor('css', cssCode, setCssCode)}</Panel>
+                <PanelResizeHandle className="w-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+                <Panel>{renderEditor('js', jsCode, setJsCode)}</Panel>
+              </PanelGroup>
+            </Panel>
+          </PanelGroup>
+        )}
+        {layout === 'grid' && (
+          <div className="grid grid-cols-2 grid-rows-2 h-full gap-1">
+            <div className="col-span-1 row-span-2">
+              <iframe
+                title="preview"
+                srcDoc={preview}
+                className="w-full h-full border-none bg-white"
+                sandbox="allow-scripts"
+              />
+            </div>
+            <div>{renderEditor('html', htmlCode, setHtmlCode)}</div>
+            <div>{renderEditor('css', cssCode, setCssCode)}</div>
+            <div>{renderEditor('js', jsCode, setJsCode)}</div>
+          </div>
+        )}
       </div>
       {showSettings && (
         <Settings
