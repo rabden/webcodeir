@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
@@ -46,27 +46,21 @@ const CodeEditor = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [previewSize, setPreviewSize] = useState(50);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const resizerRef = useRef(null);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const themes = {
-    dracula, vscodeDark, solarizedDark, githubDark, monokai,
-  };
+  const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
 
   useEffect(() => {
     const debounce = setTimeout(() => {
       updatePreview();
-      if (settings.autoSave) {
-        saveToLocalStorage();
-      }
+      if (settings.autoSave) saveToLocalStorage();
     }, 300);
-
     return () => clearTimeout(debounce);
   }, [htmlCode, cssCode, jsCode, settings.autoSave]);
 
@@ -77,13 +71,8 @@ const CodeEditor = () => {
   const updatePreview = () => {
     setPreview(`
       <html>
-        <head>
-          <style>${cssCode}</style>
-        </head>
-        <body>
-          ${htmlCode}
-          <script>${jsCode}</script>
-        </body>
+        <head><style>${cssCode}</style></head>
+        <body>${htmlCode}<script>${jsCode}</script></body>
       </html>
     `);
   };
@@ -161,6 +150,27 @@ const CodeEditor = () => {
     </Panel>
   );
 
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    const startY = touch.clientY;
+    const startPreviewSize = previewSize;
+
+    const handleTouchMove = (e) => {
+      const touch = e.touches[0];
+      const deltaY = touch.clientY - startY;
+      const newPreviewSize = Math.max(0, Math.min(100, startPreviewSize - (deltaY / window.innerHeight) * 100));
+      setPreviewSize(newPreviewSize);
+    };
+
+    const handleTouchEnd = () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', handleTouchEnd);
+  };
+
   const renderLayout = () => {
     if (isMobile) {
       return (
@@ -174,10 +184,11 @@ const CodeEditor = () => {
               {renderEditor('js', jsCode, setJsCode)}
             </PanelGroup>
           </Panel>
-          <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group" onDrag={(e) => {
-            const newSize = 100 - (e.clientY / window.innerHeight) * 100;
-            setPreviewSize(Math.max(0, Math.min(100, newSize)));
-          }}>
+          <PanelResizeHandle
+            className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group"
+            onTouchStart={handleTouchStart}
+            ref={resizerRef}
+          >
             <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
           </PanelResizeHandle>
           <Panel minSize={0} maxSize={100} defaultSize={previewSize}>
