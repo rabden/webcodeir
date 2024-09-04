@@ -4,7 +4,11 @@ import CodeMirror from '@uiw/react-codemirror';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
-import { dracula, vscodeDark, solarizedDark, githubDark, monokai } from '@uiw/codemirror-theme-dracula';
+import { dracula } from '@uiw/codemirror-theme-dracula';
+import { vscodeDark } from '@uiw/codemirror-theme-vscode';
+import { solarizedDark } from '@uiw/codemirror-theme-solarized';
+import { githubDark } from '@uiw/codemirror-theme-github';
+import { monokai } from '@uiw/codemirror-theme-monokai';
 import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
 
@@ -69,12 +73,13 @@ const EditorLayout = ({
   );
 
   const mobileResizeHandle = (
-    <PanelResizeHandle className="h-6 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group cursor-row-resize" onDrag={(e) => {
+    <PanelResizeHandle className="h-8 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group cursor-row-resize touch-action-none" onDrag={(e) => {
       const newSize = 100 - (e.clientY / window.innerHeight) * 100;
       setPreviewSize(Math.max(0, Math.min(100, newSize)));
     }}>
       <div className="absolute inset-x-0 top-1/2 h-1 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
       <div className="absolute inset-x-0 bottom-0 h-1 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+      <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-xs text-gray-400">Drag to resize</div>
     </PanelResizeHandle>
   );
 
