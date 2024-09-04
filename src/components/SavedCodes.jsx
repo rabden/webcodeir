@@ -44,13 +44,13 @@ const SavedCodes = ({ onClose, onLoad, isMobile }) => {
 
   return (
     <div className={`fixed inset-y-4 ${isMobile ? 'inset-x-4' : 'right-4'} bg-gray-800 ${isMobile ? 'w-auto' : 'w-[700px]'} shadow-lg z-50 flex flex-col rounded-lg`}>
-      <div className="p-6 flex justify-between items-center border-b border-gray-700">
+      <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-xl font-bold text-white">Saved Codes</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
           <X className="w-5 h-5" />
         </button>
       </div>
-      <div className="flex-grow overflow-y-auto p-6 space-y-4">
+      <div className="flex-grow overflow-y-auto p-4 space-y-4">
         {savedCodes.length === 0 ? (
           <p className="text-center text-gray-400 text-xl">No saved codes yet.</p>
         ) : (
@@ -79,16 +79,18 @@ const SavedCodes = ({ onClose, onLoad, isMobile }) => {
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </button>
-                    <button
-                      onClick={() => toggleExpand(code.id)}
-                      className="p-2 rounded hover:bg-gray-600 transition-colors"
-                      title={expandedCode === code.id ? "Collapse" : "Expand"}
-                    >
-                      {expandedCode === code.id ? <ChevronUp className="w-4 h-4 text-white" /> : <ChevronDown className="w-4 h-4 text-white" />}
-                    </button>
+                    {!isMobile && (
+                      <button
+                        onClick={() => toggleExpand(code.id)}
+                        className="p-2 rounded hover:bg-gray-600 transition-colors"
+                        title={expandedCode === code.id ? "Collapse" : "Expand"}
+                      >
+                        {expandedCode === code.id ? <ChevronUp className="w-4 h-4 text-white" /> : <ChevronDown className="w-4 h-4 text-white" />}
+                      </button>
+                    )}
                   </div>
                 </div>
-                {expandedCode === code.id && (
+                {!isMobile && expandedCode === code.id && (
                   <div className="mt-2">
                     <iframe
                       srcDoc={generatePreviewCode(code.html, code.css, code.js)}
