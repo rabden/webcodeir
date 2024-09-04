@@ -116,7 +116,7 @@ const CodeEditor = () => {
             <span className="text-sm font-semibold">{language.toUpperCase()}</span>
           </div>
         </div>
-        <div className="flex-grow overflow-auto">
+        <div className="flex-grow overflow-hidden">
           <CodeMirror
             value={code}
             height="100%"
@@ -126,7 +126,11 @@ const CodeEditor = () => {
               autocompletion()
             ]}
             onChange={(value) => setCode(value)}
-            style={{ fontSize: `${settings.fontSize}px` }}
+            style={{
+              fontSize: `${settings.fontSize}px`,
+              height: '100%',
+            }}
+            className="h-full"
             basicSetup={{
               lineNumbers: settings.lineNumbers,
               foldGutter: false,
