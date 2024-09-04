@@ -9,7 +9,7 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Settings as SettingsIcon, Save, BookOpen, Icons } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, IconsIcon } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
@@ -241,7 +241,7 @@ const CodeEditor = () => {
             onClick={() => setShowIconPanel(!showIconPanel)}
             className="p-2 rounded-full hover:bg-gray-800"
           >
-            <Icons className="w-5 h-5" />
+            <IconsIcon className="w-5 h-5" />
           </button>
           <button
             onClick={() => setShowSettings(!showSettings)}
