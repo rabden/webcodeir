@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, Trash2, ChevronDown, ChevronUp, Play } from 'lucide-react';
 
 const SavedCodes = ({ onClose, onLoad }) => {
   const [savedCodes, setSavedCodes] = useState([]);
@@ -67,19 +67,22 @@ const SavedCodes = ({ onClose, onLoad }) => {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => onLoad(code)}
-                      className="px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm transition-colors"
+                      className="p-2 rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                      title="Load"
                     >
-                      Load
+                      <Play className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(code.id)}
-                      className="p-1 rounded hover:bg-red-700 transition-colors"
+                      className="p-2 rounded hover:bg-red-700 transition-colors"
+                      title="Delete"
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </button>
                     <button
                       onClick={() => toggleExpand(code.id)}
-                      className="p-1 rounded hover:bg-gray-600 transition-colors"
+                      className="p-2 rounded hover:bg-gray-600 transition-colors"
+                      title={expandedCode === code.id ? "Collapse" : "Expand"}
                     >
                       {expandedCode === code.id ? <ChevronUp className="w-4 h-4 text-white" /> : <ChevronDown className="w-4 h-4 text-white" />}
                     </button>
@@ -90,7 +93,7 @@ const SavedCodes = ({ onClose, onLoad }) => {
                     <iframe
                       srcDoc={generatePreviewCode(code.html, code.css, code.js)}
                       title={`Preview of ${code.name}`}
-                      className="w-full h-48 rounded border border-gray-600"
+                      className="w-full h-96 rounded border border-gray-600"
                       sandbox="allow-scripts"
                     />
                   </div>
