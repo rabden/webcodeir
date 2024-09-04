@@ -43,6 +43,15 @@ const CodeEditor = () => {
     scrollSpeed: 5,
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const themes = {
     dracula: dracula,
@@ -130,7 +139,7 @@ const CodeEditor = () => {
             extensions={[
               language === 'html' ? html() : language === 'css' ? css() : javascript(),
               autocompletion(),
-              EditorView.lineWrapping,
+              settings.wordWrap && EditorView.lineWrapping,
               EditorView.theme({
                 "&": {
                   fontSize: `${settings.fontSize}px`,
@@ -169,7 +178,32 @@ const CodeEditor = () => {
   );
 
   const renderLayout = () => {
-    if (settings.layout === 'vertical') {
+    if (isMobile) {
+      return (
+        <PanelGroup direction="vertical" className="h-full">
+          <Panel minSize={30} defaultSize={50}>
+            <PanelGroup direction="vertical">
+              {renderEditor('html', htmlCode, setHtmlCode)}
+              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              {renderEditor('css', cssCode, setCssCode)}
+              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              {renderEditor('js', jsCode, setJsCode)}
+            </PanelGroup>
+          </Panel>
+          <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+            <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+          </PanelResizeHandle>
+          <Panel minSize={30} defaultSize={50}>
+            <iframe
+              title="preview"
+              srcDoc={preview}
+              className="w-full h-full border-none bg-white"
+              sandbox="allow-scripts"
+            />
+          </Panel>
+        </PanelGroup>
+      );
+    } else if (settings.layout === 'vertical') {
       return (
         <PanelGroup direction="horizontal" className="h-full">
           <Panel minSize={0} defaultSize={50}>
@@ -231,11 +265,13 @@ const CodeEditor = () => {
             type="text"
             value={currentCodeName}
             onChange={(e) => setCurrentCodeName(e.target.value)}
-            className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white"
+            className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white max-w-[150px] sm:max-w-none"
           />
-          <div className="text-sm ml-4">
-            Preview width: {previewWidth}px
-          </div>
+          {!isMobile && (
+            <div className="text-sm ml-4">
+              Preview width: {previewWidth}px
+            </div>
+          )}
         </div>
         <div className="flex items-center space-x-2">
           <TooltipProvider>
