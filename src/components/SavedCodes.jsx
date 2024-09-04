@@ -43,7 +43,7 @@ const SavedCodes = ({ onClose, onLoad }) => {
   };
 
   return (
-    <div className="fixed inset-y-4 right-4 bg-gray-800 w-[600px] shadow-lg z-50 flex flex-col rounded-lg">
+    <div className="fixed inset-y-4 right-4 bg-gray-800 w-[700px] shadow-lg z-50 flex flex-col rounded-lg">
       <div className="p-6 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-xl font-bold text-white">Saved Codes</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
