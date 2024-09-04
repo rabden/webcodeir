@@ -18,8 +18,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { EditorView } from '@codemirror/view';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import EditorHeader from './EditorHeader';
-import EditorLayout from './EditorLayout';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -51,16 +49,25 @@ const CodeEditor = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const themes = {
+    dracula, vscodeDark, solarizedDark, githubDark, monokai,
+  };
+
   useEffect(() => {
     const debounce = setTimeout(() => {
       updatePreview();
-      if (settings.autoSave) saveToLocalStorage();
+      if (settings.autoSave) {
+        saveToLocalStorage();
+      }
     }, 300);
+
     return () => clearTimeout(debounce);
   }, [htmlCode, cssCode, jsCode, settings.autoSave]);
 
@@ -113,41 +120,222 @@ const CodeEditor = () => {
     alert('Code saved successfully!');
   };
 
+  const renderEditor = (language, code, setCode) => (
+    <Panel minSize={5} defaultSize={33}>
+      <div className="h-full flex flex-col">
+        <div className="bg-[#2d2d2d] p-2 flex items-center justify-between sticky top-0 z-10">
+          <div className="flex items-center">
+            <div className={`w-4 h-4 rounded-full mr-2 ${language === 'html' ? 'bg-[#ff5f56]' : language === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
+            <span className="text-sm font-semibold">{language.toUpperCase()}</span>
+          </div>
+        </div>
+        <div className="flex-grow overflow-hidden">
+          <CodeMirror
+            value={code}
+            height="100%"
+            theme={themes[settings.editorTheme]}
+            extensions={[
+              language === 'html' ? html() : language === 'css' ? css() : javascript(),
+              autocompletion(),
+              EditorView.lineWrapping,
+            ]}
+            onChange={(value) => setCode(value)}
+            style={{
+              height: '100%',
+              fontSize: `${settings.fontSize}px`,
+            }}
+            className="h-full"
+            basicSetup={{
+              lineNumbers: settings.lineNumbers,
+              foldGutter: false,
+              dropCursor: false,
+              allowMultipleSelections: false,
+              indentOnInput: false,
+              tabSize: settings.tabSize,
+              highlightActiveLine: settings.highlightActiveLine,
+              bracketMatching: settings.matchBrackets,
+            }}
+            indentWithTab={settings.indentWithTabs}
+          />
+        </div>
+      </div>
+    </Panel>
+  );
+
+  const renderLayout = () => {
+    if (isMobile) {
+      return (
+        <PanelGroup direction="vertical" className="h-full">
+          <Panel minSize={0} maxSize={100} defaultSize={100 - previewSize}>
+            <PanelGroup direction="vertical">
+              {renderEditor('html', htmlCode, setHtmlCode)}
+              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              {renderEditor('css', cssCode, setCssCode)}
+              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              {renderEditor('js', jsCode, setJsCode)}
+            </PanelGroup>
+          </Panel>
+          <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group" onDrag={(e) => {
+            const newSize = 100 - (e.clientY / window.innerHeight) * 100;
+            setPreviewSize(Math.max(0, Math.min(100, newSize)));
+          }}>
+            <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+          </PanelResizeHandle>
+          <Panel minSize={0} maxSize={100} defaultSize={previewSize}>
+            <iframe
+              title="preview"
+              srcDoc={preview}
+              className="w-full h-full border-none bg-white"
+              sandbox="allow-scripts"
+            />
+          </Panel>
+        </PanelGroup>
+      );
+    } else {
+      return (
+        <PanelGroup direction="horizontal" className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
+          <Panel minSize={0} defaultSize={50}>
+            <iframe
+              title="preview"
+              srcDoc={preview}
+              className="w-full h-full border-none bg-white"
+              sandbox="allow-scripts"
+            />
+          </Panel>
+          <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+            <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+          </PanelResizeHandle>
+          <Panel minSize={0} defaultSize={50}>
+            <PanelGroup direction="vertical">
+              {renderEditor('html', htmlCode, setHtmlCode)}
+              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              {renderEditor('css', cssCode, setCssCode)}
+              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              {renderEditor('js', jsCode, setJsCode)}
+            </PanelGroup>
+          </Panel>
+        </PanelGroup>
+      );
+    }
+  };
+
   const handleMenuItemClick = (action) => {
     action();
     setIsMenuOpen(false);
   };
 
+  const renderMobileMenu = () => (
+    <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <Menu className="h-6 w-6" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-[#1e1e1e] text-white border-r border-gray-700">
+        <nav className="flex flex-col space-y-4">
+          <Button onClick={() => handleMenuItemClick(() => setShowSettings(true))} className="justify-start">
+            <SettingsIcon className="mr-2 h-4 w-4" />
+            Settings
+          </Button>
+          <Button onClick={() => handleMenuItemClick(() => setShowSavedCodes(true))} className="justify-start">
+            <BookOpen className="mr-2 h-4 w-4" />
+            Saved Codes
+          </Button>
+          <Button onClick={() => handleMenuItemClick(() => setShowFontPanel(true))} className="justify-start">
+            <Type className="mr-2 h-4 w-4" />
+            Font Library
+          </Button>
+          <Button onClick={() => handleMenuItemClick(saveCurrentCode)} className="justify-start">
+            <Save className="mr-2 h-4 w-4" />
+            Save Current Code
+          </Button>
+        </nav>
+      </SheetContent>
+    </Sheet>
+  );
+
   return (
     <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
-      <EditorHeader
-        currentCodeName={currentCodeName}
-        setCurrentCodeName={setCurrentCodeName}
-        previewWidth={previewWidth}
-        isMobile={isMobile}
-        saveCurrentCode={saveCurrentCode}
-        setShowSavedCodes={setShowSavedCodes}
-        setShowFontPanel={setShowFontPanel}
-        setShowSettings={setShowSettings}
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        handleMenuItemClick={handleMenuItemClick}
-      />
+      <header className="bg-black p-2 flex justify-between items-center">
+        <div className="flex items-center space-x-2">
+          {isMobile && renderMobileMenu()}
+          <div className="w-6 h-6 bg-white rounded-sm"></div>
+          <input
+            type="text"
+            value={currentCodeName}
+            onChange={(e) => setCurrentCodeName(e.target.value)}
+            className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white max-w-[150px] sm:max-w-none"
+          />
+          {!isMobile && (
+            <div className="text-sm ml-4 hidden sm:block">
+              Preview width: {previewWidth}px
+            </div>
+          )}
+        </div>
+        {!isMobile && (
+          <div className="flex items-center space-x-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={saveCurrentCode}
+                    className="p-2 rounded-full hover:bg-gray-800"
+                  >
+                    <Save className="w-5 h-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Save current code</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setShowSavedCodes(!showSavedCodes)}
+                    className="p-2 rounded-full hover:bg-gray-800"
+                  >
+                    <BookOpen className="w-5 h-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Saved Codes</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setShowFontPanel(!showFontPanel)}
+                    className="p-2 rounded-full hover:bg-gray-800"
+                  >
+                    <Type className="w-5 h-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Font Library</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setShowSettings(!showSettings)}
+                    className="p-2 rounded-full hover:bg-gray-800"
+                  >
+                    <SettingsIcon className="w-5 h-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Settings</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        )}
+      </header>
       <div className="flex-grow overflow-hidden">
-        <EditorLayout
-          isMobile={isMobile}
-          previewSize={previewSize}
-          setPreviewSize={setPreviewSize}
-          preview={preview}
-          htmlCode={htmlCode}
-          setHtmlCode={setHtmlCode}
-          cssCode={cssCode}
-          setCssCode={setCssCode}
-          jsCode={jsCode}
-          setJsCode={setJsCode}
-          settings={settings}
-          setPreviewWidth={setPreviewWidth}
-        />
+        {renderLayout()}
       </div>
       {showSettings && (
         <Settings
