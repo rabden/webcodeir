@@ -46,6 +46,7 @@ const CodeEditor = () => {
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [previewSize, setPreviewSize] = useState(50);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -56,11 +57,7 @@ const CodeEditor = () => {
   }, []);
 
   const themes = {
-    dracula: dracula,
-    vscodeDark: vscodeDark,
-    solarizedDark: solarizedDark,
-    githubDark: githubDark,
-    monokai: monokai,
+    dracula, vscodeDark, solarizedDark, githubDark, monokai,
   };
 
   useEffect(() => {
@@ -79,7 +76,7 @@ const CodeEditor = () => {
   }, []);
 
   const updatePreview = () => {
-    const combinedCode = `
+    setPreview(`
       <html>
         <head>
           <style>${cssCode}</style>
@@ -89,8 +86,7 @@ const CodeEditor = () => {
           <script>${jsCode}</script>
         </body>
       </html>
-    `;
-    setPreview(combinedCode);
+    `);
   };
 
   const saveToLocalStorage = () => {
@@ -223,19 +219,36 @@ const CodeEditor = () => {
     }
   };
 
+  const handleMenuItemClick = (action) => {
+    action();
+    setIsMenuOpen(false);
+  };
+
   const renderMobileMenu = () => (
-    <Sheet>
+    <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon">
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+      <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-[#1e1e1e] text-white border-r border-gray-700">
         <nav className="flex flex-col space-y-4">
-          <Button onClick={() => setShowSettings(true)}>Settings</Button>
-          <Button onClick={() => setShowSavedCodes(true)}>Saved Codes</Button>
-          <Button onClick={() => setShowFontPanel(true)}>Font Library</Button>
-          <Button onClick={saveCurrentCode}>Save Current Code</Button>
+          <Button onClick={() => handleMenuItemClick(() => setShowSettings(true))} className="justify-start">
+            <SettingsIcon className="mr-2 h-4 w-4" />
+            Settings
+          </Button>
+          <Button onClick={() => handleMenuItemClick(() => setShowSavedCodes(true))} className="justify-start">
+            <BookOpen className="mr-2 h-4 w-4" />
+            Saved Codes
+          </Button>
+          <Button onClick={() => handleMenuItemClick(() => setShowFontPanel(true))} className="justify-start">
+            <Type className="mr-2 h-4 w-4" />
+            Font Library
+          </Button>
+          <Button onClick={() => handleMenuItemClick(saveCurrentCode)} className="justify-start">
+            <Save className="mr-2 h-4 w-4" />
+            Save Current Code
+          </Button>
         </nav>
       </SheetContent>
     </Sheet>
