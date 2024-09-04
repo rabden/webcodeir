@@ -9,10 +9,11 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Settings as SettingsIcon, Save } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Icons } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
+import IconPanel from './IconPanel';
 import { autocompletion } from '@codemirror/autocomplete';
 
 const CodeEditor = () => {
@@ -24,6 +25,7 @@ const CodeEditor = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showSavedCodes, setShowSavedCodes] = useState(false);
   const [showFontPanel, setShowFontPanel] = useState(false);
+  const [showIconPanel, setShowIconPanel] = useState(false);
   const [settings, setSettings] = useState({
     editorTheme: 'dracula',
     fontSize: 14,
@@ -233,7 +235,13 @@ const CodeEditor = () => {
             onClick={() => setShowFontPanel(!showFontPanel)}
             className="p-2 rounded-full hover:bg-gray-800"
           >
-            Fonts
+            <BookOpen className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setShowIconPanel(!showIconPanel)}
+            className="p-2 rounded-full hover:bg-gray-800"
+          >
+            <Icons className="w-5 h-5" />
           </button>
           <button
             onClick={() => setShowSettings(!showSettings)}
@@ -267,6 +275,9 @@ const CodeEditor = () => {
       )}
       {showFontPanel && (
         <FontPanel onClose={() => setShowFontPanel(false)} />
+      )}
+      {showIconPanel && (
+        <IconPanel onClose={() => setShowIconPanel(false)} />
       )}
     </div>
   );
