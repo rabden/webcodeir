@@ -9,10 +9,11 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Settings as SettingsIcon, Save } from 'lucide-react';
+import { Settings as SettingsIcon, Save, MoreVertical } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import { autocompletion } from '@codemirror/autocomplete';
+import EditorSettings from './EditorSettings';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -32,9 +33,10 @@ const CodeEditor = () => {
     indentWithTabs: true,
     autoCloseBrackets: 'always',
     highlightActiveLine: true,
-    layout: 'horizontal', // New setting for layout
+    layout: 'horizontal',
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
+  const [showEditorSettings, setShowEditorSettings] = useState({ html: false, css: false, js: false });
 
   const themes = {
     dracula: dracula,
@@ -113,6 +115,12 @@ const CodeEditor = () => {
             <div className={`w-4 h-4 rounded-full mr-2 ${language === 'html' ? 'bg-[#ff5f56]' : language === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
             <span className="text-sm font-semibold">{language.toUpperCase()}</span>
           </div>
+          <button
+            onClick={() => setShowEditorSettings({ ...showEditorSettings, [language]: true })}
+            className="p-1 rounded-full hover:bg-gray-700 transition-colors"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
         </div>
         <div className="flex-grow overflow-auto">
           <CodeMirror
@@ -139,6 +147,12 @@ const CodeEditor = () => {
           />
         </div>
       </div>
+      {showEditorSettings[language] && (
+        <EditorSettings
+          onClose={() => setShowEditorSettings({ ...showEditorSettings, [language]: false })}
+          language={language}
+        />
+      )}
     </Panel>
   );
 
