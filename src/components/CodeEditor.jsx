@@ -14,6 +14,8 @@ import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import { autocompletion } from '@codemirror/autocomplete';
 import EditorSettings from './EditorSettings';
+import { foldGutter, foldKeymap } from '@codemirror/language';
+import { keymap } from '@codemirror/view';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -70,9 +72,17 @@ const CodeEditor = () => {
   };
 
   const saveCurrentCode = () => {
-    // Instead of saving to localStorage, we'll just log the action for now
-    console.log('Code saved:', { name: currentCodeName, html: htmlCode, css: cssCode, js: jsCode });
-    alert('Code saved successfully! (Note: This is a mock save as localStorage is not available)');
+    const savedCodes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
+    const newCode = {
+      id: Date.now(),
+      name: currentCodeName,
+      html: htmlCode,
+      css: cssCode,
+      js: jsCode,
+    };
+    savedCodes.push(newCode);
+    localStorage.setItem('savedCodes', JSON.stringify(savedCodes));
+    alert('Code saved successfully!');
   };
 
   const renderEditor = (language, code, setCode) => (
@@ -97,13 +107,15 @@ const CodeEditor = () => {
             theme={themes[settings.editorTheme]}
             extensions={[
               language === 'html' ? html() : language === 'css' ? css() : javascript(),
-              autocompletion()
+              autocompletion(),
+              foldGutter(),
+              keymap.of(foldKeymap)
             ]}
             onChange={(value) => setCode(value)}
             style={{ fontSize: `${settings.fontSize}px` }}
             basicSetup={{
               lineNumbers: settings.lineNumbers,
-              foldGutter: false,
+              foldGutter: true,
               dropCursor: false,
               allowMultipleSelections: false,
               indentOnInput: false,
@@ -119,6 +131,8 @@ const CodeEditor = () => {
         <EditorSettings
           onClose={() => setShowEditorSettings({ ...showEditorSettings, [language]: false })}
           language={language}
+          code={code}
+          onCodeUpdate={setCode}
         />
       )}
     </Panel>

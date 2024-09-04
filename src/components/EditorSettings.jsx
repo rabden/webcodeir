@@ -1,35 +1,30 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { formatCode, analyzeCode } from '../utils/codeUtils';
 
-const EditorSettings = ({ onClose, language }) => {
+const EditorSettings = ({ onClose, language, code, onCodeUpdate }) => {
   const handleFormatCode = () => {
-    // Implement code formatting logic here
-    console.log(`Formatting ${language} code`);
+    const formattedCode = formatCode(code, language);
+    onCodeUpdate(formattedCode);
   };
 
   const handleAnalyzeCode = () => {
-    // Implement code analysis logic here
-    console.log(`Analyzing ${language} code`);
-  };
-
-  const handleMaximizeEditor = () => {
-    // Implement editor maximization logic here
-    console.log(`Maximizing ${language} editor`);
-  };
-
-  const handleMinimizeEditor = () => {
-    // Implement editor minimization logic here
-    console.log(`Minimizing ${language} editor`);
+    const analysis = analyzeCode(code, language);
+    alert(`Code Analysis Result:\n${analysis.message}\n\nSuggestion: ${analysis.suggestion}`);
   };
 
   const handleFoldAll = () => {
     // Implement fold all logic here
     console.log(`Folding all in ${language} editor`);
+    // This would typically involve calling a method on the CodeMirror instance
+    // to fold all foldable regions
   };
 
   const handleUnfoldAll = () => {
     // Implement unfold all logic here
     console.log(`Unfolding all in ${language} editor`);
+    // This would typically involve calling a method on the CodeMirror instance
+    // to unfold all folded regions
   };
 
   return (
@@ -49,16 +44,6 @@ const EditorSettings = ({ onClose, language }) => {
         <li>
           <button onClick={handleAnalyzeCode} className="w-full text-left px-2 py-1 hover:bg-gray-700 rounded">
             Analyze {language.toUpperCase()}
-          </button>
-        </li>
-        <li>
-          <button onClick={handleMaximizeEditor} className="w-full text-left px-2 py-1 hover:bg-gray-700 rounded">
-            Maximize {language.toUpperCase()} Editor
-          </button>
-        </li>
-        <li>
-          <button onClick={handleMinimizeEditor} className="w-full text-left px-2 py-1 hover:bg-gray-700 rounded">
-            Minimize {language.toUpperCase()} Editor
           </button>
         </li>
         <li>
