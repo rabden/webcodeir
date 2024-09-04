@@ -165,7 +165,7 @@ const CodeEditor = () => {
                 <ChevronDown className="w-4 h-4" />
               </button>
               {dropdownOpen[panel] && (
-                <div className="absolute right-0 mt-2 w-48 bg-[#2d2d2d] rounded-md shadow-lg z-20">
+                <div className="absolute right-0 mt-2 w-48 bg-[#2d2d2d] rounded-md shadow-lg z-50">
                   <ul className="py-1">
                     <li>
                       <button
@@ -234,7 +234,11 @@ const CodeEditor = () => {
               autocompletion()
             ]}
             onChange={(value) => setCode(value)}
-            style={{ fontSize: `${settings.fontSize}px` }}
+            style={{
+              fontSize: `${settings.fontSize}px`,
+              height: 'calc(100% - 30vh)',
+              overflowX: 'hidden',
+            }}
             basicSetup={{
               lineNumbers: settings.lineNumbers,
               foldGutter: false,
@@ -247,6 +251,7 @@ const CodeEditor = () => {
             indentWithTab={settings.indentWithTabs}
             autoCloseBrackets={settings.autoCloseBrackets === 'always'}
           />
+          <div style={{ height: '30vh' }}></div>
         </div>
       </div>
     </Panel>
