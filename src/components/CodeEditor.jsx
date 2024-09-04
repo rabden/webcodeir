@@ -9,11 +9,12 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Settings as SettingsIcon, Save } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
 import { autocompletion } from '@codemirror/autocomplete';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -217,30 +218,63 @@ const CodeEditor = () => {
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <button
-            onClick={saveCurrentCode}
-            className="p-2 rounded-full hover:bg-gray-800"
-          >
-            <Save className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => setShowSavedCodes(!showSavedCodes)}
-            className="p-2 rounded-full hover:bg-gray-800"
-          >
-            Saved Codes
-          </button>
-          <button
-            onClick={() => setShowFontPanel(!showFontPanel)}
-            className="p-2 rounded-full hover:bg-gray-800"
-          >
-            Fonts
-          </button>
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="p-2 rounded-full hover:bg-gray-800"
-          >
-            <SettingsIcon className="w-5 h-5" />
-          </button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={saveCurrentCode}
+                  className="p-2 rounded-full hover:bg-gray-800"
+                >
+                  <Save className="w-5 h-5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Save current code</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setShowSavedCodes(!showSavedCodes)}
+                  className="p-2 rounded-full hover:bg-gray-800"
+                >
+                  <BookOpen className="w-5 h-5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Saved Codes</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setShowFontPanel(!showFontPanel)}
+                  className="p-2 rounded-full hover:bg-gray-800"
+                >
+                  <Type className="w-5 h-5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Font Library</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setShowSettings(!showSettings)}
+                  className="p-2 rounded-full hover:bg-gray-800"
+                >
+                  <SettingsIcon className="w-5 h-5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Settings</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </header>
       <div className="flex-grow overflow-hidden">
