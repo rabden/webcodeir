@@ -137,11 +137,12 @@ const CodeEditor = () => {
               autocompletion()
             ]}
             onChange={(value) => setCode(value)}
+            className="h-full overflow-y-auto"
             style={{
               fontSize: `${settings.fontSize}px`,
-              height: '100%',
+              height: 'calc(100% - 400px)',
+              minHeight: '100px',
               overflowX: 'hidden',
-              paddingBottom: '400px',
             }}
             basicSetup={{
               lineNumbers: settings.lineNumbers,
@@ -155,6 +156,7 @@ const CodeEditor = () => {
             indentWithTab={settings.indentWithTabs}
             autoCloseBrackets={settings.autoCloseBrackets === 'always'}
           />
+          <div style={{ height: '400px' }}></div>
         </div>
       </div>
     </Panel>
