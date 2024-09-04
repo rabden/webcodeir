@@ -56,13 +56,13 @@ const SavedCodes = ({ onClose, onLoad, isMobile }) => {
         ) : (
           <ul className="space-y-4">
             {savedCodes.map((code) => (
-              <li key={code.id} className="p-4 rounded-lg bg-gray-700 shadow">
+              <li key={code.id} className={`p-4 rounded-lg bg-gray-700 shadow ${isMobile ? 'text-sm' : ''}`}>
                 <div className="flex items-center justify-between mb-2">
                   <input
                     type="text"
                     value={code.name}
                     onChange={(e) => handleRename(code.id, e.target.value)}
-                    className="text-lg font-semibold mr-2 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`text-lg font-semibold mr-2 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isMobile ? 'text-sm' : ''}`}
                   />
                   <div className="flex items-center space-x-2">
                     <button
@@ -70,14 +70,14 @@ const SavedCodes = ({ onClose, onLoad, isMobile }) => {
                       className="p-2 rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
                       title="Load"
                     >
-                      <Play className="w-4 h-4" />
+                      <Play className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
                     </button>
                     <button
                       onClick={() => handleDelete(code.id)}
                       className="p-2 rounded hover:bg-red-700 transition-colors"
                       title="Delete"
                     >
-                      <Trash2 className="w-4 h-4 text-red-500" />
+                      <Trash2 className={`text-red-500 ${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
                     </button>
                     {!isMobile && (
                       <button

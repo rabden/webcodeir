@@ -9,7 +9,7 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, X } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
@@ -17,7 +17,6 @@ import { autocompletion } from '@codemirror/autocomplete';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { EditorView } from '@codemirror/view';
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -219,46 +218,44 @@ const CodeEditor = () => {
     }
   };
 
-  const handleMenuItemClick = (action) => {
-    action();
-    setIsMenuOpen(false);
-  };
-
   const renderMobileMenu = () => (
-    <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Menu className="h-6 w-6" />
+    <div className={`fixed inset-y-0 left-0 w-64 bg-gray-800 shadow-lg z-50 transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
+      <div className="p-4 flex justify-between items-center border-b border-gray-700">
+        <h2 className="text-xl font-bold text-white">Menu</h2>
+        <button onClick={() => setIsMenuOpen(false)} className="p-1 rounded-full hover:bg-gray-700">
+          <X className="w-5 h-5 text-white" />
+        </button>
+      </div>
+      <nav className="p-4 flex flex-col space-y-4">
+        <Button onClick={() => { setShowSettings(true); setIsMenuOpen(false); }} className="justify-start">
+          <SettingsIcon className="mr-2 h-4 w-4" />
+          Settings
         </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-[#1e1e1e] text-white border-r border-gray-700">
-        <nav className="flex flex-col space-y-4">
-          <Button onClick={() => handleMenuItemClick(() => setShowSettings(true))} className="justify-start">
-            <SettingsIcon className="mr-2 h-4 w-4" />
-            Settings
-          </Button>
-          <Button onClick={() => handleMenuItemClick(() => setShowSavedCodes(true))} className="justify-start">
-            <BookOpen className="mr-2 h-4 w-4" />
-            Saved Codes
-          </Button>
-          <Button onClick={() => handleMenuItemClick(() => setShowFontPanel(true))} className="justify-start">
-            <Type className="mr-2 h-4 w-4" />
-            Font Library
-          </Button>
-          <Button onClick={() => handleMenuItemClick(saveCurrentCode)} className="justify-start">
-            <Save className="mr-2 h-4 w-4" />
-            Save Current Code
-          </Button>
-        </nav>
-      </SheetContent>
-    </Sheet>
+        <Button onClick={() => { setShowSavedCodes(true); setIsMenuOpen(false); }} className="justify-start">
+          <BookOpen className="mr-2 h-4 w-4" />
+          Saved Codes
+        </Button>
+        <Button onClick={() => { setShowFontPanel(true); setIsMenuOpen(false); }} className="justify-start">
+          <Type className="mr-2 h-4 w-4" />
+          Font Library
+        </Button>
+        <Button onClick={() => { saveCurrentCode(); setIsMenuOpen(false); }} className="justify-start">
+          <Save className="mr-2 h-4 w-4" />
+          Save Current Code
+        </Button>
+      </nav>
+    </div>
   );
 
   return (
     <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
       <header className="bg-black p-2 flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          {isMobile && renderMobileMenu()}
+          {isMobile && (
+            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(true)}>
+              <Menu className="h-6 w-6" />
+            </Button>
+          )}
           <div className="w-6 h-6 bg-white rounded-sm"></div>
           <input
             type="text"
@@ -361,6 +358,7 @@ const CodeEditor = () => {
       {showFontPanel && (
         <FontPanel onClose={() => setShowFontPanel(false)} isMobile={isMobile} />
       )}
+      {renderMobileMenu()}
     </div>
   );
 };
