@@ -9,7 +9,7 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Settings as SettingsIcon, Save, BookOpen, Type } from 'lucide-react';
+import { Settings as SettingsIcon, Save } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
@@ -227,13 +227,13 @@ const CodeEditor = () => {
             onClick={() => setShowSavedCodes(!showSavedCodes)}
             className="p-2 rounded-full hover:bg-gray-800"
           >
-            <BookOpen className="w-5 h-5" />
+            Saved Codes
           </button>
           <button
             onClick={() => setShowFontPanel(!showFontPanel)}
             className="p-2 rounded-full hover:bg-gray-800"
           >
-            <Type className="w-5 h-5" />
+            Fonts
           </button>
           <button
             onClick={() => setShowSettings(!showSettings)}
@@ -247,13 +247,11 @@ const CodeEditor = () => {
         {renderLayout()}
       </div>
       {showSettings && (
-        <div className="fixed inset-y-0 right-0 w-80 bg-gray-800 shadow-lg z-50">
-          <Settings
-            settings={settings}
-            setSettings={setSettings}
-            onClose={() => setShowSettings(false)}
-          />
-        </div>
+        <Settings
+          settings={settings}
+          setSettings={setSettings}
+          onClose={() => setShowSettings(false)}
+        />
       )}
       {showSavedCodes && (
         <SavedCodes

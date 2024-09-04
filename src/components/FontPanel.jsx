@@ -30,7 +30,7 @@ const FontPanel = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-y-0 left-0 bg-gray-800 w-96 shadow-lg z-50 flex flex-col m-4 rounded-lg overflow-hidden">
+    <div className="fixed inset-y-0 left-0 bg-gray-800 w-96 shadow-lg z-50 flex flex-col">
       <div className="p-6 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-xl font-bold text-white">Font Library</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
