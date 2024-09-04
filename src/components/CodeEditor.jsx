@@ -126,21 +126,26 @@ const CodeEditor = () => {
     switch (action) {
       case 'format':
         // Implement formatting logic
+        console.log(`Formatting ${panel}`);
         break;
       case 'analyze':
         // Implement analysis logic
+        console.log(`Analyzing ${panel}`);
         break;
       case 'maximize':
         // Implement maximize logic
+        console.log(`Maximizing ${panel} editor`);
         break;
       case 'minimize':
         togglePanel(panel);
         break;
       case 'foldAll':
         // Implement fold all logic
+        console.log(`Folding all in ${panel}`);
         break;
       case 'unfoldAll':
         // Implement unfold all logic
+        console.log(`Unfolding all in ${panel}`);
         break;
       default:
         break;
@@ -237,7 +242,6 @@ const CodeEditor = () => {
             style={{
               fontSize: `${settings.fontSize}px`,
               height: '100%',
-              overflowX: 'hidden',
             }}
             basicSetup={{
               lineNumbers: settings.lineNumbers,
