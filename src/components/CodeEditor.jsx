@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
@@ -13,6 +13,9 @@ import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save } 
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import { autocompletion } from '@codemirror/autocomplete';
+import { EditorView } from '@codemirror/view';
+import { indentUnit } from '@codemirror/language';
+import { Tooltip } from '@/components/ui/tooltip';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -44,6 +47,12 @@ const CodeEditor = () => {
     css: false,
     js: false,
   });
+
+  const editorRefs = {
+    html: useRef(null),
+    css: useRef(null),
+    js: useRef(null),
+  };
 
   const themes = {
     dracula: dracula,
@@ -123,34 +132,75 @@ const CodeEditor = () => {
   };
 
   const handleDropdownAction = (action, panel) => {
+    const view = editorRefs[panel].current?.view;
+    if (!view) return;
+
     switch (action) {
       case 'format':
-        // Implement formatting logic
-        console.log(`Formatting ${panel}`);
+        formatCode(panel);
         break;
       case 'analyze':
-        // Implement analysis logic
-        console.log(`Analyzing ${panel}`);
+        analyzeCode(panel);
         break;
       case 'maximize':
-        // Implement maximize logic
-        console.log(`Maximizing ${panel} editor`);
+        maximizeEditor(panel);
         break;
       case 'minimize':
         togglePanel(panel);
         break;
       case 'foldAll':
-        // Implement fold all logic
-        console.log(`Folding all in ${panel}`);
+        foldAllCode(view);
         break;
       case 'unfoldAll':
-        // Implement unfold all logic
-        console.log(`Unfolding all in ${panel}`);
+        unfoldAllCode(view);
         break;
       default:
         break;
     }
     setDropdownOpen(prev => ({ ...prev, [panel]: false }));
+  };
+
+  const formatCode = (panel) => {
+    const view = editorRefs[panel].current?.view;
+    if (!view) return;
+
+    const formatted = prettier.format(view.state.doc.toString(), {
+      parser: panel === 'js' ? 'babel' : panel,
+      plugins: [parserHTML, parserCSS, parserBabel],
+    });
+
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: formatted },
+    });
+  };
+
+  const analyzeCode = (panel) => {
+    const code = panel === 'html' ? htmlCode : panel === 'css' ? cssCode : jsCode;
+    console.log(`Analyzing ${panel.toUpperCase()} code:`);
+    console.log('Character count:', code.length);
+    console.log('Line count:', code.split('\n').length);
+    // Add more analysis as needed
+    alert(`${panel.toUpperCase()} Analysis:\nCharacter count: ${code.length}\nLine count: ${code.split('\n').length}`);
+  };
+
+  const maximizeEditor = (panel) => {
+    const sizes = [0, 0, 0];
+    sizes[['html', 'css', 'js'].indexOf(panel)] = 100;
+    editorRefs[panel].current?.view.dispatch({
+      effects: EditorView.scrollIntoView(0),
+    });
+    // Assuming you have a way to control panel sizes, update it here
+    // For example: setPanelSizes(sizes);
+  };
+
+  const foldAllCode = (view) => {
+    // This is a placeholder. Actual implementation depends on the folding extension you're using
+    console.log('Folding all code');
+  };
+
+  const unfoldAllCode = (view) => {
+    // This is a placeholder. Actual implementation depends on the folding extension you're using
+    console.log('Unfolding all code');
   };
 
   const renderEditor = (language, code, setCode, panel) => (
@@ -163,12 +213,14 @@ const CodeEditor = () => {
           </div>
           <div className="flex items-center">
             <div className="relative">
-              <button
-                onClick={() => toggleDropdown(panel)}
-                className="p-1 hover:bg-[#3a3a3a] rounded"
-              >
-                <ChevronDown className="w-4 h-4" />
-              </button>
+              <Tooltip content="More options">
+                <button
+                  onClick={() => toggleDropdown(panel)}
+                  className="p-1 hover:bg-[#3a3a3a] rounded"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              </Tooltip>
               {dropdownOpen[panel] && (
                 <div className="absolute right-0 mt-2 w-48 bg-[#2d2d2d] rounded-md shadow-lg z-50">
                   <ul className="py-1">
@@ -224,9 +276,11 @@ const CodeEditor = () => {
                 </div>
               )}
             </div>
-            <button onClick={() => togglePanel(panel)} className="p-1 hover:bg-[#3a3a3a] rounded ml-2">
-              {collapsedPanels[panel] ? <ChevronRight className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
-            </button>
+            <Tooltip content={collapsedPanels[panel] ? "Expand" : "Collapse"}>
+              <button onClick={() => togglePanel(panel)} className="p-1 hover:bg-[#3a3a3a] rounded ml-2">
+                {collapsedPanels[panel] ? <ChevronRight className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+              </button>
+            </Tooltip>
           </div>
         </div>
         <div className={`flex-grow overflow-auto transition-all duration-300 ${collapsedPanels[panel] ? 'h-0' : 'h-auto'}`}>
@@ -236,24 +290,32 @@ const CodeEditor = () => {
             theme={themes[settings.editorTheme]}
             extensions={[
               language === 'html' ? html() : language === 'css' ? css() : javascript(),
-              autocompletion()
+              autocompletion(),
+              indentUnit.of(" ".repeat(settings.tabSize)),
+              EditorView.lineWrapping.of(settings.wordWrap),
+              EditorView.theme({
+                "&": { fontSize: settings.fontSize + "px" },
+                ".cm-activeLineGutter, .cm-activeLine": {
+                  backgroundColor: settings.highlightActiveLine ? "rgba(255,255,255,0.1)" : "transparent"
+                }
+              })
             ]}
             onChange={(value) => setCode(value)}
-            style={{
-              fontSize: `${settings.fontSize}px`,
-              height: '100%',
-            }}
             basicSetup={{
               lineNumbers: settings.lineNumbers,
-              foldGutter: false,
-              dropCursor: false,
-              allowMultipleSelections: false,
-              indentOnInput: false,
-              tabSize: settings.tabSize,
+              foldGutter: true,
+              dropCursor: true,
+              allowMultipleSelections: true,
+              indentOnInput: true,
+              bracketMatching: true,
+              closeBrackets: settings.autoCloseBrackets === 'always',
+              autocompletion: true,
               highlightActiveLine: settings.highlightActiveLine,
+              highlightSelectionMatches: true,
+              syntaxHighlighting: true,
             }}
             indentWithTab={settings.indentWithTabs}
-            autoCloseBrackets={settings.autoCloseBrackets === 'always'}
+            ref={editorRefs[panel]}
           />
         </div>
       </div>
@@ -276,24 +338,30 @@ const CodeEditor = () => {
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <button
-            onClick={saveCurrentCode}
-            className="p-2 rounded-full hover:bg-gray-800"
-          >
-            <Save className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => setShowSavedCodes(!showSavedCodes)}
-            className="p-2 rounded-full hover:bg-gray-800"
-          >
-            Saved Codes
-          </button>
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="p-2 rounded-full hover:bg-gray-800"
-          >
-            <SettingsIcon className="w-5 h-5" />
-          </button>
+          <Tooltip content="Save current code">
+            <button
+              onClick={saveCurrentCode}
+              className="p-2 rounded-full hover:bg-gray-800"
+            >
+              <Save className="w-5 h-5" />
+            </button>
+          </Tooltip>
+          <Tooltip content="View saved codes">
+            <button
+              onClick={() => setShowSavedCodes(!showSavedCodes)}
+              className="p-2 rounded-full hover:bg-gray-800"
+            >
+              Saved Codes
+            </button>
+          </Tooltip>
+          <Tooltip content="Open settings">
+            <button
+              onClick={() => setShowSettings(!showSettings)}
+              className="p-2 rounded-full hover:bg-gray-800"
+            >
+              <SettingsIcon className="w-5 h-5" />
+            </button>
+          </Tooltip>
         </div>
       </header>
       <div className="flex-grow overflow-hidden">
