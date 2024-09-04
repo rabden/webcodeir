@@ -114,6 +114,17 @@ const Settings = ({ settings, setSettings, onClose }) => {
             />
             <label htmlFor="highlightActiveLine" className="text-white">Highlight Active Line</label>
           </div>
+          <div>
+            <label className="block mb-2 text-white">Layout</label>
+            <select
+              value={settings.layout}
+              onChange={(e) => handleChange('layout', e.target.value)}
+              className="w-full p-2 rounded bg-gray-700 text-white border border-gray-300"
+            >
+              <option value="horizontal">Preview on Left</option>
+              <option value="vertical">Editors on Left</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
