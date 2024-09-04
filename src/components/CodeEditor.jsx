@@ -12,8 +12,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
-import { EditorView } from '@codemirror/view';
-import { Tooltip } from '@/components/ui/tooltip';
+import { autocompletion } from '@codemirror/autocomplete';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -36,10 +35,15 @@ const CodeEditor = () => {
     lineNumbers: true,
     wordWrap: false,
     indentWithTabs: true,
-    autoCloseBrackets: true,
+    autoCloseBrackets: 'always',
     highlightActiveLine: true,
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
+  const [dropdownOpen, setDropdownOpen] = useState({
+    html: false,
+    css: false,
+    js: false,
+  });
 
   const themes = {
     dracula: dracula,
@@ -114,6 +118,41 @@ const CodeEditor = () => {
     alert('Code saved successfully!');
   };
 
+  const toggleDropdown = (panel) => {
+    setDropdownOpen(prev => ({ ...prev, [panel]: !prev[panel] }));
+  };
+
+  const handleDropdownAction = (action, panel) => {
+    switch (action) {
+      case 'format':
+        // Implement formatting logic
+        console.log(`Formatting ${panel}`);
+        break;
+      case 'analyze':
+        // Implement analysis logic
+        console.log(`Analyzing ${panel}`);
+        break;
+      case 'maximize':
+        // Implement maximize logic
+        console.log(`Maximizing ${panel} editor`);
+        break;
+      case 'minimize':
+        togglePanel(panel);
+        break;
+      case 'foldAll':
+        // Implement fold all logic
+        console.log(`Folding all in ${panel}`);
+        break;
+      case 'unfoldAll':
+        // Implement unfold all logic
+        console.log(`Unfolding all in ${panel}`);
+        break;
+      default:
+        break;
+    }
+    setDropdownOpen(prev => ({ ...prev, [panel]: false }));
+  };
+
   const renderEditor = (language, code, setCode, panel) => (
     <Panel minSize={5} defaultSize={33} collapsible={true}>
       <div className="h-full flex flex-col">
@@ -123,11 +162,71 @@ const CodeEditor = () => {
             <span className="text-sm font-semibold">{language.toUpperCase()}</span>
           </div>
           <div className="flex items-center">
-            <Tooltip content={collapsedPanels[panel] ? "Expand" : "Collapse"}>
-              <button onClick={() => togglePanel(panel)} className="p-1 hover:bg-[#3a3a3a] rounded ml-2">
-                {collapsedPanels[panel] ? <ChevronRight className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+            <div className="relative">
+              <button
+                onClick={() => toggleDropdown(panel)}
+                className="p-1 hover:bg-[#3a3a3a] rounded"
+              >
+                <ChevronDown className="w-4 h-4" />
               </button>
-            </Tooltip>
+              {dropdownOpen[panel] && (
+                <div className="absolute right-0 mt-2 w-48 bg-[#2d2d2d] rounded-md shadow-lg z-50">
+                  <ul className="py-1">
+                    <li>
+                      <button
+                        onClick={() => handleDropdownAction('format', panel)}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
+                      >
+                        Format {language.toUpperCase()}
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => handleDropdownAction('analyze', panel)}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
+                      >
+                        Analyze {language.toUpperCase()}
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => handleDropdownAction('maximize', panel)}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
+                      >
+                        Maximize {language.toUpperCase()} Editor
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => handleDropdownAction('minimize', panel)}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
+                      >
+                        Minimize {language.toUpperCase()} Editor
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => handleDropdownAction('foldAll', panel)}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
+                      >
+                        Fold All
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => handleDropdownAction('unfoldAll', panel)}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
+                      >
+                        Unfold All
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+            <button onClick={() => togglePanel(panel)} className="p-1 hover:bg-[#3a3a3a] rounded ml-2">
+              {collapsedPanels[panel] ? <ChevronRight className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+            </button>
           </div>
         </div>
         <div className={`flex-grow overflow-auto transition-all duration-300 ${collapsedPanels[panel] ? 'h-0' : 'h-auto'}`}>
@@ -137,28 +236,24 @@ const CodeEditor = () => {
             theme={themes[settings.editorTheme]}
             extensions={[
               language === 'html' ? html() : language === 'css' ? css() : javascript(),
-              EditorView.lineWrapping.of(settings.wordWrap),
-              EditorView.theme({
-                "&": { fontSize: settings.fontSize + "px" },
-                ".cm-activeLineGutter, .cm-activeLine": {
-                  backgroundColor: settings.highlightActiveLine ? "rgba(255,255,255,0.1)" : "transparent"
-                }
-              })
+              autocompletion()
             ]}
             onChange={(value) => setCode(value)}
+            style={{
+              fontSize: `${settings.fontSize}px`,
+              height: '100%',
+            }}
             basicSetup={{
               lineNumbers: settings.lineNumbers,
-              foldGutter: true,
-              dropCursor: true,
-              allowMultipleSelections: true,
-              indentOnInput: true,
-              bracketMatching: true,
-              closeBrackets: settings.autoCloseBrackets,
-              autocompletion: true,
+              foldGutter: false,
+              dropCursor: false,
+              allowMultipleSelections: false,
+              indentOnInput: false,
+              tabSize: settings.tabSize,
               highlightActiveLine: settings.highlightActiveLine,
-              highlightSelectionMatches: true,
-              indentUnit: " ".repeat(settings.tabSize),
             }}
+            indentWithTab={settings.indentWithTabs}
+            autoCloseBrackets={settings.autoCloseBrackets === 'always'}
           />
         </div>
       </div>
@@ -181,30 +276,24 @@ const CodeEditor = () => {
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <Tooltip content="Save current code">
-            <button
-              onClick={saveCurrentCode}
-              className="p-2 rounded-full hover:bg-gray-800"
-            >
-              <Save className="w-5 h-5" />
-            </button>
-          </Tooltip>
-          <Tooltip content="View saved codes">
-            <button
-              onClick={() => setShowSavedCodes(!showSavedCodes)}
-              className="p-2 rounded-full hover:bg-gray-800"
-            >
-              Saved Codes
-            </button>
-          </Tooltip>
-          <Tooltip content="Open settings">
-            <button
-              onClick={() => setShowSettings(!showSettings)}
-              className="p-2 rounded-full hover:bg-gray-800"
-            >
-              <SettingsIcon className="w-5 h-5" />
-            </button>
-          </Tooltip>
+          <button
+            onClick={saveCurrentCode}
+            className="p-2 rounded-full hover:bg-gray-800"
+          >
+            <Save className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setShowSavedCodes(!showSavedCodes)}
+            className="p-2 rounded-full hover:bg-gray-800"
+          >
+            Saved Codes
+          </button>
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className="p-2 rounded-full hover:bg-gray-800"
+          >
+            <SettingsIcon className="w-5 h-5" />
+          </button>
         </div>
       </header>
       <div className="flex-grow overflow-hidden">
