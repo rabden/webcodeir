@@ -121,11 +121,9 @@ const CodeEditor = () => {
             <div className={`w-4 h-4 rounded-full mr-2 ${language === 'html' ? 'bg-[#ff5f56]' : language === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
             <span className="text-sm font-semibold">{language.toUpperCase()}</span>
           </div>
-          <div className="flex items-center">
-            <button onClick={() => togglePanel(panel)} className="p-1 hover:bg-[#3a3a3a] rounded ml-2">
-              {collapsedPanels[panel] ? <ChevronRight className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
-            </button>
-          </div>
+          <button onClick={() => togglePanel(panel)} className="p-1 hover:bg-[#3a3a3a] rounded ml-2">
+            {collapsedPanels[panel] ? <ChevronRight className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+          </button>
         </div>
         <div className={`flex-grow overflow-auto transition-all duration-300 ${collapsedPanels[panel] ? 'h-0' : 'h-auto'}`}>
           <CodeMirror
@@ -137,12 +135,12 @@ const CodeEditor = () => {
               autocompletion()
             ]}
             onChange={(value) => setCode(value)}
-            className="h-full overflow-y-auto"
+            className="h-full"
             style={{
               fontSize: `${settings.fontSize}px`,
-              height: 'calc(100% - 400px)',
-              minHeight: '100px',
+              height: 'calc(100% - 32px)', // Subtract header height
               overflowX: 'hidden',
+              paddingBottom: '400px',
             }}
             basicSetup={{
               lineNumbers: settings.lineNumbers,
@@ -156,7 +154,6 @@ const CodeEditor = () => {
             indentWithTab={settings.indentWithTabs}
             autoCloseBrackets={settings.autoCloseBrackets === 'always'}
           />
-          <div style={{ height: '400px' }}></div>
         </div>
       </div>
     </Panel>
