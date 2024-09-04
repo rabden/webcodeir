@@ -2,7 +2,6 @@ import prettier from 'prettier';
 import parserHtml from 'prettier/parser-html';
 import parserCss from 'prettier/parser-postcss';
 import parserBabel from 'prettier/parser-babel';
-import { ESLint } from 'eslint';
 
 export const formatCode = (code, language) => {
   try {
@@ -21,44 +20,45 @@ export const formatCode = (code, language) => {
   }
 };
 
-export const analyzeCode = async (code, language) => {
+export const analyzeCode = (code, language) => {
+  // Simple analysis based on common coding issues
+  const issues = [];
+
   if (language === 'js') {
-    const eslint = new ESLint();
-    try {
-      const results = await eslint.lintText(code);
-      if (results[0].messages.length > 0) {
-        const firstError = results[0].messages[0];
-        return {
-          message: `${firstError.message} (Line: ${firstError.line}, Column: ${firstError.column})`,
-          suggestion: `Consider reviewing your code at the specified location.`
-        };
-      } else {
-        return {
-          message: 'No issues found in the JavaScript code.',
-          suggestion: 'Your code looks good!'
-        };
-      }
-    } catch (error) {
-      console.error('Error analyzing JavaScript code:', error);
-      return {
-        message: 'An error occurred while analyzing the code.',
-        suggestion: 'Please check your code for syntax errors.'
-      };
+    // Check for common JavaScript issues
+    if (code.includes('var ')) {
+      issues.push('Consider using "let" or "const" instead of "var" for better scoping.');
     }
+    if (code.includes('==')) {
+      issues.push('Use "===" for strict equality comparisons instead of "==".');
+    }
+    if (code.includes('console.log')) {
+      issues.push('Remember to remove console.log statements before production.');
+    }
+  } else if (language === 'html') {
+    // Check for common HTML issues
+    if (!code.toLowerCase().includes('<!doctype html>')) {
+      issues.push('Add <!DOCTYPE html> declaration at the beginning of the HTML document.');
+    }
+    if (code.includes('<img') && !code.includes('alt=')) {
+      issues.push('Ensure all <img> tags have an "alt" attribute for accessibility.');
+    }
+  } else if (language === 'css') {
+    // Check for common CSS issues
+    if (code.includes('!important')) {
+      issues.push('Avoid using !important as it can lead to specificity issues.');
+    }
+  }
+
+  if (issues.length === 0) {
+    return {
+      message: `No obvious issues found in your ${language.toUpperCase()} code.`,
+      suggestion: 'Your code looks good, but consider having it reviewed by a peer for best practices.'
+    };
   } else {
-    // For HTML and CSS, we'll use a simple length check as a placeholder
-    // In a real-world scenario, you'd want to use more sophisticated analysis tools
-    const lineCount = code.split('\n').length;
-    if (lineCount > 100) {
-      return {
-        message: `Your ${language.toUpperCase()} code is quite long (${lineCount} lines).`,
-        suggestion: 'Consider breaking it into smaller, more manageable components or files.'
-      };
-    } else {
-      return {
-        message: `No obvious issues found in your ${language.toUpperCase()} code.`,
-        suggestion: 'Your code looks good, but consider having it reviewed by a peer for best practices.'
-      };
-    }
+    return {
+      message: `Found ${issues.length} potential issue(s) in your ${language.toUpperCase()} code:`,
+      suggestion: issues.join(' ')
+    };
   }
 };
