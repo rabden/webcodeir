@@ -262,17 +262,7 @@ const CodeEditor = () => {
         />
       )}
       {showFontPanel && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#1e1e1e] p-6 rounded-lg shadow-lg w-3/4 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-white">Font Panel</h2>
-              <button onClick={() => setShowFontPanel(false)} className="text-white hover:text-gray-300">
-                Close
-              </button>
-            </div>
-            <FontPanel />
-          </div>
-        </div>
+        <FontPanel onClose={() => setShowFontPanel(false)} />
       )}
     </div>
   );
