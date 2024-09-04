@@ -9,13 +9,10 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Settings as SettingsIcon, Save, MoreVertical } from 'lucide-react';
+import { Settings as SettingsIcon, Save } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import { autocompletion } from '@codemirror/autocomplete';
-import EditorSettings from './EditorSettings';
-import { foldGutter, foldKeymap } from '@codemirror/language';
-import { keymap } from '@codemirror/view';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -35,10 +32,9 @@ const CodeEditor = () => {
     indentWithTabs: true,
     autoCloseBrackets: 'always',
     highlightActiveLine: true,
-    layout: 'horizontal',
+    layout: 'horizontal', // New setting for layout
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
-  const [showEditorSettings, setShowEditorSettings] = useState({ html: false, css: false, js: false });
 
   const themes = {
     dracula: dracula,
@@ -51,10 +47,17 @@ const CodeEditor = () => {
   useEffect(() => {
     const debounce = setTimeout(() => {
       updatePreview();
+      if (settings.autoSave) {
+        saveToLocalStorage();
+      }
     }, 300);
 
     return () => clearTimeout(debounce);
-  }, [htmlCode, cssCode, jsCode]);
+  }, [htmlCode, cssCode, jsCode, settings.autoSave]);
+
+  useEffect(() => {
+    loadFromLocalStorage();
+  }, []);
 
   const updatePreview = () => {
     const combinedCode = `
@@ -71,16 +74,33 @@ const CodeEditor = () => {
     setPreview(combinedCode);
   };
 
+  const saveToLocalStorage = () => {
+    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName }));
+  };
+
+  const loadFromLocalStorage = () => {
+    const savedState = localStorage.getItem('codeEditorState');
+    if (savedState) {
+      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
+      setHtmlCode(htmlCode);
+      setCssCode(cssCode);
+      setJsCode(jsCode);
+      setSettings(savedSettings);
+      setCurrentCodeName(currentCodeName || 'Untitled');
+    }
+  };
+
   const saveCurrentCode = () => {
     const savedCodes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
-    const newCode = {
+    const newSavedCode = {
       id: Date.now(),
       name: currentCodeName,
       html: htmlCode,
       css: cssCode,
       js: jsCode,
+      date: new Date().toISOString(),
     };
-    savedCodes.push(newCode);
+    savedCodes.push(newSavedCode);
     localStorage.setItem('savedCodes', JSON.stringify(savedCodes));
     alert('Code saved successfully!');
   };
@@ -93,12 +113,6 @@ const CodeEditor = () => {
             <div className={`w-4 h-4 rounded-full mr-2 ${language === 'html' ? 'bg-[#ff5f56]' : language === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
             <span className="text-sm font-semibold">{language.toUpperCase()}</span>
           </div>
-          <button
-            onClick={() => setShowEditorSettings({ ...showEditorSettings, [language]: true })}
-            className="p-1 rounded-full hover:bg-gray-700 transition-colors"
-          >
-            <MoreVertical className="w-4 h-4" />
-          </button>
         </div>
         <div className="flex-grow overflow-auto">
           <CodeMirror
@@ -107,15 +121,13 @@ const CodeEditor = () => {
             theme={themes[settings.editorTheme]}
             extensions={[
               language === 'html' ? html() : language === 'css' ? css() : javascript(),
-              autocompletion(),
-              foldGutter(),
-              keymap.of(foldKeymap)
+              autocompletion()
             ]}
             onChange={(value) => setCode(value)}
             style={{ fontSize: `${settings.fontSize}px` }}
             basicSetup={{
               lineNumbers: settings.lineNumbers,
-              foldGutter: true,
+              foldGutter: false,
               dropCursor: false,
               allowMultipleSelections: false,
               indentOnInput: false,
@@ -123,17 +135,10 @@ const CodeEditor = () => {
               highlightActiveLine: settings.highlightActiveLine,
             }}
             indentWithTab={settings.indentWithTabs}
+            autoCloseBrackets={settings.autoCloseBrackets === 'always'}
           />
         </div>
       </div>
-      {showEditorSettings[language] && (
-        <EditorSettings
-          onClose={() => setShowEditorSettings({ ...showEditorSettings, [language]: false })}
-          language={language}
-          code={code}
-          onCodeUpdate={setCode}
-        />
-      )}
     </Panel>
   );
 
