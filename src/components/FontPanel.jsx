@@ -4,26 +4,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 
 const fonts = [
-  { name: 'Lato' },
-  { name: 'Open Sans' },
-  { name: 'Roboto' },
-  { name: 'Merriweather' },
-  { name: 'Montserrat' },
-  { name: 'Raleway' },
-  { name: 'Lora' },
-  { name: 'Poppins' },
-  { name: 'Playfair Display' },
-  { name: 'Source Sans Pro' },
-  { name: 'Nunito' },
-  { name: 'Oswald' },
-  { name: 'Quicksand' },
-  { name: 'Fira Sans' },
-  { name: 'Cabin' },
-  { name: 'Arvo' },
-  { name: 'Bitter' },
-  { name: 'Crimson Text' },
-  { name: 'Exo 2' },
-  { name: 'Josefin Sans' },
+  'Lato', 'Open Sans', 'Roboto', 'Merriweather', 'Montserrat', 'Raleway', 'Lora', 'Poppins',
+  'Playfair Display', 'Source Sans Pro', 'Nunito', 'Oswald', 'Quicksand', 'Fira Sans',
+  'Cabin', 'Arvo', 'Bitter', 'Crimson Text', 'Exo 2', 'Josefin Sans'
 ];
 
 const FontPanel = ({ onClose }) => {
@@ -33,7 +16,7 @@ const FontPanel = ({ onClose }) => {
 
   useEffect(() => {
     const results = fonts.filter(font =>
-      font.name.toLowerCase().includes(searchTerm.toLowerCase())
+      font.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredFonts(results);
   }, [searchTerm]);
@@ -68,13 +51,8 @@ const FontPanel = ({ onClose }) => {
       </div>
       <div className="flex-grow overflow-y-auto p-6 space-y-4">
         {filteredFonts.map((font) => (
-          <div key={font.name} className="bg-gray-700 rounded-lg p-4 flex justify-between items-center">
-            <div>
-              <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: font.name }}>{font.name}</h3>
-              <p className="text-sm text-gray-300" style={{ fontFamily: font.name }}>
-                ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
-              </p>
-            </div>
+          <div key={font} className="bg-gray-700 rounded-lg p-4 flex justify-between items-center">
+            <h3 className="text-lg font-bold text-white" style={{ fontFamily: font }}>{font}</h3>
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -87,16 +65,16 @@ const FontPanel = ({ onClose }) => {
                     key={type}
                     onClick={() => copyToClipboard(
                       type === 'link' 
-                        ? `<link href="https://fonts.googleapis.com/css?family=${font.name.replace(' ', '+')}" rel="stylesheet">`
+                        ? `<link href="https://fonts.googleapis.com/css?family=${font.replace(' ', '+')}" rel="stylesheet">`
                         : type === 'import'
-                        ? `@import url('https://fonts.googleapis.com/css?family=${font.name.replace(' ', '+')}');`
-                        : `font-family: '${font.name}', sans-serif;`,
-                      font.name,
+                        ? `@import url('https://fonts.googleapis.com/css?family=${font.replace(' ', '+')}');`
+                        : `font-family: '${font}', sans-serif;`,
+                      font,
                       type
                     )}
                     className="w-full px-2 py-2 text-left hover:bg-gray-600 text-sm transition-colors flex items-center space-x-2"
                   >
-                    {copiedStates[font.name + type] ? (
+                    {copiedStates[font + type] ? (
                       <>
                         <Check className="w-4 h-4 text-green-500" />
                         <span className="text-green-500">Copied!</span>
