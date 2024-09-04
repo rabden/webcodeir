@@ -6,9 +6,11 @@ const IconPanel = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedIcon, setCopiedIcon] = useState(null);
 
-  const icons = Object.entries(LucideIcons).filter(([name]) => 
-    name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const icons = Object.entries(LucideIcons)
+    .filter(([name]) => 
+      name.toLowerCase().includes(searchTerm.toLowerCase()) && typeof LucideIcons[name] === 'function'
+    )
+    .map(([name, Icon]) => ({ name, Icon }));
 
   const copyToClipboard = (iconName) => {
     const svgString = `<i data-lucide="${iconName}"></i>`;
@@ -39,7 +41,7 @@ const IconPanel = ({ onClose }) => {
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {icons.map(([name, Icon]) => (
+          {icons.map(({ name, Icon }) => (
             <div key={name} className="flex flex-col items-center p-4 bg-gray-800 rounded-lg">
               <Icon className="w-8 h-8 text-white mb-2" />
               <p className="text-sm text-gray-300 mb-2 truncate w-full text-center">{name}</p>
