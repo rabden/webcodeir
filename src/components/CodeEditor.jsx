@@ -247,7 +247,7 @@ const CodeEditor = () => {
         {renderLayout()}
       </div>
       {showSettings && (
-        <div className="fixed inset-y-0 right-0 w-80 bg-gray-800 shadow-lg z-50">
+        <div className="fixed inset-y-0 right-0 w-80 bg-gray-800 shadow-lg z-50 m-4 rounded-lg overflow-hidden">
           <Settings
             settings={settings}
             setSettings={setSettings}
