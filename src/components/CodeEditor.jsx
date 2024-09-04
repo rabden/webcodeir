@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
@@ -44,7 +44,6 @@ const CodeEditor = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [previewSize, setPreviewSize] = useState(50);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const resizerRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -80,10 +79,10 @@ const CodeEditor = () => {
   const loadFromLocalStorage = () => {
     const savedState = localStorage.getItem('codeEditorState');
     if (savedState) {
-      const { code, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
-      setCode(code);
+      const { code: savedCode, settings: savedSettings, currentCodeName: savedName } = JSON.parse(savedState);
+      setCode(savedCode);
       setSettings(savedSettings);
-      setCurrentCodeName(currentCodeName || 'Untitled');
+      setCurrentCodeName(savedName || 'Untitled');
     }
   };
 
@@ -119,7 +118,7 @@ const CodeEditor = () => {
               autocompletion(),
               EditorView.lineWrapping,
             ]}
-            onChange={(value) => setCode({ ...code, [language]: value })}
+            onChange={(value) => setCode(prevCode => ({ ...prevCode, [language]: value }))}
             style={{
               height: '100%',
               fontSize: `${settings.fontSize}px`,
@@ -142,77 +141,57 @@ const CodeEditor = () => {
     </Panel>
   );
 
-  const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    const startY = touch.clientY;
-    const startPreviewSize = previewSize;
-
-    const handleTouchMove = (e) => {
-      const touch = e.touches[0];
-      const deltaY = touch.clientY - startY;
-      const newPreviewSize = Math.max(0, Math.min(100, startPreviewSize - (deltaY / window.innerHeight) * 100));
-      setPreviewSize(newPreviewSize);
-    };
-
-    const handleTouchEnd = () => {
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-    };
-
-    document.addEventListener('touchmove', handleTouchMove);
-    document.addEventListener('touchend', handleTouchEnd);
-  };
-
-  const renderLayout = () => {
-    const editorPanel = (
-      <PanelGroup direction="vertical">
-        {renderEditor('html')}
-        <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-        {renderEditor('css')}
-        <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-        {renderEditor('js')}
-      </PanelGroup>
-    );
-
-    const previewPanel = (
-      <iframe
-        title="preview"
-        srcDoc={preview}
-        className="w-full h-full border-none bg-white"
-        sandbox="allow-scripts"
-      />
-    );
-
-    return (
-      <PanelGroup direction={settings.layout === 'horizontal' ? 'horizontal' : 'vertical'} className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
-        {settings.layout === 'horizontal' ? (
-          <>
-            <Panel minSize={0} defaultSize={50}>
-              {previewPanel}
-            </Panel>
-            <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-              <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-            </PanelResizeHandle>
-            <Panel minSize={0} defaultSize={50}>
-              {editorPanel}
-            </Panel>
-          </>
-        ) : (
-          <>
-            <Panel minSize={0} defaultSize={50}>
-              {editorPanel}
-            </Panel>
-            <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-              <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-            </PanelResizeHandle>
-            <Panel minSize={0} defaultSize={50}>
-              {previewPanel}
-            </Panel>
-          </>
-        )}
-      </PanelGroup>
-    );
-  };
+  const renderLayout = () => (
+    <PanelGroup direction={settings.layout === 'horizontal' ? 'horizontal' : 'vertical'} className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
+      {settings.layout === 'horizontal' ? (
+        <>
+          <Panel minSize={0} defaultSize={50}>
+            <iframe
+              title="preview"
+              srcDoc={preview}
+              className="w-full h-full border-none bg-white"
+              sandbox="allow-scripts"
+            />
+          </Panel>
+          <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+            <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+          </PanelResizeHandle>
+          <Panel minSize={0} defaultSize={50}>
+            <PanelGroup direction="vertical">
+              {renderEditor('html')}
+              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              {renderEditor('css')}
+              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              {renderEditor('js')}
+            </PanelGroup>
+          </Panel>
+        </>
+      ) : (
+        <>
+          <Panel minSize={0} defaultSize={50}>
+            <PanelGroup direction="vertical">
+              {renderEditor('html')}
+              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              {renderEditor('css')}
+              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              {renderEditor('js')}
+            </PanelGroup>
+          </Panel>
+          <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+            <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+          </PanelResizeHandle>
+          <Panel minSize={0} defaultSize={50}>
+            <iframe
+              title="preview"
+              srcDoc={preview}
+              className="w-full h-full border-none bg-white"
+              sandbox="allow-scripts"
+            />
+          </Panel>
+        </>
+      )}
+    </PanelGroup>
+  );
 
   const renderMobileMenu = () => (
     <div className={`fixed inset-y-0 left-0 w-64 bg-gray-800 shadow-lg z-50 transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
