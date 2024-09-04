@@ -15,6 +15,7 @@ import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
 import { autocompletion } from '@codemirror/autocomplete';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { EditorView } from '@codemirror/view';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -36,6 +37,10 @@ const CodeEditor = () => {
     autoCloseBrackets: 'always',
     highlightActiveLine: true,
     layout: 'horizontal',
+    cursorStyle: 'line',
+    matchBrackets: true,
+    minimap: false,
+    scrollSpeed: 5,
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
 
@@ -124,11 +129,24 @@ const CodeEditor = () => {
             theme={themes[settings.editorTheme]}
             extensions={[
               language === 'html' ? html() : language === 'css' ? css() : javascript(),
-              autocompletion()
+              autocompletion(),
+              EditorView.lineWrapping.of(settings.wordWrap),
+              EditorView.theme({
+                "&": {
+                  fontSize: `${settings.fontSize}px`,
+                },
+                ".cm-cursor": {
+                  borderLeft: settings.cursorStyle === 'line' ? '1px solid #fff' : 'none',
+                  backgroundColor: settings.cursorStyle === 'block' ? 'rgba(255,255,255,0.5)' : 'transparent',
+                  borderBottom: settings.cursorStyle === 'underline' ? '2px solid #fff' : 'none',
+                },
+                ".cm-matchingBracket": {
+                  backgroundColor: settings.matchBrackets ? 'rgba(255,255,255,0.3)' : 'transparent',
+                },
+              }),
             ]}
             onChange={(value) => setCode(value)}
             style={{
-              fontSize: `${settings.fontSize}px`,
               height: '100%',
             }}
             className="h-full"
@@ -140,8 +158,10 @@ const CodeEditor = () => {
               indentOnInput: false,
               tabSize: settings.tabSize,
               highlightActiveLine: settings.highlightActiveLine,
+              bracketMatching: settings.matchBrackets,
             }}
             indentWithTab={settings.indentWithTabs}
+            autoCloseBrackets={settings.autoCloseBrackets === 'always'}
           />
         </div>
       </div>
