@@ -13,6 +13,7 @@ import { Settings as SettingsIcon, Save } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
+import IconPanel from './IconPanel';
 import { autocompletion } from '@codemirror/autocomplete';
 
 const CodeEditor = () => {
@@ -24,6 +25,7 @@ const CodeEditor = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showSavedCodes, setShowSavedCodes] = useState(false);
   const [showFontPanel, setShowFontPanel] = useState(false);
+  const [showIconPanel, setShowIconPanel] = useState(false);
   const [settings, setSettings] = useState({
     editorTheme: 'dracula',
     fontSize: 14,
@@ -66,10 +68,14 @@ const CodeEditor = () => {
       <html>
         <head>
           <style>${cssCode}</style>
+          <script src="https://unpkg.com/lucide@latest"></script>
         </head>
         <body>
           ${htmlCode}
           <script>${jsCode}</script>
+          <script>
+            lucide.createIcons();
+          </script>
         </body>
       </html>
     `;
@@ -236,6 +242,12 @@ const CodeEditor = () => {
             Fonts
           </button>
           <button
+            onClick={() => setShowIconPanel(!showIconPanel)}
+            className="p-2 rounded-full hover:bg-gray-800"
+          >
+            Icons
+          </button>
+          <button
             onClick={() => setShowSettings(!showSettings)}
             className="p-2 rounded-full hover:bg-gray-800"
           >
@@ -267,6 +279,9 @@ const CodeEditor = () => {
       )}
       {showFontPanel && (
         <FontPanel onClose={() => setShowFontPanel(false)} />
+      )}
+      {showIconPanel && (
+        <IconPanel onClose={() => setShowIconPanel(false)} />
       )}
     </div>
   );
