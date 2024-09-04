@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
@@ -12,11 +12,8 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { ChevronDown, ChevronUp, ChevronRight, Settings as SettingsIcon, Save } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
-import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
-import { indentUnit } from '@codemirror/language';
 import { Tooltip } from '@/components/ui/tooltip';
-import { lineWrapping } from '@codemirror/view';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -39,21 +36,10 @@ const CodeEditor = () => {
     lineNumbers: true,
     wordWrap: false,
     indentWithTabs: true,
-    autoCloseBrackets: 'always',
+    autoCloseBrackets: true,
     highlightActiveLine: true,
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
-  const [dropdownOpen, setDropdownOpen] = useState({
-    html: false,
-    css: false,
-    js: false,
-  });
-
-  const editorRefs = {
-    html: useRef(null),
-    css: useRef(null),
-    js: useRef(null),
-  };
 
   const themes = {
     dracula: dracula,
@@ -128,76 +114,6 @@ const CodeEditor = () => {
     alert('Code saved successfully!');
   };
 
-  const toggleDropdown = (panel) => {
-    setDropdownOpen(prev => ({ ...prev, [panel]: !prev[panel] }));
-  };
-
-  const handleDropdownAction = (action, panel) => {
-    const view = editorRefs[panel].current?.view;
-    if (!view) return;
-
-    switch (action) {
-      case 'format':
-        formatCode(panel);
-        break;
-      case 'analyze':
-        analyzeCode(panel);
-        break;
-      case 'maximize':
-        maximizeEditor(panel);
-        break;
-      case 'minimize':
-        togglePanel(panel);
-        break;
-      case 'foldAll':
-        foldAllCode(view);
-        break;
-      case 'unfoldAll':
-        unfoldAllCode(view);
-        break;
-      default:
-        break;
-    }
-    setDropdownOpen(prev => ({ ...prev, [panel]: false }));
-  };
-
-  const formatCode = (panel) => {
-    const view = editorRefs[panel].current?.view;
-    if (!view) return;
-
-    // Placeholder for formatting logic
-    console.log(`Formatting ${panel} code`);
-    // You would typically use a library like Prettier here
-  };
-
-  const analyzeCode = (panel) => {
-    const code = panel === 'html' ? htmlCode : panel === 'css' ? cssCode : jsCode;
-    console.log(`Analyzing ${panel.toUpperCase()} code:`);
-    console.log('Character count:', code.length);
-    console.log('Line count:', code.split('\n').length);
-    alert(`${panel.toUpperCase()} Analysis:\nCharacter count: ${code.length}\nLine count: ${code.split('\n').length}`);
-  };
-
-  const maximizeEditor = (panel) => {
-    const sizes = [0, 0, 0];
-    sizes[['html', 'css', 'js'].indexOf(panel)] = 100;
-    editorRefs[panel].current?.view.dispatch({
-      effects: EditorView.scrollIntoView(0),
-    });
-    // Assuming you have a way to control panel sizes, update it here
-    // For example: setPanelSizes(sizes);
-  };
-
-  const foldAllCode = (view) => {
-    // Placeholder for fold all logic
-    console.log('Folding all code');
-  };
-
-  const unfoldAllCode = (view) => {
-    // Placeholder for unfold all logic
-    console.log('Unfolding all code');
-  };
-
   const renderEditor = (language, code, setCode, panel) => (
     <Panel minSize={5} defaultSize={33} collapsible={true}>
       <div className="h-full flex flex-col">
@@ -207,70 +123,6 @@ const CodeEditor = () => {
             <span className="text-sm font-semibold">{language.toUpperCase()}</span>
           </div>
           <div className="flex items-center">
-            <div className="relative">
-              <Tooltip content="More options">
-                <button
-                  onClick={() => toggleDropdown(panel)}
-                  className="p-1 hover:bg-[#3a3a3a] rounded"
-                >
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-              </Tooltip>
-              {dropdownOpen[panel] && (
-                <div className="absolute right-0 mt-2 w-48 bg-[#2d2d2d] rounded-md shadow-lg z-50">
-                  <ul className="py-1">
-                    <li>
-                      <button
-                        onClick={() => handleDropdownAction('format', panel)}
-                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
-                      >
-                        Format {language.toUpperCase()}
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        onClick={() => handleDropdownAction('analyze', panel)}
-                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
-                      >
-                        Analyze {language.toUpperCase()}
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        onClick={() => handleDropdownAction('maximize', panel)}
-                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
-                      >
-                        Maximize {language.toUpperCase()} Editor
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        onClick={() => handleDropdownAction('minimize', panel)}
-                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
-                      >
-                        Minimize {language.toUpperCase()} Editor
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        onClick={() => handleDropdownAction('foldAll', panel)}
-                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
-                      >
-                        Fold All
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        onClick={() => handleDropdownAction('unfoldAll', panel)}
-                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#3a3a3a]"
-                      >
-                        Unfold All
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              )}
-            </div>
             <Tooltip content={collapsedPanels[panel] ? "Expand" : "Collapse"}>
               <button onClick={() => togglePanel(panel)} className="p-1 hover:bg-[#3a3a3a] rounded ml-2">
                 {collapsedPanels[panel] ? <ChevronRight className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
@@ -285,9 +137,7 @@ const CodeEditor = () => {
             theme={themes[settings.editorTheme]}
             extensions={[
               language === 'html' ? html() : language === 'css' ? css() : javascript(),
-              autocompletion(),
-              indentUnit.of(" ".repeat(settings.tabSize)),
-              settings.wordWrap ? lineWrapping() : [],
+              EditorView.lineWrapping.of(settings.wordWrap),
               EditorView.theme({
                 "&": { fontSize: settings.fontSize + "px" },
                 ".cm-activeLineGutter, .cm-activeLine": {
@@ -303,14 +153,12 @@ const CodeEditor = () => {
               allowMultipleSelections: true,
               indentOnInput: true,
               bracketMatching: true,
-              closeBrackets: settings.autoCloseBrackets === 'always',
+              closeBrackets: settings.autoCloseBrackets,
               autocompletion: true,
               highlightActiveLine: settings.highlightActiveLine,
               highlightSelectionMatches: true,
-              syntaxHighlighting: true,
+              indentUnit: " ".repeat(settings.tabSize),
             }}
-            indentWithTab={settings.indentWithTabs}
-            ref={editorRefs[panel]}
           />
         </div>
       </div>
