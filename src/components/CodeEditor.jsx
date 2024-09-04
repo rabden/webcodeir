@@ -9,13 +9,15 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Settings as SettingsIcon, Save, BookOpen, Type } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
 import { autocompletion } from '@codemirror/autocomplete';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { EditorView } from '@codemirror/view';
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -43,6 +45,7 @@ const CodeEditor = () => {
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [previewSize, setPreviewSize] = useState(50);
 
   useEffect(() => {
     const handleResize = () => {
@@ -143,6 +146,7 @@ const CodeEditor = () => {
             onChange={(value) => setCode(value)}
             style={{
               height: '100%',
+              fontSize: `${settings.fontSize}px`,
             }}
             className="h-full"
             basicSetup={{
@@ -166,7 +170,7 @@ const CodeEditor = () => {
     if (isMobile) {
       return (
         <PanelGroup direction="vertical" className="h-full">
-          <Panel minSize={30} defaultSize={50}>
+          <Panel minSize={0} maxSize={100} defaultSize={100 - previewSize}>
             <PanelGroup direction="vertical">
               {renderEditor('html', htmlCode, setHtmlCode)}
               <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
@@ -175,35 +179,13 @@ const CodeEditor = () => {
               {renderEditor('js', jsCode, setJsCode)}
             </PanelGroup>
           </Panel>
-          <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+          <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group" onDrag={(e) => {
+            const newSize = 100 - (e.clientY / window.innerHeight) * 100;
+            setPreviewSize(Math.max(0, Math.min(100, newSize)));
+          }}>
             <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
           </PanelResizeHandle>
-          <Panel minSize={30} defaultSize={50}>
-            <iframe
-              title="preview"
-              srcDoc={preview}
-              className="w-full h-full border-none bg-white"
-              sandbox="allow-scripts"
-            />
-          </Panel>
-        </PanelGroup>
-      );
-    } else if (settings.layout === 'vertical') {
-      return (
-        <PanelGroup direction="horizontal" className="h-full">
-          <Panel minSize={0} defaultSize={50}>
-            <PanelGroup direction="vertical">
-              {renderEditor('html', htmlCode, setHtmlCode)}
-              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-              {renderEditor('css', cssCode, setCssCode)}
-              <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-              {renderEditor('js', jsCode, setJsCode)}
-            </PanelGroup>
-          </Panel>
-          <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-            <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-          </PanelResizeHandle>
-          <Panel minSize={0} defaultSize={50}>
+          <Panel minSize={0} maxSize={100} defaultSize={previewSize}>
             <iframe
               title="preview"
               srcDoc={preview}
@@ -241,10 +223,29 @@ const CodeEditor = () => {
     }
   };
 
+  const renderMobileMenu = () => (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <Menu className="h-6 w-6" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+        <nav className="flex flex-col space-y-4">
+          <Button onClick={() => setShowSettings(true)}>Settings</Button>
+          <Button onClick={() => setShowSavedCodes(true)}>Saved Codes</Button>
+          <Button onClick={() => setShowFontPanel(true)}>Font Library</Button>
+          <Button onClick={saveCurrentCode}>Save Current Code</Button>
+        </nav>
+      </SheetContent>
+    </Sheet>
+  );
+
   return (
     <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
       <header className="bg-black p-2 flex justify-between items-center">
         <div className="flex items-center space-x-2">
+          {isMobile && renderMobileMenu()}
           <div className="w-6 h-6 bg-white rounded-sm"></div>
           <input
             type="text"
@@ -258,65 +259,67 @@ const CodeEditor = () => {
             </div>
           )}
         </div>
-        <div className="flex items-center space-x-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={saveCurrentCode}
-                  className="p-2 rounded-full hover:bg-gray-800"
-                >
-                  <Save className="w-5 h-5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Save current code</p>
-              </TooltipContent>
-            </Tooltip>
+        {!isMobile && (
+          <div className="flex items-center space-x-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={saveCurrentCode}
+                    className="p-2 rounded-full hover:bg-gray-800"
+                  >
+                    <Save className="w-5 h-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Save current code</p>
+                </TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => setShowSavedCodes(!showSavedCodes)}
-                  className="p-2 rounded-full hover:bg-gray-800"
-                >
-                  <BookOpen className="w-5 h-5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Saved Codes</p>
-              </TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setShowSavedCodes(!showSavedCodes)}
+                    className="p-2 rounded-full hover:bg-gray-800"
+                  >
+                    <BookOpen className="w-5 h-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Saved Codes</p>
+                </TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => setShowFontPanel(!showFontPanel)}
-                  className="p-2 rounded-full hover:bg-gray-800"
-                >
-                  <Type className="w-5 h-5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Font Library</p>
-              </TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setShowFontPanel(!showFontPanel)}
+                    className="p-2 rounded-full hover:bg-gray-800"
+                  >
+                    <Type className="w-5 h-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Font Library</p>
+                </TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => setShowSettings(!showSettings)}
-                  className="p-2 rounded-full hover:bg-gray-800"
-                >
-                  <SettingsIcon className="w-5 h-5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Settings</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setShowSettings(!showSettings)}
+                    className="p-2 rounded-full hover:bg-gray-800"
+                  >
+                    <SettingsIcon className="w-5 h-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Settings</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        )}
       </header>
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
@@ -326,6 +329,7 @@ const CodeEditor = () => {
           settings={settings}
           setSettings={setSettings}
           onClose={() => setShowSettings(false)}
+          isMobile={isMobile}
         />
       )}
       {showSavedCodes && (
@@ -338,10 +342,11 @@ const CodeEditor = () => {
             setCurrentCodeName(code.name);
             setShowSavedCodes(false);
           }}
+          isMobile={isMobile}
         />
       )}
       {showFontPanel && (
-        <FontPanel onClose={() => setShowFontPanel(false)} />
+        <FontPanel onClose={() => setShowFontPanel(false)} isMobile={isMobile} />
       )}
     </div>
   );

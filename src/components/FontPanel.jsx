@@ -12,7 +12,7 @@ const fonts = [
   'Prompt', 'IBM Plex Sans', 'Catamaran', 'Heebo', 'Overpass', 'Asap', 'Noto Serif'
 ];
 
-const FontPanel = ({ onClose }) => {
+const FontPanel = ({ onClose, isMobile }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedStates, setCopiedStates] = useState({});
   const [filteredFonts, setFilteredFonts] = useState(fonts);
@@ -33,7 +33,7 @@ const FontPanel = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-y-4 right-4 bg-gray-800 w-96 shadow-lg z-50 flex flex-col rounded-lg">
+    <div className={`fixed inset-y-4 ${isMobile ? 'inset-x-4' : 'right-4'} bg-gray-800 ${isMobile ? 'w-auto' : 'w-96'} shadow-lg z-50 flex flex-col rounded-lg`}>
       <div className="p-6 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-xl font-bold text-white">Font Library</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">

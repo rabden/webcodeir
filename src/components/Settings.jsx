@@ -1,13 +1,13 @@
 import React from 'react';
 import { X } from 'lucide-react';
 
-const Settings = ({ settings, setSettings, onClose }) => {
+const Settings = ({ settings, setSettings, onClose, isMobile }) => {
   const handleChange = (key, value) => {
     setSettings({ ...settings, [key]: value });
   };
 
   return (
-    <div className="fixed inset-y-4 right-4 bg-gray-800 w-96 shadow-lg z-50 flex flex-col rounded-lg">
+    <div className={`fixed inset-y-4 ${isMobile ? 'inset-x-4' : 'right-4'} bg-gray-800 ${isMobile ? 'w-auto' : 'w-96'} shadow-lg z-50 flex flex-col rounded-lg`}>
       <div className="p-6 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-xl font-bold text-white">Settings</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
@@ -90,17 +90,6 @@ const Settings = ({ settings, setSettings, onClose }) => {
           >
             <option value="tabs">Tabs</option>
             <option value="spaces">Spaces</option>
-          </select>
-        </div>
-        <div>
-          <label className="block mb-2 text-white">Auto Close Brackets</label>
-          <select
-            value={settings.autoCloseBrackets}
-            onChange={(e) => handleChange('autoCloseBrackets', e.target.value)}
-            className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="always">Always</option>
-            <option value="never">Never</option>
           </select>
         </div>
         <div className="flex items-center">
