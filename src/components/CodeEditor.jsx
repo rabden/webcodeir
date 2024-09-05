@@ -7,6 +7,7 @@ import MobileMenu from './MobileMenu';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
+import IconPanel from './IconPanel';
 import ToolsPanel from './ToolsPanel';
 
 const CodeEditor = () => {
@@ -18,6 +19,7 @@ const CodeEditor = () => {
     showSettings: false,
     showSavedCodes: false,
     showFontPanel: false,
+    showIconPanel: false,
     showToolsPanel: false,
     settings: {
       editorTheme: 'vscodeDark',
@@ -214,6 +216,7 @@ const CodeEditor = () => {
         saveCurrentCode={saveCurrentCode}
         setShowSavedCodes={() => setState(s => ({ ...s, showSavedCodes: true }))}
         setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true }))}
+        setShowIconPanel={() => setState(s => ({ ...s, showIconPanel: true }))}
         setShowSettings={() => setState(s => ({ ...s, showSettings: true }))}
         setIsMenuOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
         toggleLayout={toggleLayout}
@@ -249,6 +252,9 @@ const CodeEditor = () => {
       {state.showFontPanel && (
         <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.isMobile} />
       )}
+      {state.showIconPanel && (
+        <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} isMobile={state.isMobile} />
+      )}
       {state.showToolsPanel && (
         <ToolsPanel onClose={() => setState(s => ({ ...s, showToolsPanel: false }))} />
       )}
@@ -258,6 +264,7 @@ const CodeEditor = () => {
         setShowSettings={() => setState(s => ({ ...s, showSettings: true, isMenuOpen: false }))}
         setShowSavedCodes={() => setState(s => ({ ...s, showSavedCodes: true, isMenuOpen: false }))}
         setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true, isMenuOpen: false }))}
+        setShowIconPanel={() => setState(s => ({ ...s, showIconPanel: true, isMenuOpen: false }))}
         saveCurrentCode={() => { saveCurrentCode(); setState(s => ({ ...s, isMenuOpen: false })); }}
       />
     </div>
