@@ -3,7 +3,7 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
-const FlexboxGenerator = ({ isMobile }) => {
+const FlexboxGenerator = () => {
   const [flexDirection, setFlexDirection] = useState('row');
   const [justifyContent, setJustifyContent] = useState('flex-start');
   const [alignItems, setAlignItems] = useState('stretch');
@@ -18,23 +18,22 @@ const FlexboxGenerator = ({ isMobile }) => {
     alignItems,
     flexWrap,
     gap: `${gap}px`,
-    minHeight: isMobile ? '150px' : '200px',
+    minHeight: '200px',
     backgroundColor: '#1e1e1e',
     padding: '10px',
     borderRadius: '8px',
   };
 
   const itemStyle = {
-    minWidth: isMobile ? '40px' : '50px',
-    minHeight: isMobile ? '40px' : '50px',
+    minWidth: '50px',
+    minHeight: '50px',
     backgroundColor: '#4299e1',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     color: 'white',
     borderRadius: '4px',
-    padding: '5px',
-    fontSize: isMobile ? '12px' : '14px',
+    padding: '10px',
   };
 
   const cssCode = `
@@ -48,16 +47,16 @@ const FlexboxGenerator = ({ isMobile }) => {
 }`;
 
   return (
-    <div className="space-y-4">
-      <h3 className={`text-${isMobile ? 'xl' : '2xl'} font-semibold text-white`}>Flexbox Generator</h3>
+    <div className="space-y-6">
+      <h3 className="text-2xl font-semibold text-white">Flexbox Generator</h3>
       <div style={flexboxStyle} className="mb-4">
         {Array.from({ length: itemCount }, (_, i) => (
           <div key={i} style={itemStyle}>
-            {i + 1}
+            Item {i + 1}
           </div>
         ))}
       </div>
-      <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
+      <div className="grid grid-cols-2 gap-4">
         <Select value={flexDirection} onValueChange={setFlexDirection}>
           <SelectTrigger className="bg-gray-800 text-white border-gray-700">
             <SelectValue placeholder="Flex Direction" />
@@ -129,7 +128,7 @@ const FlexboxGenerator = ({ isMobile }) => {
       <Button onClick={() => navigator.clipboard.writeText(cssCode)} className="bg-blue-600 text-white hover:bg-blue-700">
         Copy CSS
       </Button>
-      <pre className={`bg-gray-900 p-4 rounded text-white text-${isMobile ? 'xs' : 'sm'} overflow-x-auto`}>
+      <pre className="bg-gray-900 p-4 rounded text-white text-sm overflow-x-auto">
         {cssCode}
       </pre>
     </div>
