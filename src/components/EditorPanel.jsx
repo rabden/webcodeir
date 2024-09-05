@@ -14,7 +14,7 @@ import { EditorView } from '@codemirror/view';
 import { Palette } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowToolsPanel, isTabMode }) => {
+const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowToolsPanel, isMobile }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
 
   const getLanguageExtension = (lang) => {
@@ -104,7 +104,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     );
   };
 
-  if (isTabMode) {
+  if (isMobile) {
     return (
       <Tabs defaultValue="html" className="w-full h-full flex flex-col">
         <TabsList className="bg-gray-800 text-white">

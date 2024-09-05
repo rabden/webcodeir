@@ -39,7 +39,6 @@ const CodeEditor = () => {
     isMobile: window.innerWidth < 768,
     previewSize: 50,
     isMenuOpen: false,
-    isTabMode: false,
   });
 
   const resizerRef = useRef(null);
@@ -145,10 +144,6 @@ const CodeEditor = () => {
     }));
   };
 
-  const toggleTabMode = () => {
-    setState(s => ({ ...s, isTabMode: !s.isTabMode }));
-  };
-
   const renderEditors = () => (
     <EditorPanel
       htmlCode={state.htmlCode}
@@ -159,7 +154,7 @@ const CodeEditor = () => {
       setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
       settings={state.settings}
       setShowToolsPanel={() => setState(s => ({ ...s, showToolsPanel: true }))}
-      isTabMode={state.isTabMode}
+      isMobile={state.isMobile}
     />
   );
 
@@ -223,8 +218,6 @@ const CodeEditor = () => {
         setIsMenuOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
         toggleLayout={toggleLayout}
         layout={state.settings.layout}
-        isTabMode={state.isTabMode}
-        toggleTabMode={toggleTabMode}
       />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
