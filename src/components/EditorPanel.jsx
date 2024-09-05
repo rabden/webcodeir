@@ -11,8 +11,9 @@ import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
+import { Wrench } from 'lucide-react';
 
-const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings }) => {
+const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowToolsPanel }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
 
   const renderEditor = (language, code, setCode) => (
@@ -23,6 +24,15 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             <div className={`w-4 h-4 rounded-full mr-2 ${language === 'html' ? 'bg-[#ff5f56]' : language === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
             <span className="text-sm font-semibold">{language.toUpperCase()}</span>
           </div>
+          {language === 'css' && (
+            <button
+              onClick={() => setShowToolsPanel(true)}
+              className="p-1 rounded-full hover:bg-gray-700 transition-colors"
+              title="Open CSS Tools"
+            >
+              <Wrench className="w-4 h-4 text-white" />
+            </button>
+          )}
         </div>
         <div className="flex-grow overflow-hidden">
           <CodeMirror

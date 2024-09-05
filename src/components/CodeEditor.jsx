@@ -135,6 +135,7 @@ const CodeEditor = () => {
         setCssCode={setCssCode}
         setJsCode={setJsCode}
         settings={settings}
+        setShowToolsPanel={setShowToolsPanel}
       />
     );
 
