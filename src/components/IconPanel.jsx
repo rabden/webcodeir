@@ -1,34 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, Copy, Check } from 'lucide-react';
+import { X, Search, Check } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
-// This is a mock list of 500 Font Awesome icons. In a real implementation, you'd want to fetch this from an API or import it from a file.
-const icons = [
-  { name: 'fa-user', unicode: '\uf007' },
-  { name: 'fa-home', unicode: '\uf015' },
-  { name: 'fa-cog', unicode: '\uf013' },
-  // ... (497 more icons would be listed here)
-];
-
 const IconPanel = ({ onClose, isMobile }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [copiedStates, setCopiedStates] = useState({});
-  const [filteredIcons, setFilteredIcons] = useState(icons);
+  const [copiedIcon, setCopiedIcon] = useState(null);
+  const [filteredIcons, setFilteredIcons] = useState([]);
 
   useEffect(() => {
-    const results = icons.filter(icon =>
-      icon.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const results = Object.keys(LucideIcons)
+      .filter(iconName => 
+        iconName.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        iconName !== 'createLucideIcon' && // Exclude non-icon exports
+        typeof LucideIcons[iconName] === 'function'
+      );
     setFilteredIcons(results);
   }, [searchTerm]);
 
-  const copyToClipboard = (text, iconName) => {
-    navigator.clipboard.writeText(text);
-    setCopiedStates({ ...copiedStates, [iconName]: true });
-    setTimeout(() => {
-      setCopiedStates({ ...copiedStates, [iconName]: false });
-    }, 2000);
+  const copyToClipboard = (iconName) => {
+    const IconComponent = LucideIcons[iconName];
+    const svgString = IconComponent().props.children.toString();
+    navigator.clipboard.writeText(svgString);
+    setCopiedIcon(iconName);
+    setTimeout(() => setCopiedIcon(null), 2000);
   };
 
   return (
@@ -51,30 +47,33 @@ const IconPanel = ({ onClose, isMobile }) => {
           <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-400" />
         </div>
       </div>
-      <div className="flex-grow overflow-y-auto p-6 space-y-4">
+      <div className="flex-grow overflow-y-auto p-6">
         <div className="grid grid-cols-4 gap-4">
-          {filteredIcons.map((icon) => (
-            <TooltipProvider key={icon.name}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full h-12 flex items-center justify-center bg-gray-700 hover:bg-gray-600 border-gray-600"
-                    onClick={() => copyToClipboard(`<i class="${icon.name}"></i>`, icon.name)}
-                  >
-                    {copiedStates[icon.name] ? (
-                      <Check className="w-6 h-6 text-green-500" />
-                    ) : (
-                      <span className="text-2xl">{icon.unicode}</span>
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{icon.name}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          ))}
+          {filteredIcons.map((iconName) => {
+            const IconComponent = LucideIcons[iconName];
+            return (
+              <TooltipProvider key={iconName}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full h-12 flex items-center justify-center bg-gray-700 hover:bg-gray-600 border-gray-600"
+                      onClick={() => copyToClipboard(iconName)}
+                    >
+                      {copiedIcon === iconName ? (
+                        <Check className="w-6 h-6 text-green-500" />
+                      ) : (
+                        <IconComponent className="w-6 h-6" />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{iconName}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          })}
         </div>
       </div>
     </div>
