@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Columns } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
@@ -13,7 +13,9 @@ const Header = ({
   setShowSettings,
   setIsMenuOpen,
   toggleLayout,
-  layout
+  layout,
+  isTabMode,
+  toggleTabMode
 }) => {
   const getLayoutIcon = () => {
     switch (layout) {
@@ -29,7 +31,7 @@ const Header = ({
   };
 
   return (
-    <header className="bg-black p-2 flex justify-between items-center">
+    <header className="bg-gray-800 p-2 flex justify-between items-center">
       <div className="flex items-center space-x-2">
         {isMobile && (
           <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(true)}>
@@ -49,12 +51,14 @@ const Header = ({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={saveCurrentCode}
-                  className="p-2 rounded-full hover:bg-gray-800"
+                  className="text-white hover:bg-gray-700"
                 >
                   <Save className="w-5 h-5" />
-                </button>
+                </Button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Save current code</p>
@@ -63,12 +67,14 @@ const Header = ({
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setShowSavedCodes(true)}
-                  className="p-2 rounded-full hover:bg-gray-800"
+                  className="text-white hover:bg-gray-700"
                 >
                   <BookOpen className="w-5 h-5" />
-                </button>
+                </Button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Saved Codes</p>
@@ -77,12 +83,14 @@ const Header = ({
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setShowFontPanel(true)}
-                  className="p-2 rounded-full hover:bg-gray-800"
+                  className="text-white hover:bg-gray-700"
                 >
                   <Type className="w-5 h-5" />
-                </button>
+                </Button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Font Library</p>
@@ -91,12 +99,14 @@ const Header = ({
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setShowSettings(true)}
-                  className="p-2 rounded-full hover:bg-gray-800"
+                  className="text-white hover:bg-gray-700"
                 >
                   <SettingsIcon className="w-5 h-5" />
-                </button>
+                </Button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Settings</p>
@@ -105,15 +115,33 @@ const Header = ({
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={toggleLayout}
-                  className="p-2 rounded-full hover:bg-gray-800"
+                  className="text-white hover:bg-gray-700"
                 >
                   {getLayoutIcon()}
-                </button>
+                </Button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Toggle Layout</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleTabMode}
+                  className="text-white hover:bg-gray-700"
+                >
+                  <Columns className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{isTabMode ? 'Switch to Window Mode' : 'Switch to Tab Mode'}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

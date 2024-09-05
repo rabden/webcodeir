@@ -12,8 +12,9 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
 import { Palette } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowToolsPanel, code, setCode, language }) => {
+const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowToolsPanel, isTabMode }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
 
   const getLanguageExtension = (lang) => {
@@ -53,7 +54,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         override: [
           (context) => {
             let word = context.matchBefore(/\w+/);
-            if (word && (word.from !== word.to || context.explicit)) {
+            if (word && word.from != null && word.to != null && (word.from !== word.to || context.explicit)) {
               return {
                 from: word.from,
                 options: [
@@ -87,7 +88,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           height: '100%',
           fontSize: `${settings.fontSize}px`,
         }}
-        className="h-full"
+        className="h-full overflow-auto"
         basicSetup={{
           lineNumbers: settings.lineNumbers,
           foldGutter: false,
@@ -103,20 +104,37 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     );
   };
 
-  if (code !== undefined && setCode !== undefined && language !== undefined) {
-    // Single editor mode (for tabs)
-    return renderEditor(language, code, setCode);
+  if (isTabMode) {
+    return (
+      <Tabs defaultValue="html" className="w-full h-full flex flex-col">
+        <TabsList className="bg-gray-800 text-white">
+          <TabsTrigger value="html" className="data-[state=active]:bg-gray-700">HTML</TabsTrigger>
+          <TabsTrigger value="css" className="data-[state=active]:bg-gray-700">CSS</TabsTrigger>
+          <TabsTrigger value="js" className="data-[state=active]:bg-gray-700">JavaScript</TabsTrigger>
+        </TabsList>
+        <div className="flex-grow overflow-hidden">
+          <TabsContent value="html" className="h-full">
+            {renderEditor('html', htmlCode, setHtmlCode)}
+          </TabsContent>
+          <TabsContent value="css" className="h-full">
+            {renderEditor('css', cssCode, setCssCode)}
+          </TabsContent>
+          <TabsContent value="js" className="h-full">
+            {renderEditor('javascript', jsCode, setJsCode)}
+          </TabsContent>
+        </div>
+      </Tabs>
+    );
   }
 
-  // Multiple editors mode (for window layout)
   return (
     <PanelGroup direction={settings.layout === 'stacked' ? 'horizontal' : 'vertical'}>
       <Panel minSize={5} defaultSize={33}>
         <div className="h-full flex flex-col">
-          <div className="bg-[#2d2d2d] p-2 flex items-center justify-between sticky top-0 z-10">
+          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center">
               <div className="w-4 h-4 rounded-full mr-2 bg-[#ff5f56]"></div>
-              <span className="text-sm font-semibold">HTML</span>
+              <span className="text-sm font-semibold text-white">HTML</span>
             </div>
           </div>
           <div className="flex-grow overflow-hidden">
@@ -124,13 +142,13 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           </div>
         </div>
       </Panel>
-      <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200' : 'h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200'} />
+      <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
         <div className="h-full flex flex-col">
-          <div className="bg-[#2d2d2d] p-2 flex items-center justify-between sticky top-0 z-10">
+          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center">
               <div className="w-4 h-4 rounded-full mr-2 bg-[#27c93f]"></div>
-              <span className="text-sm font-semibold">CSS</span>
+              <span className="text-sm font-semibold text-white">CSS</span>
             </div>
             <button
               onClick={() => setShowToolsPanel(true)}
@@ -145,13 +163,13 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           </div>
         </div>
       </Panel>
-      <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200' : 'h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200'} />
+      <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
         <div className="h-full flex flex-col">
-          <div className="bg-[#2d2d2d] p-2 flex items-center justify-between sticky top-0 z-10">
+          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center">
               <div className="w-4 h-4 rounded-full mr-2 bg-[#ffbd2e]"></div>
-              <span className="text-sm font-semibold">JavaScript</span>
+              <span className="text-sm font-semibold text-white">JavaScript</span>
             </div>
           </div>
           <div className="flex-grow overflow-hidden">
