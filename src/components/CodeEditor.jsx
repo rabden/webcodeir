@@ -3,11 +3,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
-import { dracula } from '@uiw/codemirror-theme-dracula';
-import { vscodeDark } from '@uiw/codemirror-theme-vscode';
-import { solarizedDark } from '@uiw/codemirror-theme-solarized';
-import { githubDark } from '@uiw/codemirror-theme-github';
-import { monokai } from '@uiw/codemirror-theme-monokai';
+import { dracula, vscodeDark, solarizedDark, githubDark, monokai } from '@uiw/codemirror-theme-dracula';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Settings as SettingsIcon, Save, BookOpen, Type, Menu } from 'lucide-react';
 import Settings from './Settings';
@@ -19,8 +15,16 @@ import { EditorView } from '@codemirror/view';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+const initialCode = {
+  html: '<!-- HTML code here -->',
+  css: '/* CSS code here */',
+  js: '// JavaScript code here'
+};
+
+const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
+
 const CodeEditor = () => {
-  const [code, setCode] = useState({ html: '', css: '', js: '' });
+  const [code, setCode] = useState(initialCode);
   const [preview, setPreview] = useState('');
   const [showPanels, setShowPanels] = useState({ settings: false, savedCodes: false, fontPanel: false });
   const [settings, setSettings] = useState({
@@ -32,7 +36,7 @@ const CodeEditor = () => {
     wordWrap: false,
     indentWithTabs: true,
     highlightActiveLine: true,
-    layout: 'vertical',
+    layout: 'editorsLeft',
     cursorStyle: 'line',
     matchBrackets: true,
     minimap: false,
@@ -47,8 +51,6 @@ const CodeEditor = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
 
   useEffect(() => {
     const debounce = setTimeout(() => {
