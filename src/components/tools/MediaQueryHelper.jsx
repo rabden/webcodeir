@@ -35,6 +35,7 @@ const MediaQueryHelper = () => {
             id="useMinWidth"
             checked={useMinWidth}
             onCheckedChange={setUseMinWidth}
+            className="bg-gray-800 border-gray-600"
           />
           <label htmlFor="useMinWidth" className="text-sm font-medium text-white">
             Use Min Width
@@ -46,7 +47,7 @@ const MediaQueryHelper = () => {
               type="number"
               value={minWidth}
               onChange={(e) => setMinWidth(Math.max(0, parseInt(e.target.value)))}
-              className="w-24"
+              className="w-24 bg-gray-800 text-white border-gray-700"
             />
             <span className="text-white">px</span>
           </div>
@@ -56,6 +57,7 @@ const MediaQueryHelper = () => {
             id="useMaxWidth"
             checked={useMaxWidth}
             onCheckedChange={setUseMaxWidth}
+            className="bg-gray-800 border-gray-600"
           />
           <label htmlFor="useMaxWidth" className="text-sm font-medium text-white">
             Use Max Width
@@ -67,7 +69,7 @@ const MediaQueryHelper = () => {
               type="number"
               value={maxWidth}
               onChange={(e) => setMaxWidth(Math.max(0, parseInt(e.target.value)))}
-              className="w-24"
+              className="w-24 bg-gray-800 text-white border-gray-700"
             />
             <span className="text-white">px</span>
           </div>
@@ -77,6 +79,7 @@ const MediaQueryHelper = () => {
             id="useOrientation"
             checked={useOrientation}
             onCheckedChange={setUseOrientation}
+            className="bg-gray-800 border-gray-600"
           />
           <label htmlFor="useOrientation" className="text-sm font-medium text-white">
             Use Orientation
@@ -84,10 +87,10 @@ const MediaQueryHelper = () => {
         </div>
         {useOrientation && (
           <Select value={orientation} onValueChange={setOrientation}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-gray-800 text-white border-gray-700">
               <SelectValue placeholder="Select Orientation" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-gray-800 text-white border-gray-700">
               <SelectItem value="portrait">Portrait</SelectItem>
               <SelectItem value="landscape">Landscape</SelectItem>
             </SelectContent>
@@ -99,10 +102,11 @@ const MediaQueryHelper = () => {
             value={customFeatures}
             onChange={(e) => setCustomFeatures(e.target.value)}
             placeholder="e.g., (color), (hover: hover)"
+            className="bg-gray-800 text-white border-gray-700"
           />
         </div>
       </div>
-      <Button onClick={() => navigator.clipboard.writeText(generateMediaQuery())}>
+      <Button onClick={() => navigator.clipboard.writeText(generateMediaQuery())} className="bg-blue-600 text-white hover:bg-blue-700">
         Copy Media Query
       </Button>
       <pre className="bg-gray-900 p-4 rounded text-white text-sm overflow-x-auto">

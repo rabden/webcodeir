@@ -19,7 +19,7 @@ const FlexboxGenerator = () => {
     flexWrap,
     gap: `${gap}px`,
     minHeight: '200px',
-    backgroundColor: '#2d3748',
+    backgroundColor: '#1e1e1e',
     padding: '10px',
     borderRadius: '8px',
   };
@@ -58,10 +58,10 @@ const FlexboxGenerator = () => {
       </div>
       <div className="grid grid-cols-2 gap-4">
         <Select value={flexDirection} onValueChange={setFlexDirection}>
-          <SelectTrigger>
+          <SelectTrigger className="bg-gray-800 text-white border-gray-700">
             <SelectValue placeholder="Flex Direction" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-gray-800 text-white border-gray-700">
             <SelectItem value="row">Row</SelectItem>
             <SelectItem value="column">Column</SelectItem>
             <SelectItem value="row-reverse">Row Reverse</SelectItem>
@@ -69,10 +69,10 @@ const FlexboxGenerator = () => {
           </SelectContent>
         </Select>
         <Select value={justifyContent} onValueChange={setJustifyContent}>
-          <SelectTrigger>
+          <SelectTrigger className="bg-gray-800 text-white border-gray-700">
             <SelectValue placeholder="Justify Content" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-gray-800 text-white border-gray-700">
             <SelectItem value="flex-start">Flex Start</SelectItem>
             <SelectItem value="flex-end">Flex End</SelectItem>
             <SelectItem value="center">Center</SelectItem>
@@ -82,10 +82,10 @@ const FlexboxGenerator = () => {
           </SelectContent>
         </Select>
         <Select value={alignItems} onValueChange={setAlignItems}>
-          <SelectTrigger>
+          <SelectTrigger className="bg-gray-800 text-white border-gray-700">
             <SelectValue placeholder="Align Items" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-gray-800 text-white border-gray-700">
             <SelectItem value="stretch">Stretch</SelectItem>
             <SelectItem value="flex-start">Flex Start</SelectItem>
             <SelectItem value="flex-end">Flex End</SelectItem>
@@ -94,10 +94,10 @@ const FlexboxGenerator = () => {
           </SelectContent>
         </Select>
         <Select value={flexWrap} onValueChange={setFlexWrap}>
-          <SelectTrigger>
+          <SelectTrigger className="bg-gray-800 text-white border-gray-700">
             <SelectValue placeholder="Flex Wrap" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-gray-800 text-white border-gray-700">
             <SelectItem value="nowrap">No Wrap</SelectItem>
             <SelectItem value="wrap">Wrap</SelectItem>
             <SelectItem value="wrap-reverse">Wrap Reverse</SelectItem>
@@ -111,6 +111,7 @@ const FlexboxGenerator = () => {
           onValueChange={(value) => setGap(value[0])}
           max={50}
           step={1}
+          className="bg-gray-800"
         />
       </div>
       <div className="space-y-2">
@@ -121,9 +122,10 @@ const FlexboxGenerator = () => {
           min={1}
           max={10}
           step={1}
+          className="bg-gray-800"
         />
       </div>
-      <Button onClick={() => navigator.clipboard.writeText(cssCode)}>
+      <Button onClick={() => navigator.clipboard.writeText(cssCode)} className="bg-blue-600 text-white hover:bg-blue-700">
         Copy CSS
       </Button>
       <pre className="bg-gray-900 p-4 rounded text-white text-sm overflow-x-auto">

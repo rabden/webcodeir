@@ -16,7 +16,7 @@ const GridGenerator = () => {
     gridTemplateRows: templateRows,
     gap: `${gap}px`,
     minHeight: '200px',
-    backgroundColor: '#2d3748',
+    backgroundColor: '#1e1e1e',
     padding: '10px',
     borderRadius: '8px',
   };
@@ -61,6 +61,7 @@ const GridGenerator = () => {
             min={1}
             max={12}
             step={1}
+            className="bg-gray-800"
           />
         </div>
         <div className="space-y-2">
@@ -74,6 +75,7 @@ const GridGenerator = () => {
             min={1}
             max={12}
             step={1}
+            className="bg-gray-800"
           />
         </div>
         <div className="space-y-2">
@@ -83,6 +85,7 @@ const GridGenerator = () => {
             onValueChange={(value) => setGap(value[0])}
             max={50}
             step={1}
+            className="bg-gray-800"
           />
         </div>
         <div className="space-y-2">
@@ -91,6 +94,7 @@ const GridGenerator = () => {
             value={templateColumns}
             onChange={(e) => setTemplateColumns(e.target.value)}
             placeholder="e.g., 1fr 2fr 1fr"
+            className="bg-gray-800 text-white border-gray-700"
           />
         </div>
         <div className="space-y-2">
@@ -99,10 +103,11 @@ const GridGenerator = () => {
             value={templateRows}
             onChange={(e) => setTemplateRows(e.target.value)}
             placeholder="e.g., auto 1fr 2fr"
+            className="bg-gray-800 text-white border-gray-700"
           />
         </div>
       </div>
-      <Button onClick={() => navigator.clipboard.writeText(cssCode)}>
+      <Button onClick={() => navigator.clipboard.writeText(cssCode)} className="bg-blue-600 text-white hover:bg-blue-700">
         Copy CSS
       </Button>
       <pre className="bg-gray-900 p-4 rounded text-white text-sm overflow-x-auto">
