@@ -1,21 +1,33 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { LogIn } from 'lucide-react';
+import { useGoogleLogin } from '@react-oauth/google';
 
 const GoogleLogin = ({ onGoogleLogin }) => {
-  const handleGoogleLogin = () => {
-    // In a real application, you would implement the actual Google OAuth flow here
-    // For this example, we'll simulate a successful login with mock data
-    const mockGoogleUser = {
-      name: 'John Doe',
-      email: 'johndoe@example.com',
-      avatarUrl: 'https://example.com/avatar.jpg'
-    };
-    onGoogleLogin(mockGoogleUser);
-  };
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse) => {
+      fetch(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${codeResponse.access_token}`, {
+        headers: {
+          Authorization: `Bearer ${codeResponse.access_token}`,
+          Accept: 'application/json'
+        }
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          const googleUser = {
+            name: data.name,
+            email: data.email,
+            avatarUrl: data.picture
+          };
+          onGoogleLogin(googleUser);
+        })
+        .catch((err) => console.log("Error fetching user data:", err));
+    },
+    onError: (error) => console.log('Login Failed:', error)
+  });
 
   return (
-    <Button onClick={handleGoogleLogin} className="w-full">
+    <Button onClick={() => login()} className="w-full">
       <LogIn className="mr-2 h-4 w-4" />
       Login with Google
     </Button>

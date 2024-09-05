@@ -7,6 +7,7 @@ import MobileMenu from './MobileMenu';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const CodeEditor = () => {
   const [state, setState] = useState({
@@ -231,61 +232,63 @@ const CodeEditor = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
-      <Header
-        currentCodeName={state.currentCodeName}
-        setCurrentCodeName={(name) => setState(s => ({ ...s, currentCodeName: name }))}
-        isMobile={state.isMobile}
-        saveCurrentCode={saveCurrentCode}
-        setShowSavedCodes={(show) => setState(s => ({ ...s, showSavedCodes: show }))}
-        setShowFontPanel={(show) => setState(s => ({ ...s, showFontPanel: show }))}
-        setShowSettings={(show) => setState(s => ({ ...s, showSettings: show }))}
-        setIsMenuOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
-        toggleLayout={toggleLayout}
-        layout={state.settings.layout}
-        user={state.user}
-        onUpdateUser={handleUpdateUser}
-        onGoogleLogin={handleGoogleLogin}
-      />
-      <div className="flex-grow overflow-hidden">
-        {renderLayout()}
+    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+      <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
+        <Header
+          currentCodeName={state.currentCodeName}
+          setCurrentCodeName={(name) => setState(s => ({ ...s, currentCodeName: name }))}
+          isMobile={state.isMobile}
+          saveCurrentCode={saveCurrentCode}
+          setShowSavedCodes={(show) => setState(s => ({ ...s, showSavedCodes: show }))}
+          setShowFontPanel={(show) => setState(s => ({ ...s, showFontPanel: show }))}
+          setShowSettings={(show) => setState(s => ({ ...s, showSettings: show }))}
+          setIsMenuOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
+          toggleLayout={toggleLayout}
+          layout={state.settings.layout}
+          user={state.user}
+          onUpdateUser={handleUpdateUser}
+          onGoogleLogin={handleGoogleLogin}
+        />
+        <div className="flex-grow overflow-hidden">
+          {renderLayout()}
+        </div>
+        {state.showSettings && (
+          <Settings
+            settings={state.settings}
+            setSettings={(newSettings) => setState(s => ({ ...s, settings: newSettings }))}
+            onClose={() => setState(s => ({ ...s, showSettings: false }))}
+            isMobile={state.isMobile}
+          />
+        )}
+        {state.showSavedCodes && (
+          <SavedCodes
+            onClose={() => setState(s => ({ ...s, showSavedCodes: false }))}
+            onLoad={(code) => {
+              setState(s => ({
+                ...s,
+                htmlCode: code.html,
+                cssCode: code.css,
+                jsCode: code.js,
+                currentCodeName: code.name,
+                showSavedCodes: false
+              }));
+            }}
+            isMobile={state.isMobile}
+          />
+        )}
+        {state.showFontPanel && (
+          <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.isMobile} />
+        )}
+        <MobileMenu
+          isOpen={state.isMenuOpen}
+          setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
+          setShowSettings={(show) => setState(s => ({ ...s, showSettings: show }))}
+          setShowSavedCodes={(show) => setState(s => ({ ...s, showSavedCodes: show }))}
+          setShowFontPanel={(show) => setState(s => ({ ...s, showFontPanel: show }))}
+          saveCurrentCode={saveCurrentCode}
+        />
       </div>
-      {state.showSettings && (
-        <Settings
-          settings={state.settings}
-          setSettings={(newSettings) => setState(s => ({ ...s, settings: newSettings }))}
-          onClose={() => setState(s => ({ ...s, showSettings: false }))}
-          isMobile={state.isMobile}
-        />
-      )}
-      {state.showSavedCodes && (
-        <SavedCodes
-          onClose={() => setState(s => ({ ...s, showSavedCodes: false }))}
-          onLoad={(code) => {
-            setState(s => ({
-              ...s,
-              htmlCode: code.html,
-              cssCode: code.css,
-              jsCode: code.js,
-              currentCodeName: code.name,
-              showSavedCodes: false
-            }));
-          }}
-          isMobile={state.isMobile}
-        />
-      )}
-      {state.showFontPanel && (
-        <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.isMobile} />
-      )}
-      <MobileMenu
-        isOpen={state.isMenuOpen}
-        setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
-        setShowSettings={(show) => setState(s => ({ ...s, showSettings: show }))}
-        setShowSavedCodes={(show) => setState(s => ({ ...s, showSavedCodes: show }))}
-        setShowFontPanel={(show) => setState(s => ({ ...s, showFontPanel: show }))}
-        saveCurrentCode={saveCurrentCode}
-      />
-    </div>
+    </GoogleOAuthProvider>
   );
 };
 
