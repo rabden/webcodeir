@@ -8,7 +8,7 @@ import GoogleLogin from './GoogleLogin';
 
 const ProfileMenu = ({ user, onUpdateUser, onGoogleLogin }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState(user);
+  const [editedUser, setEditedUser] = useState(user || {});
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -20,7 +20,7 @@ const ProfileMenu = ({ user, onUpdateUser, onGoogleLogin }) => {
   };
 
   const handleCancel = () => {
-    setEditedUser(user);
+    setEditedUser(user || {});
     setIsEditing(false);
   };
 
@@ -29,13 +29,13 @@ const ProfileMenu = ({ user, onUpdateUser, onGoogleLogin }) => {
       <PopoverTrigger asChild>
         <Button variant="ghost" className="h-8 w-8 rounded-full">
           <Avatar>
-            <AvatarImage src={user.avatarUrl} alt={user.name} />
-            <AvatarFallback>{user.name ? user.name.charAt(0) : 'U'}</AvatarFallback>
+            <AvatarImage src={user?.avatarUrl} alt={user?.name} />
+            <AvatarFallback>{user?.name ? user.name.charAt(0) : 'U'}</AvatarFallback>
           </Avatar>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80">
-        {user.name ? (
+        {user?.name ? (
           <div className="flex flex-col space-y-4">
             <div className="flex items-center space-x-4">
               <Avatar className="h-16 w-16">
@@ -51,17 +51,17 @@ const ProfileMenu = ({ user, onUpdateUser, onGoogleLogin }) => {
               <>
                 <Input
                   placeholder="Name"
-                  value={editedUser.name}
+                  value={editedUser.name || ''}
                   onChange={(e) => setEditedUser({ ...editedUser, name: e.target.value })}
                 />
                 <Input
                   placeholder="Email"
-                  value={editedUser.email}
+                  value={editedUser.email || ''}
                   onChange={(e) => setEditedUser({ ...editedUser, email: e.target.value })}
                 />
                 <Input
                   placeholder="Avatar URL"
-                  value={editedUser.avatarUrl}
+                  value={editedUser.avatarUrl || ''}
                   onChange={(e) => setEditedUser({ ...editedUser, avatarUrl: e.target.value })}
                 />
                 <div className="flex justify-end space-x-2">
