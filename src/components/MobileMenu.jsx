@@ -1,8 +1,8 @@
 import React from 'react';
-import { X, SettingsIcon, BookOpen, Type, Save, Library } from 'lucide-react';
+import { X, SettingsIcon, BookOpen, Type, Save } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
-const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowLibraryTogglePanel, saveCurrentCode }) => {
+const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, saveCurrentCode }) => {
   return (
     <div className={`fixed inset-y-0 left-0 w-64 bg-gray-800 shadow-lg z-50 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
@@ -23,10 +23,6 @@ const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, set
         <Button onClick={() => { setShowFontPanel(true); setIsOpen(false); }} className="justify-start">
           <Type className="mr-2 h-4 w-4" />
           Font Library
-        </Button>
-        <Button onClick={() => { setShowLibraryTogglePanel(true); setIsOpen(false); }} className="justify-start">
-          <Library className="mr-2 h-4 w-4" />
-          Library Toggles
         </Button>
         <Button onClick={() => { saveCurrentCode(); setIsOpen(false); }} className="justify-start">
           <Save className="mr-2 h-4 w-4" />
