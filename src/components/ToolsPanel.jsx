@@ -10,7 +10,7 @@ const ToolsPanel = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState("color");
 
   return (
-    <div className="fixed inset-y-4 right-4 w-96 bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden">
+    <div className="fixed inset-y-4 right-4 w-[700px] bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden">
       <div className="p-4 border-b border-gray-700 flex justify-between items-center">
         <h2 className="text-xl font-bold text-white">Tools</h2>
         <button onClick={onClose} className="text-gray-400 hover:text-white">
