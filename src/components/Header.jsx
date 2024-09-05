@@ -2,7 +2,6 @@ import React from 'react';
 import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import ProfileMenu from './ProfileMenu';
 
 const Header = ({
   currentCodeName,
@@ -14,10 +13,7 @@ const Header = ({
   setShowSettings,
   setIsMenuOpen,
   toggleLayout,
-  layout,
-  user,
-  onUpdateUser,
-  onGoogleLogin
+  layout
 }) => {
   const getLayoutIcon = () => {
     switch (layout) {
@@ -34,22 +30,19 @@ const Header = ({
 
   return (
     <header className="bg-black p-2 flex justify-between items-center">
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-2">
         {isMobile && (
           <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(true)}>
             <Menu className="h-6 w-6" />
           </Button>
         )}
-        <ProfileMenu user={user} onUpdateUser={onUpdateUser} onGoogleLogin={onGoogleLogin} />
-        <div className="flex items-center space-x-2">
-          <div className="w-6 h-6 bg-white rounded-sm"></div>
-          <input
-            type="text"
-            value={currentCodeName}
-            onChange={(e) => setCurrentCodeName(e.target.value)}
-            className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white max-w-[150px] sm:max-w-none"
-          />
-        </div>
+        <div className="w-6 h-6 bg-white rounded-sm"></div>
+        <input
+          type="text"
+          value={currentCodeName}
+          onChange={(e) => setCurrentCodeName(e.target.value)}
+          className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white max-w-[150px] sm:max-w-none"
+        />
       </div>
       {!isMobile && (
         <div className="flex items-center space-x-2">
