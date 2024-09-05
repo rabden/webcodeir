@@ -5,7 +5,7 @@ import GridGenerator from './tools/GridGenerator';
 import AnimationCreator from './tools/AnimationCreator';
 import MediaQueryHelper from './tools/MediaQueryHelper';
 
-const ToolsPanel = ({ onClose }) => {
+const ToolsPanel = ({ onClose, isMobile }) => {
   const [activeTab, setActiveTab] = useState('flexbox');
 
   const tabs = [
@@ -31,18 +31,18 @@ const ToolsPanel = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-y-4 right-4 w-96 bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden">
+    <div className={`fixed inset-y-4 ${isMobile ? 'inset-x-4' : 'right-4'} bg-gray-800 ${isMobile ? 'w-auto' : 'w-96'} shadow-lg z-50 flex flex-col rounded-lg overflow-hidden`}>
       <div className="p-4 border-b border-gray-700 flex justify-between items-center">
         <h2 className="text-xl font-bold text-white">CSS Tools</h2>
         <button onClick={onClose} className="text-gray-400 hover:text-white">
           <X className="h-6 w-6" />
         </button>
       </div>
-      <div className="flex border-b border-gray-700">
+      <div className="flex border-b border-gray-700 overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            className={`flex-1 py-2 px-4 text-sm font-medium ${
+            className={`flex-shrink-0 py-2 px-4 text-sm font-medium ${
               activeTab === tab.id ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
             }`}
             onClick={() => setActiveTab(tab.id)}

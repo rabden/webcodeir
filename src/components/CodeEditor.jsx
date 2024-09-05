@@ -8,37 +8,24 @@ import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
 import ToolsPanel from './ToolsPanel';
+import useCodeEditorState from '../hooks/useCodeEditorState';
+import useLayoutManager from '../hooks/useLayoutManager';
 
 const CodeEditor = () => {
-  const [state, setState] = useState({
-    htmlCode: '',
-    cssCode: '',
-    jsCode: '',
-    preview: '',
-    showSettings: false,
-    showSavedCodes: false,
-    showFontPanel: false,
-    showToolsPanel: false,
-    settings: {
-      editorTheme: 'dracula',
-      fontSize: 14,
-      autoSave: true,
-      tabSize: 2,
-      lineNumbers: true,
-      wordWrap: false,
-      indentWithTabs: true,
-      highlightActiveLine: true,
-      layout: 'horizontal',
-      cursorStyle: 'line',
-      matchBrackets: true,
-      minimap: false,
-      scrollSpeed: 5,
-    },
-    currentCodeName: 'Untitled',
-    isMobile: window.innerWidth < 768,
-    previewSize: 50,
-    isMenuOpen: false,
-  });
+  const {
+    state,
+    setState,
+    updatePreview,
+    saveToLocalStorage,
+    loadFromLocalStorage,
+    saveCurrentCode,
+  } = useCodeEditorState();
+
+  const {
+    renderLayout,
+    toggleLayout,
+    handleTouchStart,
+  } = useLayoutManager(state, setState, updatePreview);
 
   const resizerRef = useRef(null);
 
@@ -46,7 +33,7 @@ const CodeEditor = () => {
     const handleResize = () => setState(s => ({ ...s, isMobile: window.innerWidth < 768 }));
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [setState]);
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -54,155 +41,11 @@ const CodeEditor = () => {
       if (state.settings.autoSave) saveToLocalStorage();
     }, 300);
     return () => clearTimeout(debounce);
-  }, [state.htmlCode, state.cssCode, state.jsCode, state.settings.autoSave]);
+  }, [state.htmlCode, state.cssCode, state.jsCode, state.settings.autoSave, updatePreview, saveToLocalStorage]);
 
   useEffect(() => {
     loadFromLocalStorage();
-  }, []);
-
-  const updatePreview = () => {
-    setState(s => ({
-      ...s,
-      preview: `
-        <html>
-          <head><style>${s.cssCode}</style></head>
-          <body>${s.htmlCode}<script>${s.jsCode}</script></body>
-        </html>
-      `
-    }));
-  };
-
-  const saveToLocalStorage = () => {
-    localStorage.setItem('codeEditorState', JSON.stringify({
-      htmlCode: state.htmlCode,
-      cssCode: state.cssCode,
-      jsCode: state.jsCode,
-      settings: state.settings,
-      currentCodeName: state.currentCodeName
-    }));
-  };
-
-  const loadFromLocalStorage = () => {
-    const savedState = localStorage.getItem('codeEditorState');
-    if (savedState) {
-      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
-      setState(s => ({
-        ...s,
-        htmlCode,
-        cssCode,
-        jsCode,
-        settings: savedSettings,
-        currentCodeName: currentCodeName || 'Untitled'
-      }));
-    }
-  };
-
-  const saveCurrentCode = () => {
-    const savedCodes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
-    const newSavedCode = {
-      id: Date.now(),
-      name: state.currentCodeName,
-      html: state.htmlCode,
-      css: state.cssCode,
-      js: state.jsCode,
-      date: new Date().toISOString(),
-    };
-    savedCodes.push(newSavedCode);
-    localStorage.setItem('savedCodes', JSON.stringify(savedCodes));
-    alert('Code saved successfully!');
-  };
-
-  const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    const startY = touch.clientY;
-    const startPreviewSize = state.previewSize;
-
-    const handleTouchMove = (e) => {
-      const touch = e.touches[0];
-      const deltaY = touch.clientY - startY;
-      const newPreviewSize = Math.max(0, Math.min(100, startPreviewSize - (deltaY / window.innerHeight) * 100));
-      setState(s => ({ ...s, previewSize: newPreviewSize }));
-    };
-
-    const handleTouchEnd = () => {
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-    };
-
-    document.addEventListener('touchmove', handleTouchMove);
-    document.addEventListener('touchend', handleTouchEnd);
-  };
-
-  const toggleLayout = () => {
-    setState(s => ({
-      ...s,
-      settings: {
-        ...s.settings,
-        layout: s.settings.layout === 'horizontal' ? 'vertical' : s.settings.layout === 'vertical' ? 'stacked' : 'horizontal'
-      }
-    }));
-  };
-
-  const renderLayout = () => {
-    const editorPanel = (
-      <EditorPanel
-        htmlCode={state.htmlCode}
-        cssCode={state.cssCode}
-        jsCode={state.jsCode}
-        setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
-        setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
-        setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
-        settings={state.settings}
-        setShowToolsPanel={() => setState(s => ({ ...s, showToolsPanel: true }))}
-      />
-    );
-
-    const previewPanel = (
-      <PreviewPanel preview={state.preview} />
-    );
-
-    if (state.isMobile) {
-      return (
-        <PanelGroup direction="vertical" className="h-full">
-          <Panel minSize={0} maxSize={100} defaultSize={100 - state.previewSize}>
-            {editorPanel}
-          </Panel>
-          <PanelResizeHandle
-            className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group"
-            onTouchStart={handleTouchStart}
-            ref={resizerRef}
-          >
-            <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-          </PanelResizeHandle>
-          <Panel minSize={0} maxSize={100} defaultSize={state.previewSize}>
-            {previewPanel}
-          </Panel>
-        </PanelGroup>
-      );
-    } else {
-      const panelConfig = {
-        horizontal: [previewPanel, editorPanel],
-        vertical: [editorPanel, previewPanel],
-        stacked: [editorPanel, previewPanel]
-      };
-
-      const [leftPanel, rightPanel] = panelConfig[state.settings.layout];
-
-      return (
-        <PanelGroup direction={state.settings.layout === 'stacked' ? 'vertical' : 'horizontal'} className="h-full">
-          <Panel minSize={0} defaultSize={50}>
-            {leftPanel}
-          </Panel>
-          <PanelResizeHandle className={state.settings.layout === 'stacked' ? 'h-2' : 'w-2'}>
-            <div className={`${state.settings.layout === 'stacked' ? 'h-0.5 w-full' : 'w-0.5 h-full'} bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200`}></div>
-          </PanelResizeHandle>
-          <Panel minSize={0} defaultSize={50}>
-            {rightPanel}
-          </Panel>
-        </PanelGroup>
-      );
-    }
-  };
+  }, [loadFromLocalStorage]);
 
   return (
     <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
@@ -249,7 +92,7 @@ const CodeEditor = () => {
         <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.isMobile} />
       )}
       {state.showToolsPanel && (
-        <ToolsPanel onClose={() => setState(s => ({ ...s, showToolsPanel: false }))} />
+        <ToolsPanel onClose={() => setState(s => ({ ...s, showToolsPanel: false }))} isMobile={state.isMobile} />
       )}
       <MobileMenu
         isOpen={state.isMenuOpen}
