@@ -21,7 +21,7 @@ const IconPanel = ({ onClose, isMobile }) => {
 
   const copyToClipboard = (iconName) => {
     const IconComponent = LucideIcons[iconName];
-    const svgString = IconComponent().props.children.toString();
+    const svgString = IconComponent({}).props.children.join('');
     navigator.clipboard.writeText(svgString);
     setCopiedIcon(iconName);
     setTimeout(() => setCopiedIcon(null), 2000);
