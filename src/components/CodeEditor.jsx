@@ -7,17 +7,16 @@ import MobileMenu from './MobileMenu';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
-import ImportPanel from './ImportPanel';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
   const [cssCode, setCssCode] = useState('');
   const [jsCode, setJsCode] = useState('');
   const [preview, setPreview] = useState('');
+  const [previewWidth, setPreviewWidth] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [showSavedCodes, setShowSavedCodes] = useState(false);
   const [showFontPanel, setShowFontPanel] = useState(false);
-  const [showImportPanel, setShowImportPanel] = useState(false);
   const [settings, setSettings] = useState({
     editorTheme: 'dracula',
     fontSize: 14,
@@ -125,12 +124,6 @@ const CodeEditor = () => {
     }));
   };
 
-  const handleImport = (importedCode) => {
-    setHtmlCode(importedCode.html);
-    setCssCode(importedCode.css);
-    setJsCode(importedCode.js);
-  };
-
   const renderLayout = () => {
     const editorPanel = (
       <EditorPanel
@@ -218,12 +211,12 @@ const CodeEditor = () => {
       <Header
         currentCodeName={currentCodeName}
         setCurrentCodeName={setCurrentCodeName}
+        previewWidth={previewWidth}
         isMobile={isMobile}
         saveCurrentCode={saveCurrentCode}
         setShowSavedCodes={setShowSavedCodes}
         setShowFontPanel={setShowFontPanel}
         setShowSettings={setShowSettings}
-        setShowImportPanel={setShowImportPanel}
         setIsMenuOpen={setIsMenuOpen}
         toggleLayout={toggleLayout}
         layout={settings.layout}
@@ -255,20 +248,12 @@ const CodeEditor = () => {
       {showFontPanel && (
         <FontPanel onClose={() => setShowFontPanel(false)} isMobile={isMobile} />
       )}
-      {showImportPanel && (
-        <ImportPanel
-          onClose={() => setShowImportPanel(false)}
-          onImport={handleImport}
-          isMobile={isMobile}
-        />
-      )}
       <MobileMenu
         isOpen={isMenuOpen}
         setIsOpen={setIsMenuOpen}
         setShowSettings={setShowSettings}
         setShowSavedCodes={setShowSavedCodes}
         setShowFontPanel={setShowFontPanel}
-        setShowImportPanel={setShowImportPanel}
         saveCurrentCode={saveCurrentCode}
       />
     </div>
