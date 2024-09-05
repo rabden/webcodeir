@@ -13,7 +13,7 @@ const ToolsPanel = ({ onClose }) => {
           <X className="h-6 w-6" />
         </button>
       </div>
-      <div className="flex-grow overflow-y-auto p-4 space-y-4">
+      <div className="flex-grow overflow-y-auto p-4">
         <div className="space-y-4 w-full">
           <h3 className="text-lg font-semibold text-white">Color Picker</h3>
           <HexColorPicker color={color} onChange={setColor} className="w-full" />

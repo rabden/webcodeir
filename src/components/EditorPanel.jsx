@@ -11,7 +11,7 @@ import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
-import { Wrench } from 'lucide-react';
+import { Palette } from 'lucide-react';
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowToolsPanel }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
@@ -30,7 +30,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               className="p-1 rounded-full hover:bg-gray-700 transition-colors"
               title="Open CSS Tools"
             >
-              <Wrench className="w-4 h-4 text-white" />
+              <Palette className="w-4 h-4 text-white" />
             </button>
           )}
         </div>

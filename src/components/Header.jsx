@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Wrench } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
@@ -11,7 +11,6 @@ const Header = ({
   setShowSavedCodes,
   setShowFontPanel,
   setShowSettings,
-  setShowToolsPanel,
   setIsMenuOpen,
   toggleLayout,
   layout
@@ -87,20 +86,6 @@ const Header = ({
               </TooltipTrigger>
               <TooltipContent>
                 <p>Font Library</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => setShowToolsPanel(true)}
-                  className="p-2 rounded-full hover:bg-gray-800"
-                >
-                  <Wrench className="w-5 h-5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Tools</p>
               </TooltipContent>
             </Tooltip>
 
