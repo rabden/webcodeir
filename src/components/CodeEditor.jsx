@@ -62,18 +62,32 @@ const CodeEditor = () => {
   }, []);
 
   const updatePreview = () => {
+    const cdnLinks = `
+      <script src="https://cdn.tailwindcss.com"></script>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.5/dist/css/foundation.min.css">
+      <script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.5/dist/js/foundation.min.js"></script>
+      <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+      <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+      <script src="https://d3js.org/d3.v7.min.js"></script>
+    `;
+
     setState(s => ({
       ...s,
       preview: `
         <html>
           <head>
             <style>${s.cssCode}</style>
-            <script src="https://cdn.tailwindcss.com"></script>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            ${cdnLinks}
           </head>
-          <body>${s.htmlCode}<script>${s.jsCode}</script>
-          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-          </body>
+          <body>${s.htmlCode}<script>${s.jsCode}</script></body>
         </html>
       `
     }));
