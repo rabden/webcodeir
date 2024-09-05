@@ -11,10 +11,11 @@ import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
-import { Palette } from 'lucide-react';
+import { Palette, Play } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 
-const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowToolsPanel, isTabMode }) => {
+const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowToolsPanel, isTabMode, toggleFullScreenPreview }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
 
   const getLanguageExtension = (lang) => {
@@ -104,13 +105,27 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     );
   };
 
+  const renderTabHeader = (label) => (
+    <div className="flex items-center space-x-2">
+      <span>{label}</span>
+      <Button
+        size="sm"
+        variant="ghost"
+        className="p-0 h-6 w-6"
+        onClick={toggleFullScreenPreview}
+      >
+        <Play className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+
   if (isTabMode) {
     return (
       <Tabs defaultValue="html" className="w-full h-full flex flex-col">
         <TabsList className="bg-gray-800 text-white">
-          <TabsTrigger value="html" className="data-[state=active]:bg-gray-700">HTML</TabsTrigger>
-          <TabsTrigger value="css" className="data-[state=active]:bg-gray-700">CSS</TabsTrigger>
-          <TabsTrigger value="js" className="data-[state=active]:bg-gray-700">JavaScript</TabsTrigger>
+          <TabsTrigger value="html" className="data-[state=active]:bg-gray-700">{renderTabHeader('HTML')}</TabsTrigger>
+          <TabsTrigger value="css" className="data-[state=active]:bg-gray-700">{renderTabHeader('CSS')}</TabsTrigger>
+          <TabsTrigger value="js" className="data-[state=active]:bg-gray-700">{renderTabHeader('JavaScript')}</TabsTrigger>
         </TabsList>
         <div className="flex-grow overflow-hidden">
           <TabsContent value="html" className="h-full">
@@ -136,6 +151,14 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               <div className="w-4 h-4 rounded-full mr-2 bg-[#ff5f56]"></div>
               <span className="text-sm font-semibold text-white">HTML</span>
             </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="p-0 h-6 w-6"
+              onClick={toggleFullScreenPreview}
+            >
+              <Play className="h-4 w-4" />
+            </Button>
           </div>
           <div className="flex-grow overflow-hidden">
             {renderEditor('html', htmlCode, setHtmlCode)}
@@ -150,13 +173,23 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               <div className="w-4 h-4 rounded-full mr-2 bg-[#27c93f]"></div>
               <span className="text-sm font-semibold text-white">CSS</span>
             </div>
-            <button
-              onClick={() => setShowToolsPanel(true)}
-              className="p-1 rounded-full hover:bg-gray-700 transition-colors"
-              title="Open CSS Tools"
-            >
-              <Palette className="w-4 h-4 text-white" />
-            </button>
+            <div className="flex items-center space-x-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="p-0 h-6 w-6"
+                onClick={toggleFullScreenPreview}
+              >
+                <Play className="h-4 w-4" />
+              </Button>
+              <button
+                onClick={() => setShowToolsPanel(true)}
+                className="p-1 rounded-full hover:bg-gray-700 transition-colors"
+                title="Open CSS Tools"
+              >
+                <Palette className="w-4 h-4 text-white" />
+              </button>
+            </div>
           </div>
           <div className="flex-grow overflow-hidden">
             {renderEditor('css', cssCode, setCssCode)}
@@ -171,6 +204,14 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               <div className="w-4 h-4 rounded-full mr-2 bg-[#ffbd2e]"></div>
               <span className="text-sm font-semibold text-white">JavaScript</span>
             </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="p-0 h-6 w-6"
+              onClick={toggleFullScreenPreview}
+            >
+              <Play className="h-4 w-4" />
+            </Button>
           </div>
           <div className="flex-grow overflow-hidden">
             {renderEditor('javascript', jsCode, setJsCode)}
