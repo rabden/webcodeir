@@ -6,7 +6,7 @@ import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
 import ToolsPanel from './ToolsPanel';
 import useCodeEditorState from '../hooks/useCodeEditorState';
-import useLayoutManager from '../hooks/useLayoutManager';
+import useLayoutManager from '../hooks/useLayoutManager.jsx';
 
 const CodeEditor = () => {
   const {
