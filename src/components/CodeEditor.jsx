@@ -7,8 +7,10 @@ import MobileMenu from './MobileMenu';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
+import { useAuth } from '../contexts/AuthContext';
 
 const CodeEditor = () => {
+  const { user } = useAuth();
   const [htmlCode, setHtmlCode] = useState('');
   const [cssCode, setCssCode] = useState('');
   const [jsCode, setJsCode] = useState('');
@@ -54,7 +56,7 @@ const CodeEditor = () => {
 
   useEffect(() => {
     loadFromLocalStorage();
-  }, []);
+  }, [user]);
 
   const updatePreview = () => {
     setPreview(`
@@ -66,34 +68,42 @@ const CodeEditor = () => {
   };
 
   const saveToLocalStorage = () => {
-    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName }));
+    if (user) {
+      localStorage.setItem(`codeEditorState_${user.id}`, JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName }));
+    }
   };
 
   const loadFromLocalStorage = () => {
-    const savedState = localStorage.getItem('codeEditorState');
-    if (savedState) {
-      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
-      setHtmlCode(htmlCode);
-      setCssCode(cssCode);
-      setJsCode(jsCode);
-      setSettings(savedSettings);
-      setCurrentCodeName(currentCodeName || 'Untitled');
+    if (user) {
+      const savedState = localStorage.getItem(`codeEditorState_${user.id}`);
+      if (savedState) {
+        const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
+        setHtmlCode(htmlCode);
+        setCssCode(cssCode);
+        setJsCode(jsCode);
+        setSettings(savedSettings);
+        setCurrentCodeName(currentCodeName || 'Untitled');
+      }
     }
   };
 
   const saveCurrentCode = () => {
-    const savedCodes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
-    const newSavedCode = {
-      id: Date.now(),
-      name: currentCodeName,
-      html: htmlCode,
-      css: cssCode,
-      js: jsCode,
-      date: new Date().toISOString(),
-    };
-    savedCodes.push(newSavedCode);
-    localStorage.setItem('savedCodes', JSON.stringify(savedCodes));
-    alert('Code saved successfully!');
+    if (user) {
+      const savedCodes = JSON.parse(localStorage.getItem(`savedCodes_${user.id}`) || '[]');
+      const newSavedCode = {
+        id: Date.now(),
+        name: currentCodeName,
+        html: htmlCode,
+        css: cssCode,
+        js: jsCode,
+        date: new Date().toISOString(),
+      };
+      savedCodes.push(newSavedCode);
+      localStorage.setItem(`savedCodes_${user.id}`, JSON.stringify(savedCodes));
+      alert('Code saved successfully!');
+    } else {
+      alert('Please log in to save your code.');
+    }
   };
 
   const handleTouchStart = (e) => {
@@ -243,6 +253,7 @@ const CodeEditor = () => {
             setShowSavedCodes(false);
           }}
           isMobile={isMobile}
+          userId={user?.id}
         />
       )}
       {showFontPanel && (

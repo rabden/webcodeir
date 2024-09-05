@@ -1,7 +1,9 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, LogOut } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Header = ({
   currentCodeName,
@@ -16,6 +18,9 @@ const Header = ({
   toggleLayout,
   layout
 }) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
   const getLayoutIcon = () => {
     switch (layout) {
       case 'horizontal':
@@ -27,6 +32,11 @@ const Header = ({
       default:
         return <LayoutPanelLeft className="w-5 h-5" />;
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -120,6 +130,20 @@ const Header = ({
               </TooltipTrigger>
               <TooltipContent>
                 <p>Toggle Layout</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={handleLogout}
+                  className="p-2 rounded-full hover:bg-gray-800"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Logout</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
