@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ColorPicker from './tools/ColorPicker';
+import { HexColorPicker } from 'react-colorful';
 import GradientMaker from './tools/GradientMaker';
 import BlobMaker from './tools/BlobMaker';
 import ClipPathGenerator from './tools/ClipPathGenerator';
@@ -8,6 +8,7 @@ import BoxShadowGenerator from './tools/BoxShadowGenerator';
 
 const ToolsPanel = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState("color");
+  const [color, setColor] = useState("#aabbcc");
 
   return (
     <div className="fixed inset-y-4 right-4 w-[700px] bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden">
@@ -29,7 +30,18 @@ const ToolsPanel = ({ onClose }) => {
         </TabsList>
         <div className="flex-grow overflow-y-auto p-4">
           <TabsContent value="color">
-            <ColorPicker />
+            <div className="space-y-4">
+              <HexColorPicker color={color} onChange={setColor} />
+              <div className="flex justify-between items-center">
+                <span className="text-white">HEX</span>
+                <input
+                  type="text"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="bg-gray-700 text-white p-2 rounded"
+                />
+              </div>
+            </div>
           </TabsContent>
           <TabsContent value="gradient">
             <GradientMaker />
