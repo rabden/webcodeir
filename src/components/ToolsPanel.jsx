@@ -7,7 +7,7 @@ import MediaQueryHelper from './tools/MediaQueryHelper';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-const ToolsPanel = ({ onClose, isMobile }) => {
+const ToolsPanel = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState('flexbox');
 
   const tabs = [
@@ -20,11 +20,10 @@ const ToolsPanel = ({ onClose, isMobile }) => {
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || (() => null);
 
   return (
-    <div className={`fixed ${isMobile ? 'inset-0' : 'inset-y-4 right-4 w-96'} bg-gray-800 z-50 flex flex-col rounded-lg overflow-hidden`}>
+    <div className="fixed inset-0 bg-gray-800 z-50 flex flex-col md:inset-y-4 md:right-4 md:left-auto md:w-96 md:rounded-lg overflow-hidden">
       <div className="p-4 border-b border-gray-700 flex justify-between items-center">
         <h2 className="text-xl font-bold text-white">CSS Tools</h2>
         <div className="flex items-center space-x-2">
-          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
