@@ -16,7 +16,8 @@ const Header = ({
   toggleLayout,
   layout,
   user,
-  onUpdateUser
+  onUpdateUser,
+  onGoogleLogin
 }) => {
   const getLayoutIcon = () => {
     switch (layout) {
@@ -33,19 +34,22 @@ const Header = ({
 
   return (
     <header className="bg-black p-2 flex justify-between items-center">
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-4">
         {isMobile && (
           <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(true)}>
             <Menu className="h-6 w-6" />
           </Button>
         )}
-        <div className="w-6 h-6 bg-white rounded-sm"></div>
-        <input
-          type="text"
-          value={currentCodeName}
-          onChange={(e) => setCurrentCodeName(e.target.value)}
-          className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white max-w-[150px] sm:max-w-none"
-        />
+        <ProfileMenu user={user} onUpdateUser={onUpdateUser} onGoogleLogin={onGoogleLogin} />
+        <div className="flex items-center space-x-2">
+          <div className="w-6 h-6 bg-white rounded-sm"></div>
+          <input
+            type="text"
+            value={currentCodeName}
+            onChange={(e) => setCurrentCodeName(e.target.value)}
+            className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white max-w-[150px] sm:max-w-none"
+          />
+        </div>
       </div>
       {!isMobile && (
         <div className="flex items-center space-x-2">
@@ -120,7 +124,6 @@ const Header = ({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <ProfileMenu user={user} onUpdateUser={onUpdateUser} />
         </div>
       )}
     </header>
