@@ -33,6 +33,15 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               language === 'html' ? html() : language === 'css' ? css() : javascript(),
               autocompletion(),
               EditorView.lineWrapping,
+              EditorView.theme({
+                "&": {
+                  height: "100%",
+                  overflow: "auto"
+                },
+                ".cm-scroller": {
+                  paddingBottom: "50vh"
+                }
+              })
             ]}
             onChange={(value) => setCode(value)}
             style={{
