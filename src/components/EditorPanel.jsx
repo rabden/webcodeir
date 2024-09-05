@@ -104,30 +104,28 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     );
   };
 
-  if (isMobile) {
-    return (
-      <Tabs defaultValue="html" className="w-full h-full flex flex-col">
-        <TabsList className="bg-gray-800 text-white">
-          <TabsTrigger value="html" className="data-[state=active]:bg-gray-700">HTML</TabsTrigger>
-          <TabsTrigger value="css" className="data-[state=active]:bg-gray-700">CSS</TabsTrigger>
-          <TabsTrigger value="js" className="data-[state=active]:bg-gray-700">JavaScript</TabsTrigger>
-        </TabsList>
-        <div className="flex-grow overflow-hidden">
-          <TabsContent value="html" className="h-full">
-            {renderEditor('html', htmlCode, setHtmlCode)}
-          </TabsContent>
-          <TabsContent value="css" className="h-full">
-            {renderEditor('css', cssCode, setCssCode)}
-          </TabsContent>
-          <TabsContent value="js" className="h-full">
-            {renderEditor('javascript', jsCode, setJsCode)}
-          </TabsContent>
-        </div>
-      </Tabs>
-    );
-  }
+  const renderTabMode = () => (
+    <Tabs defaultValue="html" className="w-full h-full flex flex-col">
+      <TabsList className="bg-gray-800 text-white">
+        <TabsTrigger value="html" className="data-[state=active]:bg-gray-700">HTML</TabsTrigger>
+        <TabsTrigger value="css" className="data-[state=active]:bg-gray-700">CSS</TabsTrigger>
+        <TabsTrigger value="js" className="data-[state=active]:bg-gray-700">JavaScript</TabsTrigger>
+      </TabsList>
+      <div className="flex-grow overflow-hidden">
+        <TabsContent value="html" className="h-full">
+          {renderEditor('html', htmlCode, setHtmlCode)}
+        </TabsContent>
+        <TabsContent value="css" className="h-full">
+          {renderEditor('css', cssCode, setCssCode)}
+        </TabsContent>
+        <TabsContent value="js" className="h-full">
+          {renderEditor('javascript', jsCode, setJsCode)}
+        </TabsContent>
+      </div>
+    </Tabs>
+  );
 
-  return (
+  const renderPanelMode = () => (
     <PanelGroup direction={settings.layout === 'stacked' ? 'horizontal' : 'vertical'}>
       <Panel minSize={5} defaultSize={33}>
         <div className="h-full flex flex-col">
@@ -179,6 +177,8 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       </Panel>
     </PanelGroup>
   );
+
+  return isMobile ? renderTabMode() : renderPanelMode();
 };
 
 export default EditorPanel;

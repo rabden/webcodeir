@@ -20,7 +20,7 @@ const CodeEditor = () => {
     showFontPanel: false,
     showToolsPanel: false,
     settings: {
-      editorTheme: 'dracula',
+      editorTheme: 'vscodeDark',
       fontSize: 14,
       autoSave: true,
       tabSize: 2,

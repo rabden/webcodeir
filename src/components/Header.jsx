@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Columns } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
@@ -13,9 +13,7 @@ const Header = ({
   setShowSettings,
   setIsMenuOpen,
   toggleLayout,
-  layout,
-  isTabMode,
-  toggleTabMode
+  layout
 }) => {
   const getLayoutIcon = () => {
     switch (layout) {
@@ -126,22 +124,6 @@ const Header = ({
               </TooltipTrigger>
               <TooltipContent>
                 <p>Toggle Layout</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleTabMode}
-                  className="text-white hover:bg-gray-700"
-                >
-                  <Columns className="w-5 h-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{isTabMode ? 'Switch to Window Mode' : 'Switch to Tab Mode'}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
