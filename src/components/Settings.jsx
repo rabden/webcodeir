@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 
 const Settings = ({ settings, setSettings, onClose, isMobile }) => {
   const handleChange = (key, value) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+    setSettings({ ...settings, [key]: value });
   };
 
   return (
@@ -102,20 +102,17 @@ const Settings = ({ settings, setSettings, onClose, isMobile }) => {
           />
           <label htmlFor="highlightActiveLine" className="text-white">Highlight Active Line</label>
         </div>
-        {!isMobile && (
-          <div>
-            <label className="block mb-2 text-white">Layout</label>
-            <select
-              value={settings.layout}
-              onChange={(e) => handleChange('layout', e.target.value)}
-              className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="editorsLeft">Editors Left</option>
-              <option value="editorsRight">Editors Right</option>
-              <option value="previewBottom">Preview Bottom</option>
-            </select>
-          </div>
-        )}
+        <div>
+          <label className="block mb-2 text-white">Layout</label>
+          <select
+            value={settings.layout}
+            onChange={(e) => handleChange('layout', e.target.value)}
+            className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="horizontal">Preview on Left</option>
+            <option value="vertical">Editors on Left</option>
+          </select>
+        </div>
         <div>
           <label className="block mb-2 text-white">Cursor Style</label>
           <select
