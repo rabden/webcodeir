@@ -8,6 +8,8 @@ import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
 import ToolsPanel from './ToolsPanel';
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const CodeEditor = () => {
   const [state, setState] = useState({
@@ -39,6 +41,7 @@ const CodeEditor = () => {
     isMobile: window.innerWidth < 768,
     previewSize: 50,
     isMenuOpen: false,
+    isTabMode: false,
   });
 
   const resizerRef = useRef(null);
@@ -144,23 +147,64 @@ const CodeEditor = () => {
     }));
   };
 
-  const renderLayout = () => {
-    const editorPanel = (
-      <EditorPanel
-        htmlCode={state.htmlCode}
-        cssCode={state.cssCode}
-        jsCode={state.jsCode}
-        setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
-        setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
-        setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
-        settings={state.settings}
-        setShowToolsPanel={() => setState(s => ({ ...s, showToolsPanel: true }))}
-      />
-    );
+  const toggleTabMode = () => {
+    setState(s => ({ ...s, isTabMode: !s.isTabMode }));
+  };
 
-    const previewPanel = (
-      <PreviewPanel preview={state.preview} />
-    );
+  const renderEditors = () => {
+    if (state.isTabMode) {
+      return (
+        <Tabs defaultValue="html" className="w-full">
+          <TabsList>
+            <TabsTrigger value="html">HTML</TabsTrigger>
+            <TabsTrigger value="css">CSS</TabsTrigger>
+            <TabsTrigger value="js">JavaScript</TabsTrigger>
+          </TabsList>
+          <TabsContent value="html">
+            <EditorPanel
+              code={state.htmlCode}
+              setCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
+              language="html"
+              settings={state.settings}
+            />
+          </TabsContent>
+          <TabsContent value="css">
+            <EditorPanel
+              code={state.cssCode}
+              setCode={(code) => setState(s => ({ ...s, cssCode: code }))}
+              language="css"
+              settings={state.settings}
+            />
+          </TabsContent>
+          <TabsContent value="js">
+            <EditorPanel
+              code={state.jsCode}
+              setCode={(code) => setState(s => ({ ...s, jsCode: code }))}
+              language="javascript"
+              settings={state.settings}
+            />
+          </TabsContent>
+        </Tabs>
+      );
+    } else {
+      return (
+        <EditorPanel
+          htmlCode={state.htmlCode}
+          cssCode={state.cssCode}
+          jsCode={state.jsCode}
+          setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
+          setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
+          setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
+          settings={state.settings}
+          setShowToolsPanel={() => setState(s => ({ ...s, showToolsPanel: true }))}
+        />
+      );
+    }
+  };
+
+  const renderLayout = () => {
+    const editorPanel = renderEditors();
+    const previewPanel = <PreviewPanel preview={state.preview} />;
 
     if (state.isMobile) {
       return (
@@ -220,6 +264,11 @@ const CodeEditor = () => {
         layout={state.settings.layout}
       />
       <div className="flex-grow overflow-hidden">
+        <div className="flex justify-end p-2">
+          <Button onClick={toggleTabMode} variant="outline" size="sm">
+            {state.isTabMode ? 'Window Mode' : 'Tab Mode'}
+          </Button>
+        </div>
         {renderLayout()}
       </div>
       {state.showSettings && (
