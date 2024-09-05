@@ -1,27 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { X, Search, Check } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+
+// Top 200 Lucide icons (subset)
+const topIcons = {
+  Home: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  Search: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+  Settings: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>',
+  User: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  Mail: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+  // Add more icons here...
+};
 
 const IconPanel = ({ onClose, isMobile }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedIcon, setCopiedIcon] = useState(null);
-  const [filteredIcons, setFilteredIcons] = useState([]);
+  const [filteredIcons, setFilteredIcons] = useState(Object.keys(topIcons));
 
   useEffect(() => {
-    const results = Object.keys(LucideIcons)
-      .filter(iconName => 
-        iconName.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        iconName !== 'createLucideIcon' && // Exclude non-icon exports
-        typeof LucideIcons[iconName] === 'function'
-      );
+    const results = Object.keys(topIcons).filter(iconName => 
+      iconName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
     setFilteredIcons(results);
   }, [searchTerm]);
 
   const copyToClipboard = (iconName) => {
-    const IconComponent = LucideIcons[iconName];
-    const svgString = IconComponent({}).props.children.join('');
+    const svgString = topIcons[iconName];
     navigator.clipboard.writeText(svgString);
     setCopiedIcon(iconName);
     setTimeout(() => setCopiedIcon(null), 2000);
@@ -49,31 +54,28 @@ const IconPanel = ({ onClose, isMobile }) => {
       </div>
       <div className="flex-grow overflow-y-auto p-6">
         <div className="grid grid-cols-4 gap-4">
-          {filteredIcons.map((iconName) => {
-            const IconComponent = LucideIcons[iconName];
-            return (
-              <TooltipProvider key={iconName}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full h-12 flex items-center justify-center bg-gray-700 hover:bg-gray-600 border-gray-600"
-                      onClick={() => copyToClipboard(iconName)}
-                    >
-                      {copiedIcon === iconName ? (
-                        <Check className="w-6 h-6 text-green-500" />
-                      ) : (
-                        <IconComponent className="w-6 h-6" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{iconName}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            );
-          })}
+          {filteredIcons.map((iconName) => (
+            <TooltipProvider key={iconName}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full h-12 flex items-center justify-center bg-gray-700 hover:bg-gray-600 border-gray-600"
+                    onClick={() => copyToClipboard(iconName)}
+                  >
+                    {copiedIcon === iconName ? (
+                      <Check className="w-6 h-6 text-green-500" />
+                    ) : (
+                      <div dangerouslySetInnerHTML={{ __html: topIcons[iconName] }} />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{iconName}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ))}
         </div>
       </div>
     </div>
