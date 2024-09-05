@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
-import { X, MoreVertical } from 'lucide-react';
+import { X, ChevronDown } from 'lucide-react';
 import FlexboxGenerator from './tools/FlexboxGenerator';
 import GridGenerator from './tools/GridGenerator';
 import AnimationCreator from './tools/AnimationCreator';
 import MediaQueryHelper from './tools/MediaQueryHelper';
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const ToolsPanel = ({ onClose, isMobile }) => {
   const [activeTab, setActiveTab] = useState('flexbox');
+  const [isOpen, setIsOpen] = useState(false);
 
   const tabs = [
     { id: 'flexbox', label: 'Flexbox' },
@@ -37,33 +33,42 @@ const ToolsPanel = ({ onClose, isMobile }) => {
     }
   };
 
+  const TabSelector = () => (
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="w-full justify-between bg-gray-800 text-white border-gray-700">
+          {tabs.find(tab => tab.id === activeTab)?.label}
+          <ChevronDown className="ml-2 h-4 w-4" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-full p-0 bg-gray-800 border-gray-700">
+        {tabs.map((tab) => (
+          <Button
+            key={tab.id}
+            className="w-full justify-start text-white"
+            variant={activeTab === tab.id ? "secondary" : "ghost"}
+            onClick={() => {
+              setActiveTab(tab.id);
+              setIsOpen(false);
+            }}
+          >
+            {tab.label}
+          </Button>
+        ))}
+      </PopoverContent>
+    </Popover>
+  );
+
   return (
     <div className={`fixed inset-y-4 ${isMobile ? 'inset-x-4' : 'right-4'} bg-gray-800 ${isMobile ? 'w-auto' : 'w-96'} shadow-lg z-50 flex flex-col rounded-lg overflow-hidden`}>
       <div className="p-4 border-b border-gray-700 flex justify-between items-center">
         <h2 className="text-xl font-bold text-white">CSS Tools</h2>
-        <div className="flex items-center space-x-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-gray-800 text-white border-gray-700">
-              {tabs.map((tab) => (
-                <DropdownMenuItem
-                  key={tab.id}
-                  onSelect={() => setActiveTab(tab.id)}
-                  className="hover:bg-gray-700"
-                >
-                  {tab.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
+        <button onClick={onClose} className="text-gray-400 hover:text-white">
+          <X className="h-6 w-6" />
+        </button>
+      </div>
+      <div className="p-4">
+        <TabSelector />
       </div>
       <div className="flex-grow overflow-y-auto p-4">
         {renderTool()}
