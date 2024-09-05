@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { X, Trash2, ChevronDown, ChevronUp, Play } from 'lucide-react';
 
-const SavedCodes = ({ onClose, onLoad, isMobile, userId }) => {
+const SavedCodes = ({ onClose, onLoad, isMobile }) => {
   const [savedCodes, setSavedCodes] = useState([]);
   const [expandedCode, setExpandedCode] = useState(null);
 
   useEffect(() => {
-    if (userId) {
-      const codes = JSON.parse(localStorage.getItem(`savedCodes_${userId}`) || '[]');
-      setSavedCodes(codes);
-    }
-  }, [userId]);
+    const codes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
+    setSavedCodes(codes);
+  }, []);
 
   const handleDelete = (id) => {
     const updatedCodes = savedCodes.filter(code => code.id !== id);
     setSavedCodes(updatedCodes);
-    localStorage.setItem(`savedCodes_${userId}`, JSON.stringify(updatedCodes));
+    localStorage.setItem('savedCodes', JSON.stringify(updatedCodes));
   };
 
   const handleRename = (id, newName) => {
@@ -23,7 +21,7 @@ const SavedCodes = ({ onClose, onLoad, isMobile, userId }) => {
       code.id === id ? { ...code, name: newName } : code
     );
     setSavedCodes(updatedCodes);
-    localStorage.setItem(`savedCodes_${userId}`, JSON.stringify(updatedCodes));
+    localStorage.setItem('savedCodes', JSON.stringify(updatedCodes));
   };
 
   const toggleExpand = (id) => {

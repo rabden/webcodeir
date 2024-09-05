@@ -7,10 +7,8 @@ import MobileMenu from './MobileMenu';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
-import { useAuth } from '../contexts/AuthContext';
 
 const CodeEditor = () => {
-  const { user } = useAuth();
   const [htmlCode, setHtmlCode] = useState('');
   const [cssCode, setCssCode] = useState('');
   const [jsCode, setJsCode] = useState('');
@@ -56,7 +54,7 @@ const CodeEditor = () => {
 
   useEffect(() => {
     loadFromLocalStorage();
-  }, [user]);
+  }, []);
 
   const updatePreview = () => {
     setPreview(`
@@ -68,42 +66,34 @@ const CodeEditor = () => {
   };
 
   const saveToLocalStorage = () => {
-    if (user) {
-      localStorage.setItem(`codeEditorState_${user.id}`, JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName }));
-    }
+    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName }));
   };
 
   const loadFromLocalStorage = () => {
-    if (user) {
-      const savedState = localStorage.getItem(`codeEditorState_${user.id}`);
-      if (savedState) {
-        const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
-        setHtmlCode(htmlCode);
-        setCssCode(cssCode);
-        setJsCode(jsCode);
-        setSettings(savedSettings);
-        setCurrentCodeName(currentCodeName || 'Untitled');
-      }
+    const savedState = localStorage.getItem('codeEditorState');
+    if (savedState) {
+      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
+      setHtmlCode(htmlCode);
+      setCssCode(cssCode);
+      setJsCode(jsCode);
+      setSettings(savedSettings);
+      setCurrentCodeName(currentCodeName || 'Untitled');
     }
   };
 
   const saveCurrentCode = () => {
-    if (user) {
-      const savedCodes = JSON.parse(localStorage.getItem(`savedCodes_${user.id}`) || '[]');
-      const newSavedCode = {
-        id: Date.now(),
-        name: currentCodeName,
-        html: htmlCode,
-        css: cssCode,
-        js: jsCode,
-        date: new Date().toISOString(),
-      };
-      savedCodes.push(newSavedCode);
-      localStorage.setItem(`savedCodes_${user.id}`, JSON.stringify(savedCodes));
-      alert('Code saved successfully!');
-    } else {
-      alert('Please log in to save your code.');
-    }
+    const savedCodes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
+    const newSavedCode = {
+      id: Date.now(),
+      name: currentCodeName,
+      html: htmlCode,
+      css: cssCode,
+      js: jsCode,
+      date: new Date().toISOString(),
+    };
+    savedCodes.push(newSavedCode);
+    localStorage.setItem('savedCodes', JSON.stringify(savedCodes));
+    alert('Code saved successfully!');
   };
 
   const handleTouchStart = (e) => {
@@ -130,7 +120,7 @@ const CodeEditor = () => {
   const toggleLayout = () => {
     setSettings(prevSettings => ({
       ...prevSettings,
-      layout: prevSettings.layout === 'horizontal' ? 'vertical' : 'horizontal'
+      layout: prevSettings.layout === 'horizontal' ? 'vertical' : prevSettings.layout === 'vertical' ? 'stacked' : 'horizontal'
     }));
   };
 
@@ -170,19 +160,49 @@ const CodeEditor = () => {
         </PanelGroup>
       );
     } else {
-      return (
-        <PanelGroup direction={settings.layout === 'horizontal' ? 'horizontal' : 'vertical'} className="h-full">
-          <Panel minSize={0} defaultSize={50}>
-            {settings.layout === 'horizontal' ? previewPanel : editorPanel}
-          </Panel>
-          <PanelResizeHandle className={`${settings.layout === 'horizontal' ? 'w-2' : 'h-2'} bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group`}>
-            <div className={`absolute ${settings.layout === 'horizontal' ? 'inset-y-0 left-1/2 w-0.5' : 'inset-x-0 top-1/2 h-0.5'} bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200`}></div>
-          </PanelResizeHandle>
-          <Panel minSize={0} defaultSize={50}>
-            {settings.layout === 'horizontal' ? editorPanel : previewPanel}
-          </Panel>
-        </PanelGroup>
-      );
+      if (settings.layout === 'horizontal') {
+        return (
+          <PanelGroup direction="horizontal" className="h-full">
+            <Panel minSize={0} defaultSize={50}>
+              {previewPanel}
+            </Panel>
+            <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+              <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+            </PanelResizeHandle>
+            <Panel minSize={0} defaultSize={50}>
+              {editorPanel}
+            </Panel>
+          </PanelGroup>
+        );
+      } else if (settings.layout === 'vertical') {
+        return (
+          <PanelGroup direction="horizontal" className="h-full">
+            <Panel minSize={0} defaultSize={50}>
+              {editorPanel}
+            </Panel>
+            <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+              <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+            </PanelResizeHandle>
+            <Panel minSize={0} defaultSize={50}>
+              {previewPanel}
+            </Panel>
+          </PanelGroup>
+        );
+      } else {
+        return (
+          <PanelGroup direction="vertical" className="h-full">
+            <Panel minSize={0} defaultSize={50}>
+              {editorPanel}
+            </Panel>
+            <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+              <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+            </PanelResizeHandle>
+            <Panel minSize={0} defaultSize={50}>
+              {previewPanel}
+            </Panel>
+          </PanelGroup>
+        );
+      }
     }
   };
 
@@ -223,7 +243,6 @@ const CodeEditor = () => {
             setShowSavedCodes(false);
           }}
           isMobile={isMobile}
-          userId={user?.id}
         />
       )}
       {showFontPanel && (
