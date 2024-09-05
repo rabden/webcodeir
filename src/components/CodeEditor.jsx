@@ -7,16 +7,17 @@ import MobileMenu from './MobileMenu';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
+import ToolsPanel from './ToolsPanel';
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
   const [cssCode, setCssCode] = useState('');
   const [jsCode, setJsCode] = useState('');
   const [preview, setPreview] = useState('');
-  const [previewWidth, setPreviewWidth] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [showSavedCodes, setShowSavedCodes] = useState(false);
   const [showFontPanel, setShowFontPanel] = useState(false);
+  const [showToolsPanel, setShowToolsPanel] = useState(false);
   const [settings, setSettings] = useState({
     editorTheme: 'dracula',
     fontSize: 14,
@@ -211,12 +212,12 @@ const CodeEditor = () => {
       <Header
         currentCodeName={currentCodeName}
         setCurrentCodeName={setCurrentCodeName}
-        previewWidth={previewWidth}
         isMobile={isMobile}
         saveCurrentCode={saveCurrentCode}
         setShowSavedCodes={setShowSavedCodes}
         setShowFontPanel={setShowFontPanel}
         setShowSettings={setShowSettings}
+        setShowToolsPanel={setShowToolsPanel}
         setIsMenuOpen={setIsMenuOpen}
         toggleLayout={toggleLayout}
         layout={settings.layout}
@@ -248,12 +249,16 @@ const CodeEditor = () => {
       {showFontPanel && (
         <FontPanel onClose={() => setShowFontPanel(false)} isMobile={isMobile} />
       )}
+      {showToolsPanel && (
+        <ToolsPanel onClose={() => setShowToolsPanel(false)} />
+      )}
       <MobileMenu
         isOpen={isMenuOpen}
         setIsOpen={setIsMenuOpen}
         setShowSettings={setShowSettings}
         setShowSavedCodes={setShowSavedCodes}
         setShowFontPanel={setShowFontPanel}
+        setShowToolsPanel={setShowToolsPanel}
         saveCurrentCode={saveCurrentCode}
       />
     </div>
