@@ -3,7 +3,6 @@ import CodeMirror from '@uiw/react-codemirror';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
-import { dracula } from '@uiw/codemirror-theme-dracula';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
@@ -15,7 +14,7 @@ import { Palette } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowToolsPanel, isTabMode }) => {
-  const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
+  const themes = { vscodeDark, solarizedDark, githubDark, monokai };
 
   const getLanguageExtension = (lang) => {
     switch (lang) {
@@ -128,7 +127,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   }
 
   return (
-    <PanelGroup direction={settings.layout === 'stacked' ? 'horizontal' : 'vertical'}>
+    <PanelGroup direction="vertical">
       <Panel minSize={5} defaultSize={33}>
         <div className="h-full flex flex-col">
           <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
@@ -142,7 +141,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           </div>
         </div>
       </Panel>
-      <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
+      <PanelResizeHandle className="h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200" />
       <Panel minSize={5} defaultSize={33}>
         <div className="h-full flex flex-col">
           <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
@@ -163,7 +162,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           </div>
         </div>
       </Panel>
-      <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
+      <PanelResizeHandle className="h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200" />
       <Panel minSize={5} defaultSize={33}>
         <div className="h-full flex flex-col">
           <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
