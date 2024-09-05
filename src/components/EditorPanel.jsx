@@ -9,7 +9,7 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { autocompletion } from '@codemirror/autocomplete';
+import { autocompletion, completionKeymap } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
 import { Palette } from 'lucide-react';
 
@@ -41,7 +41,29 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             theme={themes[settings.editorTheme]}
             extensions={[
               language === 'html' ? html() : language === 'css' ? css() : javascript(),
-              autocompletion(),
+              settings.enableAutocompletion && autocompletion({
+                override: [
+                  (context) => {
+                    let word = context.matchBefore(/\w+/);
+                    if (word.from == word.to && !context.explicit) return null;
+                    return {
+                      from: word.from,
+                      options: [
+                        { label: "function", type: "keyword" },
+                        { label: "class", type: "keyword" },
+                        { label: "if", type: "keyword" },
+                        { label: "else", type: "keyword" },
+                        { label: "for", type: "keyword" },
+                        { label: "while", type: "keyword" },
+                        { label: "return", type: "keyword" },
+                        { label: "const", type: "keyword" },
+                        { label: "let", type: "keyword" },
+                        { label: "var", type: "keyword" },
+                      ]
+                    };
+                  }
+                ]
+              }),
               EditorView.lineWrapping,
               EditorView.theme({
                 "&": {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { Switch } from "@/components/ui/switch";
 
 const Settings = ({ settings, setSettings, onClose, isMobile }) => {
   const handleChange = (key, value) => {
@@ -40,15 +41,13 @@ const Settings = ({ settings, setSettings, onClose, isMobile }) => {
             className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <div className="flex items-center">
-          <input
-            type="checkbox"
+        <div className="flex items-center justify-between">
+          <label htmlFor="autoSave" className="text-white">Auto Save</label>
+          <Switch
             id="autoSave"
             checked={settings.autoSave}
-            onChange={(e) => handleChange('autoSave', e.target.checked)}
-            className="mr-2"
+            onCheckedChange={(checked) => handleChange('autoSave', checked)}
           />
-          <label htmlFor="autoSave" className="text-white">Auto Save</label>
         </div>
         <div>
           <label className="block mb-2 text-white">Tab Size</label>
@@ -61,25 +60,21 @@ const Settings = ({ settings, setSettings, onClose, isMobile }) => {
             className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <div className="flex items-center">
-          <input
-            type="checkbox"
+        <div className="flex items-center justify-between">
+          <label htmlFor="lineNumbers" className="text-white">Show Line Numbers</label>
+          <Switch
             id="lineNumbers"
             checked={settings.lineNumbers}
-            onChange={(e) => handleChange('lineNumbers', e.target.checked)}
-            className="mr-2"
+            onCheckedChange={(checked) => handleChange('lineNumbers', checked)}
           />
-          <label htmlFor="lineNumbers" className="text-white">Show Line Numbers</label>
         </div>
-        <div className="flex items-center">
-          <input
-            type="checkbox"
+        <div className="flex items-center justify-between">
+          <label htmlFor="wordWrap" className="text-white">Word Wrap</label>
+          <Switch
             id="wordWrap"
             checked={settings.wordWrap}
-            onChange={(e) => handleChange('wordWrap', e.target.checked)}
-            className="mr-2"
+            onCheckedChange={(checked) => handleChange('wordWrap', checked)}
           />
-          <label htmlFor="wordWrap" className="text-white">Word Wrap</label>
         </div>
         <div>
           <label className="block mb-2 text-white">Indentation</label>
@@ -92,15 +87,13 @@ const Settings = ({ settings, setSettings, onClose, isMobile }) => {
             <option value="spaces">Spaces</option>
           </select>
         </div>
-        <div className="flex items-center">
-          <input
-            type="checkbox"
+        <div className="flex items-center justify-between">
+          <label htmlFor="highlightActiveLine" className="text-white">Highlight Active Line</label>
+          <Switch
             id="highlightActiveLine"
             checked={settings.highlightActiveLine}
-            onChange={(e) => handleChange('highlightActiveLine', e.target.checked)}
-            className="mr-2"
+            onCheckedChange={(checked) => handleChange('highlightActiveLine', checked)}
           />
-          <label htmlFor="highlightActiveLine" className="text-white">Highlight Active Line</label>
         </div>
         <div>
           <label className="block mb-2 text-white">Layout</label>
@@ -125,25 +118,21 @@ const Settings = ({ settings, setSettings, onClose, isMobile }) => {
             <option value="underline">Underline</option>
           </select>
         </div>
-        <div className="flex items-center">
-          <input
-            type="checkbox"
+        <div className="flex items-center justify-between">
+          <label htmlFor="matchBrackets" className="text-white">Match Brackets</label>
+          <Switch
             id="matchBrackets"
             checked={settings.matchBrackets}
-            onChange={(e) => handleChange('matchBrackets', e.target.checked)}
-            className="mr-2"
+            onCheckedChange={(checked) => handleChange('matchBrackets', checked)}
           />
-          <label htmlFor="matchBrackets" className="text-white">Match Brackets</label>
         </div>
-        <div className="flex items-center">
-          <input
-            type="checkbox"
+        <div className="flex items-center justify-between">
+          <label htmlFor="minimap" className="text-white">Show Minimap</label>
+          <Switch
             id="minimap"
             checked={settings.minimap}
-            onChange={(e) => handleChange('minimap', e.target.checked)}
-            className="mr-2"
+            onCheckedChange={(checked) => handleChange('minimap', checked)}
           />
-          <label htmlFor="minimap" className="text-white">Show Minimap</label>
         </div>
         <div>
           <label className="block mb-2 text-white">Scroll Speed</label>
@@ -154,6 +143,14 @@ const Settings = ({ settings, setSettings, onClose, isMobile }) => {
             value={settings.scrollSpeed}
             onChange={(e) => handleChange('scrollSpeed', parseInt(e.target.value))}
             className="w-full"
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <label htmlFor="enableAutocompletion" className="text-white">Enable Autocompletion</label>
+          <Switch
+            id="enableAutocompletion"
+            checked={settings.enableAutocompletion}
+            onCheckedChange={(checked) => handleChange('enableAutocompletion', checked)}
           />
         </div>
       </div>

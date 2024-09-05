@@ -33,6 +33,7 @@ const CodeEditor = () => {
       matchBrackets: true,
       minimap: false,
       scrollSpeed: 5,
+      enableAutocompletion: true,
     },
     currentCodeName: 'Untitled',
     isMobile: window.innerWidth < 768,
