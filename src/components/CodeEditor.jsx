@@ -13,7 +13,6 @@ const CodeEditor = () => {
   const [cssCode, setCssCode] = useState('');
   const [jsCode, setJsCode] = useState('');
   const [preview, setPreview] = useState('');
-  const [previewWidth, setPreviewWidth] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [showSavedCodes, setShowSavedCodes] = useState(false);
   const [showFontPanel, setShowFontPanel] = useState(false);
@@ -37,6 +36,11 @@ const CodeEditor = () => {
   const [previewSize, setPreviewSize] = useState(50);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const resizerRef = useRef(null);
+  const [user, setUser] = useState({
+    name: 'John Doe',
+    email: 'john@example.com',
+    avatarUrl: 'https://example.com/avatar.jpg',
+  });
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -66,18 +70,19 @@ const CodeEditor = () => {
   };
 
   const saveToLocalStorage = () => {
-    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName }));
+    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName, user }));
   };
 
   const loadFromLocalStorage = () => {
     const savedState = localStorage.getItem('codeEditorState');
     if (savedState) {
-      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
+      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName, user: savedUser } = JSON.parse(savedState);
       setHtmlCode(htmlCode);
       setCssCode(cssCode);
       setJsCode(jsCode);
       setSettings(savedSettings);
       setCurrentCodeName(currentCodeName || 'Untitled');
+      setUser(savedUser || user);
     }
   };
 
@@ -122,6 +127,11 @@ const CodeEditor = () => {
       ...prevSettings,
       layout: prevSettings.layout === 'horizontal' ? 'vertical' : prevSettings.layout === 'vertical' ? 'stacked' : 'horizontal'
     }));
+  };
+
+  const handleUpdateUser = (updatedUser) => {
+    setUser(updatedUser);
+    saveToLocalStorage();
   };
 
   const renderLayout = () => {
@@ -211,7 +221,6 @@ const CodeEditor = () => {
       <Header
         currentCodeName={currentCodeName}
         setCurrentCodeName={setCurrentCodeName}
-        previewWidth={previewWidth}
         isMobile={isMobile}
         saveCurrentCode={saveCurrentCode}
         setShowSavedCodes={setShowSavedCodes}
@@ -220,6 +229,8 @@ const CodeEditor = () => {
         setIsMenuOpen={setIsMenuOpen}
         toggleLayout={toggleLayout}
         layout={settings.layout}
+        user={user}
+        onUpdateUser={handleUpdateUser}
       />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}

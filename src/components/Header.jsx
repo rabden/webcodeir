@@ -2,6 +2,7 @@ import React from 'react';
 import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import ProfileMenu from './ProfileMenu';
 
 const Header = ({
   currentCodeName,
@@ -13,7 +14,9 @@ const Header = ({
   setShowSettings,
   setIsMenuOpen,
   toggleLayout,
-  layout
+  layout,
+  user,
+  onUpdateUser
 }) => {
   const getLayoutIcon = () => {
     switch (layout) {
@@ -117,6 +120,7 @@ const Header = ({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+          <ProfileMenu user={user} onUpdateUser={onUpdateUser} />
         </div>
       )}
     </header>
