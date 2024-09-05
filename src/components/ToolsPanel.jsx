@@ -1,60 +1,41 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { HexColorPicker } from 'react-colorful';
-import GradientMaker from './tools/GradientMaker';
-import BlobMaker from './tools/BlobMaker';
-import ClipPathGenerator from './tools/ClipPathGenerator';
-import BoxShadowGenerator from './tools/BoxShadowGenerator';
+import { X } from 'lucide-react';
+import ColorTool from './tools/ColorTool';
+import GradientTool from './tools/GradientTool';
+import ShadowTool from './tools/ShadowTool';
+import TransformTool from './tools/TransformTool';
 
 const ToolsPanel = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState("color");
-  const [color, setColor] = useState("#aabbcc");
+
+  const tools = [
+    { id: "color", label: "Color", component: ColorTool },
+    { id: "gradient", label: "Gradient", component: GradientTool },
+    { id: "shadow", label: "Shadow", component: ShadowTool },
+    { id: "transform", label: "Transform", component: TransformTool },
+  ];
 
   return (
-    <div className="fixed inset-y-4 right-4 w-[700px] bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden">
+    <div className="fixed inset-y-4 right-4 w-96 bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden">
       <div className="p-4 border-b border-gray-700 flex justify-between items-center">
-        <h2 className="text-xl font-bold text-white">Tools</h2>
+        <h2 className="text-xl font-bold text-white">CSS Tools</h2>
         <button onClick={onClose} className="text-gray-400 hover:text-white">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X className="h-6 w-6" />
         </button>
       </div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-grow flex flex-col">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="color">Color</TabsTrigger>
-          <TabsTrigger value="gradient">Gradient</TabsTrigger>
-          <TabsTrigger value="blob">Blob</TabsTrigger>
-          <TabsTrigger value="clippath">Clip Path</TabsTrigger>
-          <TabsTrigger value="boxshadow">Box Shadow</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4">
+          {tools.map(tool => (
+            <TabsTrigger key={tool.id} value={tool.id}>{tool.label}</TabsTrigger>
+          ))}
         </TabsList>
         <div className="flex-grow overflow-y-auto p-4">
-          <TabsContent value="color">
-            <div className="space-y-4">
-              <HexColorPicker color={color} onChange={setColor} />
-              <div className="flex justify-between items-center">
-                <span className="text-white">HEX</span>
-                <input
-                  type="text"
-                  value={color}
-                  onChange={(e) => setColor(e.target.value)}
-                  className="bg-gray-700 text-white p-2 rounded"
-                />
-              </div>
-            </div>
-          </TabsContent>
-          <TabsContent value="gradient">
-            <GradientMaker />
-          </TabsContent>
-          <TabsContent value="blob">
-            <BlobMaker />
-          </TabsContent>
-          <TabsContent value="clippath">
-            <ClipPathGenerator />
-          </TabsContent>
-          <TabsContent value="boxshadow">
-            <BoxShadowGenerator />
-          </TabsContent>
+          {tools.map(tool => (
+            <TabsContent key={tool.id} value={tool.id}>
+              <tool.component />
+            </TabsContent>
+          ))}
         </div>
       </Tabs>
     </div>
