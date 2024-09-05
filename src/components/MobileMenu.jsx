@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, SettingsIcon, BookOpen, Type, Save, Tool } from 'lucide-react';
+import { X, SettingsIcon, BookOpen, Type, Save, Wrench } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowToolsPanel, saveCurrentCode }) => {
@@ -25,7 +25,7 @@ const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, set
           Font Library
         </Button>
         <Button onClick={() => { setShowToolsPanel(true); setIsOpen(false); }} className="justify-start">
-          <Tool className="mr-2 h-4 w-4" />
+          <Wrench className="mr-2 h-4 w-4" />
           Tools
         </Button>
         <Button onClick={() => { saveCurrentCode(); setIsOpen(false); }} className="justify-start">
