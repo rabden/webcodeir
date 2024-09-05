@@ -39,6 +39,9 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
                   overflow: "auto"
                 },
                 ".cm-scroller": {
+                  overflow: "auto"
+                },
+                ".cm-content": {
                   paddingBottom: "50vh"
                 }
               })
