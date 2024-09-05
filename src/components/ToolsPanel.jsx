@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 const ToolsPanel = ({ onClose, isMobile }) => {
   const [activeTab, setActiveTab] = useState('flexbox');
+  const [isOpen, setIsOpen] = useState(false);
 
   const tabs = [
     { id: 'flexbox', label: 'Flexbox' },
@@ -33,7 +34,7 @@ const ToolsPanel = ({ onClose, isMobile }) => {
   };
 
   const TabSelector = () => (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" className="w-full justify-between bg-gray-800 text-white border-gray-700">
           {tabs.find(tab => tab.id === activeTab)?.label}
@@ -46,7 +47,10 @@ const ToolsPanel = ({ onClose, isMobile }) => {
             key={tab.id}
             className="w-full justify-start text-white"
             variant={activeTab === tab.id ? "secondary" : "ghost"}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => {
+              setActiveTab(tab.id);
+              setIsOpen(false);
+            }}
           >
             {tab.label}
           </Button>
