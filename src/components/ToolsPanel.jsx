@@ -1,11 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
-import { GradientPicker } from 'react-linear-gradient-picker';
-import 'react-linear-gradient-picker/dist/index.css';
 
 const ShadowTool = () => {
-  const [shadow, setShadow] = React.useState('2px 2px 4px rgba(0,0,0,0.5)');
+  const [shadow, setShadow] = useState('2px 2px 4px rgba(0,0,0,0.5)');
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-white">Shadow Generator</h3>
@@ -22,7 +20,7 @@ const ShadowTool = () => {
 };
 
 const TransformTool = () => {
-  const [transform, setTransform] = React.useState('rotate(45deg) scale(1.5)');
+  const [transform, setTransform] = useState('rotate(45deg) scale(1.5)');
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-white">Transform Generator</h3>
@@ -38,15 +36,25 @@ const TransformTool = () => {
   );
 };
 
+const GradientTool = () => {
+  const [gradient, setGradient] = useState('linear-gradient(to right, #ff0000, #00ff00)');
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-white">Gradient Generator</h3>
+      <div className="w-full h-20 rounded" style={{ background: gradient }}></div>
+      <input
+        type="text"
+        value={gradient}
+        onChange={(e) => setGradient(e.target.value)}
+        className="w-full p-2 rounded bg-gray-700 text-white"
+        placeholder="Enter CSS gradient value"
+      />
+    </div>
+  );
+};
+
 const ToolsPanel = ({ onClose }) => {
-  const [color, setColor] = React.useState("#aabbcc");
-  const [gradient, setGradient] = React.useState({
-    angle: 90,
-    colors: [
-      { rgb: { r: 0, g: 0, b: 0 }, stop: 0 },
-      { rgb: { r: 255, g: 255, b: 255 }, stop: 100 },
-    ],
-  });
+  const [color, setColor] = useState("#aabbcc");
 
   return (
     <div className="fixed inset-y-4 right-4 w-96 bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden">
@@ -67,10 +75,7 @@ const ToolsPanel = ({ onClose }) => {
             className="w-full p-2 rounded bg-gray-700 text-white"
           />
         </div>
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white">Gradient Picker</h3>
-          <GradientPicker {...gradient} setGradient={setGradient} />
-        </div>
+        <GradientTool />
         <ShadowTool />
         <TransformTool />
       </div>
