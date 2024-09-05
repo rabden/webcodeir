@@ -211,7 +211,7 @@ const CodeEditor = () => {
       );
     } else {
       return (
-        <PanelGroup direction={settings.layout === 'horizontal' ? 'horizontal' : 'vertical'} className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
+        <PanelGroup direction={settings.layout === 'horizontal' ? 'horizontal' : 'horizontal'} className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[1] * window.innerWidth / 100))}>
           {settings.layout === 'horizontal' ? (
             <>
               <Panel minSize={0} defaultSize={50}>
@@ -229,8 +229,8 @@ const CodeEditor = () => {
               <Panel minSize={0} defaultSize={50}>
                 {editorPanel}
               </Panel>
-              <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-                <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+              <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+                <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
               </PanelResizeHandle>
               <Panel minSize={0} defaultSize={50}>
                 {previewPanel}
