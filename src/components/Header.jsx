@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, LayoutPanelBottom } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
@@ -16,6 +16,19 @@ const Header = ({
   toggleLayout,
   layout
 }) => {
+  const getLayoutIcon = () => {
+    switch (layout) {
+      case 'horizontal':
+        return <LayoutPanelLeft className="w-5 h-5" />;
+      case 'vertical':
+        return <LayoutPanelTop className="w-5 h-5" />;
+      case 'stacked':
+        return <LayoutPanelBottom className="w-5 h-5" />;
+      default:
+        return <LayoutPanelLeft className="w-5 h-5" />;
+    }
+  };
+
   return (
     <header className="bg-black p-2 flex justify-between items-center">
       <div className="flex items-center space-x-2">
@@ -102,11 +115,7 @@ const Header = ({
                   onClick={toggleLayout}
                   className="p-2 rounded-full hover:bg-gray-800"
                 >
-                  {layout === 'horizontal' ? (
-                    <LayoutPanelLeft className="w-5 h-5" />
-                  ) : (
-                    <LayoutPanelTop className="w-5 h-5" />
-                  )}
+                  {getLayoutIcon()}
                 </button>
               </TooltipTrigger>
               <TooltipContent>

@@ -58,11 +58,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   );
 
   return (
-    <PanelGroup direction="vertical">
+    <PanelGroup direction={settings.layout === 'stacked' ? 'horizontal' : 'vertical'}>
       {renderEditor('html', htmlCode, setHtmlCode)}
-      <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+      <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200' : 'h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200'} />
       {renderEditor('css', cssCode, setCssCode)}
-      <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+      <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200' : 'h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200'} />
       {renderEditor('js', jsCode, setJsCode)}
     </PanelGroup>
   );
