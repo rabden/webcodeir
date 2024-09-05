@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Icons } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Library } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
@@ -104,7 +104,7 @@ const Header = ({
                   onClick={() => setShowIconPanel(true)}
                   className="text-white hover:bg-gray-700"
                 >
-                  <Icons className="w-5 h-5" />
+                  <Library className="w-5 h-5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
