@@ -39,17 +39,13 @@ const CodeEditor = () => {
     isMobile: window.innerWidth < 768,
     previewSize: 50,
     isMenuOpen: false,
-    isTabMode: window.innerWidth < 768,
-    isFullScreenPreview: false,
+    isTabMode: false,
   });
 
   const resizerRef = useRef(null);
 
   useEffect(() => {
-    const handleResize = () => {
-      const isMobile = window.innerWidth < 768;
-      setState(s => ({ ...s, isMobile, isTabMode: isMobile }));
-    };
+    const handleResize = () => setState(s => ({ ...s, isMobile: window.innerWidth < 768 }));
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -153,25 +149,22 @@ const CodeEditor = () => {
     setState(s => ({ ...s, isTabMode: !s.isTabMode }));
   };
 
-  const toggleFullScreenPreview = () => {
-    setState(s => ({ ...s, isFullScreenPreview: !s.isFullScreenPreview }));
-  };
+  const renderEditors = () => (
+    <EditorPanel
+      htmlCode={state.htmlCode}
+      cssCode={state.cssCode}
+      jsCode={state.jsCode}
+      setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
+      setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
+      setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
+      settings={state.settings}
+      setShowToolsPanel={() => setState(s => ({ ...s, showToolsPanel: true }))}
+      isTabMode={state.isTabMode}
+    />
+  );
 
   const renderLayout = () => {
-    const editorPanel = (
-      <EditorPanel
-        htmlCode={state.htmlCode}
-        cssCode={state.cssCode}
-        jsCode={state.jsCode}
-        setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
-        setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
-        setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
-        settings={state.settings}
-        setShowToolsPanel={() => setState(s => ({ ...s, showToolsPanel: true }))}
-        isTabMode={state.isTabMode}
-        toggleFullScreenPreview={toggleFullScreenPreview}
-      />
-    );
+    const editorPanel = renderEditors();
     const previewPanel = <PreviewPanel preview={state.preview} />;
 
     if (state.isMobile) {
@@ -203,19 +196,15 @@ const CodeEditor = () => {
 
       return (
         <PanelGroup direction={state.settings.layout === 'stacked' ? 'vertical' : 'horizontal'} className="h-full">
-          <Panel minSize={0} defaultSize={state.isFullScreenPreview ? 100 : 50}>
+          <Panel minSize={0} defaultSize={50}>
             {leftPanel}
           </Panel>
-          {!state.isFullScreenPreview && (
-            <>
-              <PanelResizeHandle className={state.settings.layout === 'stacked' ? 'h-2' : 'w-2'}>
-                <div className={`${state.settings.layout === 'stacked' ? 'h-0.5 w-full' : 'w-0.5 h-full'} bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200`}></div>
-              </PanelResizeHandle>
-              <Panel minSize={0} defaultSize={50}>
-                {rightPanel}
-              </Panel>
-            </>
-          )}
+          <PanelResizeHandle className={state.settings.layout === 'stacked' ? 'h-2' : 'w-2'}>
+            <div className={`${state.settings.layout === 'stacked' ? 'h-0.5 w-full' : 'w-0.5 h-full'} bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200`}></div>
+          </PanelResizeHandle>
+          <Panel minSize={0} defaultSize={50}>
+            {rightPanel}
+          </Panel>
         </PanelGroup>
       );
     }
