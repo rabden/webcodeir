@@ -130,7 +130,7 @@ const CodeEditor = () => {
   const toggleLayout = () => {
     setSettings(prevSettings => ({
       ...prevSettings,
-      layout: prevSettings.layout === 'horizontal' ? 'vertical' : prevSettings.layout === 'vertical' ? 'stacked' : 'horizontal'
+      layout: prevSettings.layout === 'horizontal' ? 'vertical' : 'horizontal'
     }));
   };
 
@@ -170,49 +170,19 @@ const CodeEditor = () => {
         </PanelGroup>
       );
     } else {
-      if (settings.layout === 'horizontal') {
-        return (
-          <PanelGroup direction="horizontal" className="h-full">
-            <Panel minSize={0} defaultSize={50}>
-              {previewPanel}
-            </Panel>
-            <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-              <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-            </PanelResizeHandle>
-            <Panel minSize={0} defaultSize={50}>
-              {editorPanel}
-            </Panel>
-          </PanelGroup>
-        );
-      } else if (settings.layout === 'vertical') {
-        return (
-          <PanelGroup direction="horizontal" className="h-full">
-            <Panel minSize={0} defaultSize={50}>
-              {editorPanel}
-            </Panel>
-            <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-              <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-            </PanelResizeHandle>
-            <Panel minSize={0} defaultSize={50}>
-              {previewPanel}
-            </Panel>
-          </PanelGroup>
-        );
-      } else {
-        return (
-          <PanelGroup direction="vertical" className="h-full">
-            <Panel minSize={0} defaultSize={50}>
-              {editorPanel}
-            </Panel>
-            <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-              <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-            </PanelResizeHandle>
-            <Panel minSize={0} defaultSize={50}>
-              {previewPanel}
-            </Panel>
-          </PanelGroup>
-        );
-      }
+      return (
+        <PanelGroup direction={settings.layout === 'horizontal' ? 'horizontal' : 'vertical'} className="h-full">
+          <Panel minSize={0} defaultSize={50}>
+            {settings.layout === 'horizontal' ? previewPanel : editorPanel}
+          </Panel>
+          <PanelResizeHandle className={`${settings.layout === 'horizontal' ? 'w-2' : 'h-2'} bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group`}>
+            <div className={`absolute ${settings.layout === 'horizontal' ? 'inset-y-0 left-1/2 w-0.5' : 'inset-x-0 top-1/2 h-0.5'} bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200`}></div>
+          </PanelResizeHandle>
+          <Panel minSize={0} defaultSize={50}>
+            {settings.layout === 'horizontal' ? editorPanel : previewPanel}
+          </Panel>
+        </PanelGroup>
+      );
     }
   };
 
