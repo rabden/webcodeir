@@ -66,8 +66,14 @@ const CodeEditor = () => {
       ...s,
       preview: `
         <html>
-          <head><style>${s.cssCode}</style></head>
-          <body>${s.htmlCode}<script>${s.jsCode}</script></body>
+          <head>
+            <style>${s.cssCode}</style>
+            <script src="https://cdn.tailwindcss.com"></script>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+          </head>
+          <body>${s.htmlCode}<script>${s.jsCode}</script>
+          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+          </body>
         </html>
       `
     }));
@@ -132,16 +138,6 @@ const CodeEditor = () => {
 
     document.addEventListener('touchmove', handleTouchMove);
     document.addEventListener('touchend', handleTouchEnd);
-  };
-
-  const toggleLayout = () => {
-    setState(s => ({
-      ...s,
-      settings: {
-        ...s.settings,
-        layout: s.settings.layout === 'horizontal' ? 'vertical' : s.settings.layout === 'vertical' ? 'stacked' : 'horizontal'
-      }
-    }));
   };
 
   const renderEditors = () => (
@@ -216,7 +212,6 @@ const CodeEditor = () => {
         setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true }))}
         setShowSettings={() => setState(s => ({ ...s, showSettings: true }))}
         setIsMenuOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
-        toggleLayout={toggleLayout}
         layout={state.settings.layout}
       />
       <div className="flex-grow overflow-hidden">
