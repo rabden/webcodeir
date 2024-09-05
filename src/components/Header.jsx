@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, LayoutPanelBottom } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
@@ -23,7 +23,7 @@ const Header = ({
       case 'vertical':
         return <LayoutPanelTop className="w-5 h-5" />;
       case 'stacked':
-        return <LayoutPanelBottom className="w-5 h-5" />;
+        return <Layout className="w-5 h-5" />;
       default:
         return <LayoutPanelLeft className="w-5 h-5" />;
     }
