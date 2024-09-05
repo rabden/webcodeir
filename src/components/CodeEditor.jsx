@@ -19,14 +19,10 @@ import { EditorView } from '@codemirror/view';
 import { Button } from "@/components/ui/button";
 
 const CodeEditor = () => {
-  const [htmlCode, setHtmlCode] = useState('');
-  const [cssCode, setCssCode] = useState('');
-  const [jsCode, setJsCode] = useState('');
+  const [code, setCode] = useState({ html: '', css: '', js: '' });
   const [preview, setPreview] = useState('');
   const [previewWidth, setPreviewWidth] = useState(0);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showSavedCodes, setShowSavedCodes] = useState(false);
-  const [showFontPanel, setShowFontPanel] = useState(false);
+  const [showPanels, setShowPanels] = useState({ settings: false, savedCodes: false, fontPanel: false });
   const [settings, setSettings] = useState({
     editorTheme: 'dracula',
     fontSize: 14,
@@ -62,7 +58,7 @@ const CodeEditor = () => {
       if (settings.autoSave) saveToLocalStorage();
     }, 300);
     return () => clearTimeout(debounce);
-  }, [htmlCode, cssCode, jsCode, settings.autoSave]);
+  }, [code, settings.autoSave]);
 
   useEffect(() => {
     loadFromLocalStorage();
@@ -71,23 +67,21 @@ const CodeEditor = () => {
   const updatePreview = () => {
     setPreview(`
       <html>
-        <head><style>${cssCode}</style></head>
-        <body>${htmlCode}<script>${jsCode}</script></body>
+        <head><style>${code.css}</style></head>
+        <body>${code.html}<script>${code.js}</script></body>
       </html>
     `);
   };
 
   const saveToLocalStorage = () => {
-    localStorage.setItem('codeEditorState', JSON.stringify({ htmlCode, cssCode, jsCode, settings, currentCodeName }));
+    localStorage.setItem('codeEditorState', JSON.stringify({ code, settings, currentCodeName }));
   };
 
   const loadFromLocalStorage = () => {
     const savedState = localStorage.getItem('codeEditorState');
     if (savedState) {
-      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
-      setHtmlCode(htmlCode);
-      setCssCode(cssCode);
-      setJsCode(jsCode);
+      const { code: savedCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
+      setCode(savedCode);
       setSettings(savedSettings);
       setCurrentCodeName(currentCodeName || 'Untitled');
     }
@@ -98,9 +92,7 @@ const CodeEditor = () => {
     const newSavedCode = {
       id: Date.now(),
       name: currentCodeName,
-      html: htmlCode,
-      css: cssCode,
-      js: jsCode,
+      ...code,
       date: new Date().toISOString(),
     };
     savedCodes.push(newSavedCode);
@@ -108,7 +100,7 @@ const CodeEditor = () => {
     alert('Code saved successfully!');
   };
 
-  const renderEditor = (language, code, setCode) => (
+  const renderEditor = (language) => (
     <Panel minSize={5} defaultSize={33}>
       <div className="h-full flex flex-col">
         <div className="bg-[#2d2d2d] p-2 flex items-center justify-between sticky top-0 z-10">
@@ -119,7 +111,7 @@ const CodeEditor = () => {
         </div>
         <div className="flex-grow overflow-hidden">
           <CodeMirror
-            value={code}
+            value={code[language]}
             height="100%"
             theme={themes[settings.editorTheme]}
             extensions={[
@@ -127,7 +119,7 @@ const CodeEditor = () => {
               autocompletion(),
               EditorView.lineWrapping,
             ]}
-            onChange={(value) => setCode(value)}
+            onChange={(value) => setCode(prevCode => ({ ...prevCode, [language]: value }))}
             style={{
               height: '100%',
               fontSize: `${settings.fontSize}px`,
@@ -174,11 +166,11 @@ const CodeEditor = () => {
   const renderLayout = () => {
     const editorPanel = (
       <PanelGroup direction="vertical">
-        {renderEditor('html', htmlCode, setHtmlCode)}
+        {renderEditor('html')}
         <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-        {renderEditor('css', cssCode, setCssCode)}
+        {renderEditor('css')}
         <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
-        {renderEditor('js', jsCode, setJsCode)}
+        {renderEditor('js')}
       </PanelGroup>
     );
 
@@ -191,55 +183,27 @@ const CodeEditor = () => {
       />
     );
 
-    if (isMobile) {
-      return (
-        <PanelGroup direction="vertical" className="h-full">
-          <Panel minSize={0} maxSize={100} defaultSize={100 - previewSize}>
-            {editorPanel}
-          </Panel>
-          <PanelResizeHandle
-            className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group"
-            onTouchStart={handleTouchStart}
-            ref={resizerRef}
-          >
-            <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-          </PanelResizeHandle>
-          <Panel minSize={0} maxSize={100} defaultSize={previewSize}>
-            {previewPanel}
-          </Panel>
-        </PanelGroup>
-      );
-    } else {
-      return (
-        <PanelGroup direction={settings.layout === 'horizontal' ? 'horizontal' : 'vertical'} className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
-          {settings.layout === 'horizontal' ? (
-            <>
-              <Panel minSize={0} defaultSize={50}>
-                {previewPanel}
-              </Panel>
-              <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-                <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-              </PanelResizeHandle>
-              <Panel minSize={0} defaultSize={50}>
-                {editorPanel}
-              </Panel>
-            </>
-          ) : (
-            <>
-              <Panel minSize={0} defaultSize={50}>
-                {editorPanel}
-              </Panel>
-              <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-                <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-              </PanelResizeHandle>
-              <Panel minSize={0} defaultSize={50}>
-                {previewPanel}
-              </Panel>
-            </>
-          )}
-        </PanelGroup>
-      );
-    }
+    return (
+      <PanelGroup direction={settings.layout === 'horizontal' ? 'horizontal' : 'vertical'} className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
+        {settings.layout === 'horizontal' ? (
+          <>
+            <Panel minSize={0} defaultSize={50}>{previewPanel}</Panel>
+            <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+              <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+            </PanelResizeHandle>
+            <Panel minSize={0} defaultSize={50}>{editorPanel}</Panel>
+          </>
+        ) : (
+          <>
+            <Panel minSize={0} defaultSize={50}>{editorPanel}</Panel>
+            <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
+              <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
+            </PanelResizeHandle>
+            <Panel minSize={0} defaultSize={50}>{previewPanel}</Panel>
+          </>
+        )}
+      </PanelGroup>
+    );
   };
 
   const renderMobileMenu = () => (
@@ -251,15 +215,15 @@ const CodeEditor = () => {
         </button>
       </div>
       <nav className="p-4 flex flex-col space-y-4">
-        <Button onClick={() => { setShowSettings(true); setIsMenuOpen(false); }} className="justify-start">
+        <Button onClick={() => { setShowPanels({ ...showPanels, settings: true }); setIsMenuOpen(false); }} className="justify-start">
           <SettingsIcon className="mr-2 h-4 w-4" />
           Settings
         </Button>
-        <Button onClick={() => { setShowSavedCodes(true); setIsMenuOpen(false); }} className="justify-start">
+        <Button onClick={() => { setShowPanels({ ...showPanels, savedCodes: true }); setIsMenuOpen(false); }} className="justify-start">
           <BookOpen className="mr-2 h-4 w-4" />
           Saved Codes
         </Button>
-        <Button onClick={() => { setShowFontPanel(true); setIsMenuOpen(false); }} className="justify-start">
+        <Button onClick={() => { setShowPanels({ ...showPanels, fontPanel: true }); setIsMenuOpen(false); }} className="justify-start">
           <Type className="mr-2 h-4 w-4" />
           Font Library
         </Button>
@@ -313,7 +277,7 @@ const CodeEditor = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={() => setShowSavedCodes(!showSavedCodes)}
+                    onClick={() => setShowPanels({ ...showPanels, savedCodes: !showPanels.savedCodes })}
                     className="p-2 rounded-full hover:bg-gray-800"
                   >
                     <BookOpen className="w-5 h-5" />
@@ -327,7 +291,7 @@ const CodeEditor = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={() => setShowFontPanel(!showFontPanel)}
+                    onClick={() => setShowPanels({ ...showPanels, fontPanel: !showPanels.fontPanel })}
                     className="p-2 rounded-full hover:bg-gray-800"
                   >
                     <Type className="w-5 h-5" />
@@ -341,7 +305,7 @@ const CodeEditor = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={() => setShowSettings(!showSettings)}
+                    onClick={() => setShowPanels({ ...showPanels, settings: !showPanels.settings })}
                     className="p-2 rounded-full hover:bg-gray-800"
                   >
                     <SettingsIcon className="w-5 h-5" />
@@ -358,29 +322,27 @@ const CodeEditor = () => {
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
       </div>
-      {showSettings && (
+      {showPanels.settings && (
         <Settings
           settings={settings}
           setSettings={setSettings}
-          onClose={() => setShowSettings(false)}
+          onClose={() => setShowPanels({ ...showPanels, settings: false })}
           isMobile={isMobile}
         />
       )}
-      {showSavedCodes && (
+      {showPanels.savedCodes && (
         <SavedCodes
-          onClose={() => setShowSavedCodes(false)}
-          onLoad={(code) => {
-            setHtmlCode(code.html);
-            setCssCode(code.css);
-            setJsCode(code.js);
-            setCurrentCodeName(code.name);
-            setShowSavedCodes(false);
+          onClose={() => setShowPanels({ ...showPanels, savedCodes: false })}
+          onLoad={(loadedCode) => {
+            setCode(loadedCode);
+            setCurrentCodeName(loadedCode.name);
+            setShowPanels({ ...showPanels, savedCodes: false });
           }}
           isMobile={isMobile}
         />
       )}
-      {showFontPanel && (
-        <FontPanel onClose={() => setShowFontPanel(false)} isMobile={isMobile} />
+      {showPanels.fontPanel && (
+        <FontPanel onClose={() => setShowPanels({ ...showPanels, fontPanel: false })} isMobile={isMobile} />
       )}
       {renderMobileMenu()}
     </div>
