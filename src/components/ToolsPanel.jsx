@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { HexColorPicker } from 'react-colorful';
+import ColorPicker from './tools/ColorPicker';
+import GradientMaker from './tools/GradientMaker';
+import BoxShadowGenerator from './tools/BoxShadowGenerator';
+import TransformTool from './tools/TransformTool';
 
 const ToolsPanel = ({ onClose }) => {
   const [color, setColor] = useState("#aabbcc");
@@ -14,15 +17,14 @@ const ToolsPanel = ({ onClose }) => {
         </button>
       </div>
       <div className="flex-grow overflow-y-auto p-4">
-        <div className="space-y-4 w-full">
-          <h3 className="text-lg font-semibold text-white">Color Picker</h3>
-          <HexColorPicker color={color} onChange={setColor} className="w-full" />
-          <input
-            type="text"
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
-            className="w-full p-2 rounded bg-gray-700 text-white"
-          />
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-2">Color Picker</h3>
+            <ColorPicker color={color} onChange={setColor} />
+          </div>
+          <GradientMaker />
+          <BoxShadowGenerator />
+          <TransformTool />
         </div>
       </div>
     </div>
