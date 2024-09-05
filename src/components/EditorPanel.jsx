@@ -53,7 +53,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         override: [
           (context) => {
             let word = context.matchBefore(/\w+/);
-            if (word.from == word.to && !context.explicit) return null;
+            if (!word || (word.from === word.to && !context.explicit)) return null;
             return {
               from: word.from,
               options: [
