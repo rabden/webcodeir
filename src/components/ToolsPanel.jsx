@@ -1,20 +1,52 @@
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React from 'react';
 import { X } from 'lucide-react';
-import ColorTool from './tools/ColorTool';
-import GradientTool from './tools/GradientTool';
-import ShadowTool from './tools/ShadowTool';
-import TransformTool from './tools/TransformTool';
+import { HexColorPicker } from 'react-colorful';
+import { GradientPicker } from 'react-linear-gradient-picker';
+import 'react-linear-gradient-picker/dist/index.css';
+
+const ShadowTool = () => {
+  const [shadow, setShadow] = React.useState('2px 2px 4px rgba(0,0,0,0.5)');
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-white">Shadow Generator</h3>
+      <div className="w-full h-20 bg-white rounded" style={{ boxShadow: shadow }}></div>
+      <input
+        type="text"
+        value={shadow}
+        onChange={(e) => setShadow(e.target.value)}
+        className="w-full p-2 rounded bg-gray-700 text-white"
+        placeholder="Enter box-shadow value"
+      />
+    </div>
+  );
+};
+
+const TransformTool = () => {
+  const [transform, setTransform] = React.useState('rotate(45deg) scale(1.5)');
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-white">Transform Generator</h3>
+      <div className="w-full h-20 bg-blue-500 rounded" style={{ transform: transform }}></div>
+      <input
+        type="text"
+        value={transform}
+        onChange={(e) => setTransform(e.target.value)}
+        className="w-full p-2 rounded bg-gray-700 text-white"
+        placeholder="Enter CSS transform value"
+      />
+    </div>
+  );
+};
 
 const ToolsPanel = ({ onClose }) => {
-  const [activeTab, setActiveTab] = useState("color");
-
-  const tools = [
-    { id: "color", label: "Color", component: ColorTool },
-    { id: "gradient", label: "Gradient", component: GradientTool },
-    { id: "shadow", label: "Shadow", component: ShadowTool },
-    { id: "transform", label: "Transform", component: TransformTool },
-  ];
+  const [color, setColor] = React.useState("#aabbcc");
+  const [gradient, setGradient] = React.useState({
+    angle: 90,
+    colors: [
+      { rgb: { r: 0, g: 0, b: 0 }, stop: 0 },
+      { rgb: { r: 255, g: 255, b: 255 }, stop: 100 },
+    ],
+  });
 
   return (
     <div className="fixed inset-y-4 right-4 w-96 bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden">
@@ -24,20 +56,24 @@ const ToolsPanel = ({ onClose }) => {
           <X className="h-6 w-6" />
         </button>
       </div>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-grow flex flex-col">
-        <TabsList className="grid w-full grid-cols-4">
-          {tools.map(tool => (
-            <TabsTrigger key={tool.id} value={tool.id}>{tool.label}</TabsTrigger>
-          ))}
-        </TabsList>
-        <div className="flex-grow overflow-y-auto p-4">
-          {tools.map(tool => (
-            <TabsContent key={tool.id} value={tool.id}>
-              <tool.component />
-            </TabsContent>
-          ))}
+      <div className="flex-grow overflow-y-auto p-4 space-y-8">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-white">Color Picker</h3>
+          <HexColorPicker color={color} onChange={setColor} />
+          <input
+            type="text"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            className="w-full p-2 rounded bg-gray-700 text-white"
+          />
         </div>
-      </Tabs>
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-white">Gradient Picker</h3>
+          <GradientPicker {...gradient} setGradient={setGradient} />
+        </div>
+        <ShadowTool />
+        <TransformTool />
+      </div>
     </div>
   );
 };
