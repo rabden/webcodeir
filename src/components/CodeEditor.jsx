@@ -8,6 +8,7 @@ import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
 import ToolsPanel from './ToolsPanel';
+import LibraryTogglePanel from './LibraryTogglePanel';
 
 const CodeEditor = () => {
   const [state, setState] = useState({
@@ -19,6 +20,7 @@ const CodeEditor = () => {
     showSavedCodes: false,
     showFontPanel: false,
     showToolsPanel: false,
+    showLibraryTogglePanel: false,
     settings: {
       editorTheme: 'vscodeDark',
       fontSize: 14,
@@ -34,6 +36,18 @@ const CodeEditor = () => {
       minimap: false,
       scrollSpeed: 5,
       enableAutocompletion: true,
+    },
+    libraries: {
+      'Tailwind CSS': true,
+      'Bootstrap': true,
+      'Bulma': true,
+      'Materialize': true,
+      'Foundation': true,
+      'React': true,
+      'Vue.js': true,
+      'Angular': true,
+      'jQuery': true,
+      'D3.js': true,
     },
     currentCodeName: 'Untitled',
     isMobile: window.innerWidth < 768,
@@ -55,29 +69,54 @@ const CodeEditor = () => {
       if (state.settings.autoSave) saveToLocalStorage();
     }, 300);
     return () => clearTimeout(debounce);
-  }, [state.htmlCode, state.cssCode, state.jsCode, state.settings.autoSave]);
+  }, [state.htmlCode, state.cssCode, state.jsCode, state.settings.autoSave, state.libraries]);
 
   useEffect(() => {
     loadFromLocalStorage();
   }, []);
 
   const updatePreview = () => {
-    const cdnLinks = `
-      <script src="https://cdn.tailwindcss.com"></script>
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.5/dist/css/foundation.min.css">
-      <script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.5/dist/js/foundation.min.js"></script>
-      <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-      <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-      <script src="https://d3js.org/d3.v7.min.js"></script>
-    `;
+    const cdnLinks = Object.entries(state.libraries)
+      .filter(([_, enabled]) => enabled)
+      .map(([name, _]) => {
+        switch (name) {
+          case 'Tailwind CSS':
+            return '<script src="https://cdn.tailwindcss.com"></script>';
+          case 'Bootstrap':
+            return `
+              <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+              <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            `;
+          case 'Bulma':
+            return '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">';
+          case 'Materialize':
+            return `
+              <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+            `;
+          case 'Foundation':
+            return `
+              <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.5/dist/css/foundation.min.css">
+              <script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.5/dist/js/foundation.min.js"></script>
+            `;
+          case 'React':
+            return `
+              <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+              <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+            `;
+          case 'Vue.js':
+            return '<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>';
+          case 'Angular':
+            return '<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>';
+          case 'jQuery':
+            return '<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>';
+          case 'D3.js':
+            return '<script src="https://d3js.org/d3.v7.min.js"></script>';
+          default:
+            return '';
+        }
+      })
+      .join('\n');
 
     setState(s => ({
       ...s,
@@ -99,6 +138,7 @@ const CodeEditor = () => {
       cssCode: state.cssCode,
       jsCode: state.jsCode,
       settings: state.settings,
+      libraries: state.libraries,
       currentCodeName: state.currentCodeName
     }));
   };
@@ -106,13 +146,14 @@ const CodeEditor = () => {
   const loadFromLocalStorage = () => {
     const savedState = localStorage.getItem('codeEditorState');
     if (savedState) {
-      const { htmlCode, cssCode, jsCode, settings: savedSettings, currentCodeName } = JSON.parse(savedState);
+      const { htmlCode, cssCode, jsCode, settings: savedSettings, libraries: savedLibraries, currentCodeName } = JSON.parse(savedState);
       setState(s => ({
         ...s,
         htmlCode,
         cssCode,
         jsCode,
         settings: savedSettings,
+        libraries: savedLibraries || s.libraries,
         currentCodeName: currentCodeName || 'Untitled'
       }));
     }
@@ -152,6 +193,16 @@ const CodeEditor = () => {
 
     document.addEventListener('touchmove', handleTouchMove);
     document.addEventListener('touchend', handleTouchEnd);
+  };
+
+  const toggleLibrary = (name) => {
+    setState(s => ({
+      ...s,
+      libraries: {
+        ...s.libraries,
+        [name]: !s.libraries[name]
+      }
+    }));
   };
 
   const renderEditors = () => (
@@ -225,6 +276,7 @@ const CodeEditor = () => {
         setShowSavedCodes={() => setState(s => ({ ...s, showSavedCodes: true }))}
         setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true }))}
         setShowSettings={() => setState(s => ({ ...s, showSettings: true }))}
+        setShowLibraryTogglePanel={() => setState(s => ({ ...s, showLibraryTogglePanel: true }))}
         setIsMenuOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
         layout={state.settings.layout}
       />
@@ -261,12 +313,20 @@ const CodeEditor = () => {
       {state.showToolsPanel && (
         <ToolsPanel onClose={() => setState(s => ({ ...s, showToolsPanel: false }))} />
       )}
+      {state.showLibraryTogglePanel && (
+        <LibraryTogglePanel
+          libraries={state.libraries}
+          toggleLibrary={toggleLibrary}
+          onClose={() => setState(s => ({ ...s, showLibraryTogglePanel: false }))}
+        />
+      )}
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
         setShowSettings={() => setState(s => ({ ...s, showSettings: true, isMenuOpen: false }))}
         setShowSavedCodes={() => setState(s => ({ ...s, showSavedCodes: true, isMenuOpen: false }))}
         setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true, isMenuOpen: false }))}
+        setShowLibraryTogglePanel={() => setState(s => ({ ...s, showLibraryTogglePanel: true, isMenuOpen: false }))}
         saveCurrentCode={() => { saveCurrentCode(); setState(s => ({ ...s, isMenuOpen: false })); }}
       />
     </div>
