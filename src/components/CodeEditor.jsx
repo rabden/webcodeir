@@ -1,8 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import React from 'react';
 import Header from './Header';
-import EditorPanel from './EditorPanel';
-import PreviewPanel from './PreviewPanel';
 import MobileMenu from './MobileMenu';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
@@ -27,15 +24,13 @@ const CodeEditor = () => {
     handleTouchStart,
   } = useLayoutManager(state, setState, updatePreview);
 
-  const resizerRef = useRef(null);
-
-  useEffect(() => {
+  React.useEffect(() => {
     const handleResize = () => setState(s => ({ ...s, isMobile: window.innerWidth < 768 }));
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [setState]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const debounce = setTimeout(() => {
       updatePreview();
       if (state.settings.autoSave) saveToLocalStorage();
@@ -43,7 +38,7 @@ const CodeEditor = () => {
     return () => clearTimeout(debounce);
   }, [state.htmlCode, state.cssCode, state.jsCode, state.settings.autoSave, updatePreview, saveToLocalStorage]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     loadFromLocalStorage();
   }, [loadFromLocalStorage]);
 
