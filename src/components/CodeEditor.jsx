@@ -9,7 +9,7 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, X } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, X, Layout } from 'lucide-react';
 import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
@@ -17,6 +17,7 @@ import { autocompletion } from '@codemirror/autocomplete';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { EditorView } from '@codemirror/view';
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const CodeEditor = () => {
   const [htmlCode, setHtmlCode] = useState('');
@@ -36,7 +37,7 @@ const CodeEditor = () => {
     wordWrap: false,
     indentWithTabs: true,
     highlightActiveLine: true,
-    layout: 'horizontal',
+    layout: 'vertical',
     cursorStyle: 'line',
     matchBrackets: true,
     minimap: false,
@@ -44,7 +45,6 @@ const CodeEditor = () => {
   });
   const [currentCodeName, setCurrentCodeName] = useState('Untitled');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [previewSize, setPreviewSize] = useState(50);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const resizerRef = useRef(null);
 
@@ -109,7 +109,7 @@ const CodeEditor = () => {
   };
 
   const renderEditor = (language, code, setCode) => (
-    <Panel minSize={5} defaultSize={33}>
+    <Panel minSize={5}>
       <div className="h-full flex flex-col">
         <div className="bg-[#2d2d2d] p-2 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center">
@@ -150,34 +150,13 @@ const CodeEditor = () => {
     </Panel>
   );
 
-  const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    const startY = touch.clientY;
-    const startPreviewSize = previewSize;
-
-    const handleTouchMove = (e) => {
-      const touch = e.touches[0];
-      const deltaY = touch.clientY - startY;
-      const newPreviewSize = Math.max(0, Math.min(100, startPreviewSize - (deltaY / window.innerHeight) * 100));
-      setPreviewSize(newPreviewSize);
-    };
-
-    const handleTouchEnd = () => {
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-    };
-
-    document.addEventListener('touchmove', handleTouchMove);
-    document.addEventListener('touchend', handleTouchEnd);
-  };
-
   const renderLayout = () => {
     const editorPanel = (
-      <PanelGroup direction="vertical">
+      <PanelGroup direction={isMobile ? "vertical" : settings.layout === "horizontal" ? "horizontal" : "vertical"}>
         {renderEditor('html', htmlCode, setHtmlCode)}
-        <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+        <PanelResizeHandle className={`${isMobile || settings.layout === "horizontal" ? "h-1" : "w-1"} bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200`} />
         {renderEditor('css', cssCode, setCssCode)}
-        <PanelResizeHandle className="h-1 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+        <PanelResizeHandle className={`${isMobile || settings.layout === "horizontal" ? "h-1" : "w-1"} bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200`} />
         {renderEditor('js', jsCode, setJsCode)}
       </PanelGroup>
     );
@@ -194,51 +173,52 @@ const CodeEditor = () => {
     if (isMobile) {
       return (
         <PanelGroup direction="vertical" className="h-full">
-          <Panel minSize={0} maxSize={100} defaultSize={100 - previewSize}>
-            {editorPanel}
-          </Panel>
-          <PanelResizeHandle
-            className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group"
-            onTouchStart={handleTouchStart}
-            ref={resizerRef}
-          >
-            <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-          </PanelResizeHandle>
-          <Panel minSize={0} maxSize={100} defaultSize={previewSize}>
-            {previewPanel}
-          </Panel>
+          <Panel>{editorPanel}</Panel>
+          <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+          <Panel>{previewPanel}</Panel>
         </PanelGroup>
       );
     } else {
-      return (
-        <PanelGroup direction={settings.layout === 'horizontal' ? 'horizontal' : 'vertical'} className="h-full" onLayout={(sizes) => setPreviewWidth(Math.round(sizes[0] * window.innerWidth / 100))}>
-          {settings.layout === 'horizontal' ? (
-            <>
-              <Panel minSize={0} defaultSize={50}>
-                {previewPanel}
+      switch (settings.layout) {
+        case 'horizontal':
+          return (
+            <PanelGroup direction="horizontal" className="h-full">
+              <Panel>{previewPanel}</Panel>
+              <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              <Panel>{editorPanel}</Panel>
+            </PanelGroup>
+          );
+        case 'vertical':
+          return (
+            <PanelGroup direction="vertical" className="h-full">
+              <Panel>{editorPanel}</Panel>
+              <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              <Panel>{previewPanel}</Panel>
+            </PanelGroup>
+          );
+        case 'grid':
+          return (
+            <PanelGroup direction="horizontal" className="h-full">
+              <Panel>
+                <PanelGroup direction="vertical">
+                  {renderEditor('html', htmlCode, setHtmlCode)}
+                  <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+                  {renderEditor('css', cssCode, setCssCode)}
+                </PanelGroup>
               </Panel>
-              <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-                <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-              </PanelResizeHandle>
-              <Panel minSize={0} defaultSize={50}>
-                {editorPanel}
+              <PanelResizeHandle className="w-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+              <Panel>
+                <PanelGroup direction="vertical">
+                  {renderEditor('js', jsCode, setJsCode)}
+                  <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200" />
+                  {previewPanel}
+                </PanelGroup>
               </Panel>
-            </>
-          ) : (
-            <>
-              <Panel minSize={0} defaultSize={50}>
-                {editorPanel}
-              </Panel>
-              <PanelResizeHandle className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group">
-                <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-              </PanelResizeHandle>
-              <Panel minSize={0} defaultSize={50}>
-                {previewPanel}
-              </Panel>
-            </>
-          )}
-        </PanelGroup>
-      );
+            </PanelGroup>
+          );
+        default:
+          return null;
+      }
     }
   };
 
@@ -295,6 +275,19 @@ const CodeEditor = () => {
         </div>
         {!isMobile && (
           <div className="flex items-center space-x-2">
+            <Select
+              value={settings.layout}
+              onValueChange={(value) => setSettings({ ...settings, layout: value })}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select layout" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="horizontal">Horizontal</SelectItem>
+                <SelectItem value="vertical">Vertical</SelectItem>
+                <SelectItem value="grid">Grid</SelectItem>
+              </SelectContent>
+            </Select>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -309,7 +302,6 @@ const CodeEditor = () => {
                   <p>Save current code</p>
                 </TooltipContent>
               </Tooltip>
-
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
@@ -323,7 +315,6 @@ const CodeEditor = () => {
                   <p>Saved Codes</p>
                 </TooltipContent>
               </Tooltip>
-
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
@@ -337,7 +328,6 @@ const CodeEditor = () => {
                   <p>Font Library</p>
                 </TooltipContent>
               </Tooltip>
-
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
