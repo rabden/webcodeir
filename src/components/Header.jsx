@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 const Header = ({
   currentCodeName,
   setCurrentCodeName,
-  previewWidth,
   isMobile,
   saveCurrentCode,
   setShowSavedCodes,
@@ -44,11 +43,6 @@ const Header = ({
           onChange={(e) => setCurrentCodeName(e.target.value)}
           className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white max-w-[150px] sm:max-w-none"
         />
-        {!isMobile && (
-          <div className="text-sm ml-4 hidden sm:block">
-            Preview width: {previewWidth}px
-          </div>
-        )}
       </div>
       {!isMobile && (
         <div className="flex items-center space-x-2">
