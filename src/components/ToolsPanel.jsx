@@ -35,16 +35,16 @@ const ToolsPanel = ({ onClose, isMobile }) => {
   const TabSelector = () => (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-full justify-between">
+        <Button variant="outline" className="w-full justify-between bg-gray-800 text-white border-gray-700">
           {tabs.find(tab => tab.id === activeTab)?.label}
           <ChevronDown className="ml-2 h-4 w-4" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
+      <PopoverContent className="w-full p-0 bg-gray-800 border-gray-700">
         {tabs.map((tab) => (
           <Button
             key={tab.id}
-            className="w-full justify-start"
+            className="w-full justify-start text-white"
             variant={activeTab === tab.id ? "secondary" : "ghost"}
             onClick={() => setActiveTab(tab.id)}
           >
@@ -64,21 +64,7 @@ const ToolsPanel = ({ onClose, isMobile }) => {
         </button>
       </div>
       <div className="p-4">
-        {isMobile ? <TabSelector /> : (
-          <div className="flex border-b border-gray-700 overflow-x-auto">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                className={`flex-shrink-0 py-2 px-4 text-sm font-medium ${
-                  activeTab === tab.id ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
-                }`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        )}
+        <TabSelector />
       </div>
       <div className="flex-grow overflow-y-auto p-4">
         {renderTool()}
