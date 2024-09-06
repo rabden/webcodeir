@@ -29,8 +29,8 @@ const PexelsImagePanel = ({ onClose }) => {
     setError(null);
     try {
       const url = query
-        ? `https://api.pexels.com/v1/search?query=${query}&per_page=15&page=${pageNum}`
-        : `https://api.pexels.com/v1/curated?per_page=15&page=${pageNum}`;
+        ? `https://api.pexels.com/v1/search?query=${query}&per_page=50&page=${pageNum}`
+        : `https://api.pexels.com/v1/curated?per_page=50&page=${pageNum}`;
       const response = await fetch(url, {
         headers: {
           Authorization: PEXELS_API_KEY
@@ -62,8 +62,10 @@ const PexelsImagePanel = ({ onClose }) => {
     navigator.clipboard.writeText(url);
   };
 
+  const isMobile = window.innerWidth <= 768;
+
   return (
-    <div className="fixed inset-y-4 right-4 w-96 bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg">
+    <div className={`fixed inset-y-4 right-4 ${isMobile ? 'left-4' : 'w-96'} bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg`}>
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-xl font-bold text-white">Pexels Images</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
@@ -84,22 +86,24 @@ const PexelsImagePanel = ({ onClose }) => {
       </div>
       <div className="flex-grow overflow-y-auto p-4 space-y-4">
         {error && <p className="text-red-500">{error}</p>}
-        {images.map((image, index) => (
-          <div key={image.id} className="relative group" ref={index === images.length - 1 ? lastImageElementRef : null}>
-            <img src={image.src.medium} alt={image.alt} className="w-full rounded-lg" />
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button onClick={() => copyImageUrl(image.src.original)} className="mr-2">
-                Copy URL
-              </Button>
-              <a href={image.url} target="_blank" rel="noopener noreferrer">
-                <Button>
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  View on Pexels
+        <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-3'} gap-4`}>
+          {images.map((image, index) => (
+            <div key={image.id} className="relative group" ref={index === images.length - 1 ? lastImageElementRef : null}>
+              <img src={image.src.medium} alt={image.alt} className="w-full h-auto rounded-lg" />
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button onClick={() => copyImageUrl(image.src.original)} className="mb-2 text-xs">
+                  Copy URL
                 </Button>
-              </a>
+                <a href={image.url} target="_blank" rel="noopener noreferrer" className="text-white text-xs">
+                  <Button size="sm">
+                    <ExternalLink className="w-3 h-3 mr-1" />
+                    View on Pexels
+                  </Button>
+                </a>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
         {loading && <p className="text-center text-white">Loading more images...</p>}
       </div>
     </div>
