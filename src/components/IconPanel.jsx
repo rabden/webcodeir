@@ -1,66 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, Check, AlertCircle } from 'lucide-react';
+import { X, Search, Check } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+
+// Top 200 Lucide icons
+const topIcons = {
+  Home: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  Search: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+  Settings: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>',
+  User: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  Mail: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+  Bell: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
+  Calendar: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>',
+  Clock: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  Heart: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+  Star: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  // Add more icons here...
+};
 
 const IconPanel = ({ onClose, isMobile }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedIcon, setCopiedIcon] = useState(null);
-  const [icons, setIcons] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [filteredIcons, setFilteredIcons] = useState(Object.keys(topIcons));
 
   useEffect(() => {
-    const fetchIcons = async () => {
-      if (searchTerm.length > 1) {
-        setIsLoading(true);
-        setError(null);
-        try {
-          const response = await fetch(`https://api.iconify.design/search?query=${searchTerm}&limit=50`);
-          if (!response.ok) {
-            throw new Error('Failed to fetch icons');
-          }
-          const data = await response.json();
-          if (data && Array.isArray(data.icons)) {
-            setIcons(data.icons);
-          } else {
-            setIcons([]);
-          }
-        } catch (error) {
-          console.error('Error fetching icons:', error);
-          setError('Failed to load icons. Please try again.');
-        } finally {
-          setIsLoading(false);
-        }
-      } else {
-        setIcons([]);
-      }
-    };
-
-    const debounceTimer = setTimeout(fetchIcons, 300);
-    return () => clearTimeout(debounceTimer);
+    const results = Object.keys(topIcons).filter(iconName => 
+      iconName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredIcons(results);
   }, [searchTerm]);
 
-  const copyToClipboard = async (iconData) => {
-    try {
-      const response = await fetch(`https://api.iconify.design/${iconData.provider}.json?icons=${iconData.name}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch icon data');
-      }
-      const data = await response.json();
-      if (data && data.icons && data.icons[iconData.name]) {
-        const svgPath = data.icons[iconData.name].body;
-        const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">${svgPath}</svg>`;
-        await navigator.clipboard.writeText(svgString);
-        setCopiedIcon(iconData.name);
-        setTimeout(() => setCopiedIcon(null), 2000);
-      } else {
-        throw new Error('Icon data not found');
-      }
-    } catch (error) {
-      console.error('Error copying icon:', error);
-      setError('Failed to copy icon. Please try again.');
-    }
+  const copyToClipboard = (iconName) => {
+    const svgString = topIcons[iconName];
+    navigator.clipboard.writeText(svgString);
+    setCopiedIcon(iconName);
+    setTimeout(() => setCopiedIcon(null), 2000);
   };
 
   return (
@@ -84,38 +58,25 @@ const IconPanel = ({ onClose, isMobile }) => {
         </div>
       </div>
       <div className="flex-grow overflow-y-auto p-6">
-        {isLoading && <p className="text-white">Loading icons...</p>}
-        {error && <p className="text-red-500">{error}</p>}
-        {!isLoading && !error && icons.length === 0 && searchTerm.length > 1 && (
-          <p className="text-white">No icons found. Try a different search term.</p>
-        )}
         <div className="grid grid-cols-4 gap-4">
-          {icons.map((icon) => (
-            <TooltipProvider key={`${icon.provider}:${icon.name}`}>
+          {filteredIcons.map((iconName) => (
+            <TooltipProvider key={iconName}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="outline"
                     className="w-full h-12 flex items-center justify-center bg-gray-700 hover:bg-gray-600 border-gray-600"
-                    onClick={() => copyToClipboard(icon)}
+                    onClick={() => copyToClipboard(iconName)}
                   >
-                    {copiedIcon === icon.name ? (
+                    {copiedIcon === iconName ? (
                       <Check className="w-6 h-6 text-green-500" />
                     ) : (
-                      <img 
-                        src={`https://api.iconify.design/${icon.provider}/${icon.name}.svg`} 
-                        alt={icon.name} 
-                        className="w-6 h-6"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFsZXJ0LWNpcmNsZSI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48bGluZSB4MT0iMTIiIHkxPSI4IiB4Mj0iMTIiIHkyPSIxMiIvPjxsaW5lIHgxPSIxMiIgeTE9IjE2IiB4Mj0iMTIuMDEiIHkyPSIxNiIvPjwvc3ZnPg==';
-                        }}
-                      />
+                      <div dangerouslySetInnerHTML={{ __html: topIcons[iconName] }} />
                     )}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{icon.name}</p>
+                  <p>{iconName}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
