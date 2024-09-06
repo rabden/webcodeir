@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { X, Search, Check } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { topIcons, additionalIcons } from '../data/iconData';
+import { topIcons } from '../data/iconData';
+import { additionalIcons } from '../data/iconData2';
 import ReactDOMServer from 'react-dom/server';
 
 const IconPanel = ({ onClose, isMobile }) => {
@@ -21,15 +22,13 @@ const IconPanel = ({ onClose, isMobile }) => {
 
   const copyToClipboard = (iconName) => {
     const IconComponent = allIcons[iconName];
-    if (IconComponent && typeof IconComponent === 'function') {
-      const iconElement = React.createElement(IconComponent, { width: 24, height: 24 });
-      const svgString = ReactDOMServer.renderToStaticMarkup(iconElement);
-      
-      navigator.clipboard.writeText(svgString);
+    const iconElement = React.createElement(IconComponent, { width: 24, height: 24 });
+    const svgString = ReactDOMServer.renderToStaticMarkup(iconElement);
+    
+    navigator.clipboard.writeText(svgString);
 
-      setCopiedIcon(iconName);
-      setTimeout(() => setCopiedIcon(null), 2000);
-    }
+    setCopiedIcon(iconName);
+    setTimeout(() => setCopiedIcon(null), 2000);
   };
 
   return (
@@ -56,7 +55,6 @@ const IconPanel = ({ onClose, isMobile }) => {
         <div className={`grid ${isMobile ? 'grid-cols-5 gap-2' : 'grid-cols-4 gap-4'}`}>
           {filteredIcons.map((iconName) => {
             const IconComponent = allIcons[iconName];
-            if (!IconComponent || typeof IconComponent !== 'function') return null;
             return (
               <TooltipProvider key={iconName}>
                 <Tooltip>
