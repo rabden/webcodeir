@@ -120,6 +120,9 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             minimalSetup={{
               minimap: settings.minimap ? { enabled: true } : { enabled: false },
             }}
+            options={{
+              lineWrapping: !isMobile && settings.wordWrap,
+            }}
           />
         </div>
       </div>
