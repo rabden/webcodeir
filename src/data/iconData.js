@@ -18,9 +18,7 @@ import {
   UserCheck, UserMinus, UserPlus, UserX, Users, Video, Voicemail, Volume, 
   Watch, Wifi, Wind, X, XCircle, Youtube, Zap, ZoomIn, ZoomOut,
   // Brand icons
-  Linkedin, Github, Figma, Framer, Slack, Apple,
-  // Newly added icons
-  Bitbucket, Twitch, Android
+  Linkedin, Github, Figma, Framer, Slack, Apple
 } from 'lucide-react';
 
 export const topIcons = {
@@ -46,11 +44,9 @@ export const topIcons = {
   UserMinus, UserPlus, UserX, Users, Voicemail, Watch, Wind, XCircle, Youtube,
   Zap, ZoomIn, ZoomOut,
   // Brand icons
-  Linkedin, Github, Figma, Framer, Slack, Apple,
-  // Newly added icons
-  Bitbucket, Twitch, Android
+  Linkedin, Github, Figma, Framer, Slack, Apple
 };
 
 // Note: The following icons are not available in lucide-react:
-// Behance, Sketch, Adobe, Notion, Discord, Windows, Linux, Amazon, Dropbox, Google, Microsoft, Paypal, Visa, Mastercard, Airbnb, Uber, Lyft, Netflix
+// Bitbucket, Twitch, Android, Behance, Sketch, Adobe, Notion, Discord, Windows, Linux, Amazon, Dropbox, Google, Microsoft, Paypal, Visa, Mastercard, Airbnb, Uber, Lyft, Netflix
 // You may need to use a different icon library or custom SVGs for these icons.
