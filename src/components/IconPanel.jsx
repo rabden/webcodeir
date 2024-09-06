@@ -3,6 +3,7 @@ import { X, Search, Check } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { topIcons, additionalIcons } from '../data/iconData';
+import ReactDOMServer from 'react-dom/server';
 
 const IconPanel = ({ onClose, isMobile }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,7 +21,7 @@ const IconPanel = ({ onClose, isMobile }) => {
 
   const copyToClipboard = (iconName) => {
     const IconComponent = allIcons[iconName];
-    if (IconComponent) {
+    if (IconComponent && typeof IconComponent === 'function') {
       const iconElement = React.createElement(IconComponent, { width: 24, height: 24 });
       const svgString = ReactDOMServer.renderToStaticMarkup(iconElement);
       
@@ -55,7 +56,7 @@ const IconPanel = ({ onClose, isMobile }) => {
         <div className={`grid ${isMobile ? 'grid-cols-5 gap-2' : 'grid-cols-4 gap-4'}`}>
           {filteredIcons.map((iconName) => {
             const IconComponent = allIcons[iconName];
-            if (!IconComponent) return null; // Skip rendering if the icon is undefined
+            if (!IconComponent || typeof IconComponent !== 'function') return null;
             return (
               <TooltipProvider key={iconName}>
                 <Tooltip>
