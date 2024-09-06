@@ -21,7 +21,7 @@ const PexelsImagePanel = ({ onClose }) => {
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && hasMore && !isSearching) {
-        setPage(prevPage => prevPage + 1);
+        loadMoreImages();
       }
     });
     if (node) observer.current.observe(node);
@@ -32,8 +32,8 @@ const PexelsImagePanel = ({ onClose }) => {
     setError(null);
     try {
       const url = query
-        ? `https://api.pexels.com/v1/search?query=${query}&per_page=100&page=${newPage}`
-        : `https://api.pexels.com/v1/curated?per_page=100&page=${newPage}`;
+        ? `https://api.pexels.com/v1/search?query=${query}&per_page=30&page=${newPage}`
+        : `https://api.pexels.com/v1/curated?per_page=30&page=${newPage}`;
       const response = await fetch(url, {
         headers: {
           Authorization: PEXELS_API_KEY
@@ -50,7 +50,8 @@ const PexelsImagePanel = ({ onClose }) => {
         setImages(prevImages => [...prevImages, ...data.photos]);
         setVisibleImages(prevImages => [...prevImages, ...data.photos.slice(0, 10)]);
       }
-      setHasMore(data.photos.length === 100);
+      setHasMore(data.photos.length === 30);
+      setPage(newPage);
     } catch (error) {
       console.error('Error fetching images:', error);
       setError('Failed to fetch images. Please try again.');
@@ -62,12 +63,6 @@ const PexelsImagePanel = ({ onClose }) => {
     fetchImages();
   }, []);
 
-  useEffect(() => {
-    if (!isSearching && page > 1) {
-      fetchImages('', page);
-    }
-  }, [page, isSearching]);
-
   const handleSearch = () => {
     setImages([]);
     setVisibleImages([]);
@@ -76,11 +71,12 @@ const PexelsImagePanel = ({ onClose }) => {
     fetchImages(searchTerm);
   };
 
-  const loadMore = () => {
+  const loadMoreImages = () => {
     if (isSearching) {
       fetchImages(searchTerm, page + 1);
+    } else {
+      fetchImages('', page + 1);
     }
-    setPage(prevPage => prevPage + 1);
   };
 
   const copyImageUrl = (url) => {
@@ -152,8 +148,8 @@ const PexelsImagePanel = ({ onClose }) => {
           ))}
         </div>
         {loading && <p className="text-center text-white">Loading images...</p>}
-        {!loading && hasMore && isSearching && (
-          <Button onClick={loadMore} className="w-full bg-blue-600 text-white hover:bg-blue-700">
+        {!loading && hasMore && (
+          <Button onClick={loadMoreImages} className="w-full bg-blue-600 text-white hover:bg-blue-700">
             Load More
           </Button>
         )}
