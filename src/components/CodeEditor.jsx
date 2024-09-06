@@ -56,15 +56,11 @@ const CodeEditor = () => {
   }, [state.isMobile]);
 
   const updatePreview = () => {
-    const fontAwesomeCSS = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">';
     setState(s => ({
       ...s,
       preview: `
         <html>
-          <head>
-            ${fontAwesomeCSS}
-            <style>${s.cssCode}</style>
-          </head>
+          <head><style>${s.cssCode}</style></head>
           <body>${s.htmlCode}<script>${s.jsCode}</script></body>
         </html>
       `
