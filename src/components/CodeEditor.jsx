@@ -128,10 +128,6 @@ const CodeEditor = () => {
           {state.showMobilePreview && (
             <div className="fixed inset-0 z-40 bg-gray-900">
               {previewPanel}
-              <MobilePreviewButton
-                onClick={() => setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }))}
-                isPreviewVisible={state.showMobilePreview}
-              />
             </div>
           )}
         </div>
