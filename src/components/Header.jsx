@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Library } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Library, Keyboard } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
@@ -14,7 +14,8 @@ const Header = ({
   setShowSettings,
   setIsMenuOpen,
   toggleLayout,
-  layout
+  layout,
+  setShowKeyboardShortcuts
 }) => {
   const getLayoutIcon = () => {
     switch (layout) {
@@ -60,7 +61,7 @@ const Header = ({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Save current code</p>
+                <p>Save current code (Ctrl + S)</p>
               </TooltipContent>
             </Tooltip>
 
@@ -76,7 +77,7 @@ const Header = ({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Saved Codes</p>
+                <p>Saved Codes (Ctrl + O)</p>
               </TooltipContent>
             </Tooltip>
 
@@ -92,7 +93,7 @@ const Header = ({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Font Library</p>
+                <p>Font Library (Ctrl + F)</p>
               </TooltipContent>
             </Tooltip>
 
@@ -108,7 +109,7 @@ const Header = ({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Icon Library</p>
+                <p>Icon Library (Ctrl + I)</p>
               </TooltipContent>
             </Tooltip>
 
@@ -124,7 +125,7 @@ const Header = ({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Settings</p>
+                <p>Settings (Ctrl + ,)</p>
               </TooltipContent>
             </Tooltip>
 
@@ -140,7 +141,23 @@ const Header = ({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Toggle Layout</p>
+                <p>Toggle Layout (Ctrl + L)</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowKeyboardShortcuts(true)}
+                  className="text-white hover:bg-gray-700"
+                >
+                  <Keyboard className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Keyboard Shortcuts (Ctrl + /)</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

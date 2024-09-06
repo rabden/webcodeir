@@ -1,8 +1,8 @@
 import React from 'react';
-import { X, SettingsIcon, BookOpen, Type, Save, Library, Palette, Code, Wrench } from 'lucide-react';
+import { X, SettingsIcon, BookOpen, Type, Save, Library, Palette, Code, Wrench, Keyboard } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
-const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, saveCurrentCode }) => {
+const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, setShowKeyboardShortcuts, saveCurrentCode }) => {
   return (
     <div className={`fixed inset-y-0 left-0 w-64 bg-gray-800 shadow-lg z-50 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
@@ -39,6 +39,10 @@ const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, set
         <Button onClick={() => { setShowJsToolsPanel(true); setIsOpen(false); }} className="justify-start">
           <Wrench className="mr-2 h-4 w-4" />
           JS Tools
+        </Button>
+        <Button onClick={() => { setShowKeyboardShortcuts(true); setIsOpen(false); }} className="justify-start">
+          <Keyboard className="mr-2 h-4 w-4" />
+          Keyboard Shortcuts
         </Button>
         <Button onClick={() => { saveCurrentCode(); setIsOpen(false); }} className="justify-start">
           <Save className="mr-2 h-4 w-4" />

@@ -10,6 +10,7 @@ import FontPanel from './FontPanel';
 import IconPanel from './IconPanel';
 import ToolsPanel from './ToolsPanel';
 import MobilePreviewButton from './MobilePreviewButton';
+import KeyboardShortcutsPanel from './KeyboardShortcutsPanel';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
@@ -31,6 +32,70 @@ const CodeEditor = () => {
     }, 300);
     return () => clearTimeout(debounce);
   }, [state.htmlCode, state.cssCode, state.jsCode, state.settings.autoSave]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey) {
+        switch (e.key) {
+          case 's':
+            e.preventDefault();
+            saveCurrentCode();
+            break;
+          case 'o':
+            e.preventDefault();
+            setState(s => ({ ...s, showSavedCodes: true }));
+            break;
+          case 'f':
+            e.preventDefault();
+            setState(s => ({ ...s, showFontPanel: true }));
+            break;
+          case 'i':
+            e.preventDefault();
+            setState(s => ({ ...s, showIconPanel: true }));
+            break;
+          case ',':
+            e.preventDefault();
+            setState(s => ({ ...s, showSettings: true }));
+            break;
+          case 'l':
+            e.preventDefault();
+            toggleLayout();
+            break;
+          case '1':
+            e.preventDefault();
+            // Focus HTML editor
+            break;
+          case '2':
+            e.preventDefault();
+            // Focus CSS editor
+            break;
+          case '3':
+            e.preventDefault();
+            // Focus JavaScript editor
+            break;
+          case 'p':
+            e.preventDefault();
+            if (state.isMobile) {
+              setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }));
+            }
+            break;
+          case 'm':
+            e.preventDefault();
+            if (state.isMobile) {
+              setState(s => ({ ...s, isMenuOpen: !s.isMenuOpen }));
+            }
+            break;
+          case '/':
+            e.preventDefault();
+            setState(s => ({ ...s, showKeyboardShortcuts: !s.showKeyboardShortcuts }));
+            break;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [state.isMobile]);
 
   const updatePreview = () => {
     setState(s => ({
@@ -133,6 +198,7 @@ const CodeEditor = () => {
         setIsMenuOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
         toggleLayout={toggleLayout}
         layout={state.settings.layout}
+        setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true }))}
       />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
@@ -144,6 +210,7 @@ const CodeEditor = () => {
       {state.showCssToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showCssToolsPanel: false }))} type="css" />}
       {state.showHtmlToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showHtmlToolsPanel: false }))} type="html" />}
       {state.showJsToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showJsToolsPanel: false }))} type="js" />}
+      {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
@@ -154,6 +221,7 @@ const CodeEditor = () => {
         setShowCssToolsPanel={() => setState(s => ({ ...s, showCssToolsPanel: true, isMenuOpen: false }))}
         setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true, isMenuOpen: false }))}
         setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true, isMenuOpen: false }))}
+        setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true, isMenuOpen: false }))}
         saveCurrentCode={() => { saveCurrentCode(); setState(s => ({ ...s, isMenuOpen: false })); }}
       />
     </div>
