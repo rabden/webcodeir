@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { Eye, EyeOff } from 'lucide-react';
 import Header from './Header';
 import EditorPanel from './EditorPanel';
 import PreviewPanel from './PreviewPanel';
