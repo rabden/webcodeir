@@ -1,8 +1,8 @@
 import React from 'react';
-import { X, SettingsIcon, BookOpen, Type, Save, Library, Palette } from 'lucide-react';
+import { X, SettingsIcon, BookOpen, Type, Save, Library, Palette, Code } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
-const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowToolsPanel, saveCurrentCode }) => {
+const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCssToolsPanel, setShowHtmlToolsPanel, saveCurrentCode }) => {
   return (
     <div className={`fixed inset-y-0 left-0 w-64 bg-gray-800 shadow-lg z-50 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
@@ -28,9 +28,13 @@ const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, set
           <Library className="mr-2 h-4 w-4" />
           Icon Library
         </Button>
-        <Button onClick={() => { setShowToolsPanel(true); setIsOpen(false); }} className="justify-start">
+        <Button onClick={() => { setShowCssToolsPanel(true); setIsOpen(false); }} className="justify-start">
           <Palette className="mr-2 h-4 w-4" />
           CSS Tools
+        </Button>
+        <Button onClick={() => { setShowHtmlToolsPanel(true); setIsOpen(false); }} className="justify-start">
+          <Code className="mr-2 h-4 w-4" />
+          HTML Tools
         </Button>
         <Button onClick={() => { saveCurrentCode(); setIsOpen(false); }} className="justify-start">
           <Save className="mr-2 h-4 w-4" />

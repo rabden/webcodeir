@@ -11,10 +11,10 @@ import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
-import { Palette } from 'lucide-react';
+import { Palette, Code } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowToolsPanel, isMobile }) => {
+const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowCssToolsPanel, setShowHtmlToolsPanel, isMobile }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
 
   const getLanguageExtension = (lang) => {
@@ -30,7 +30,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     }
   };
 
-  const renderEditor = (lang, codeValue, setCodeValue) => {
+  const renderEditor = (lang, codeValue, setCodeValue, setShowToolsPanel) => {
     const languageExtension = getLanguageExtension(lang);
     const extensions = [
       languageExtension,
@@ -78,32 +78,49 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     }
 
     return (
-      <CodeMirror
-        value={codeValue}
-        height="100%"
-        theme={themes[settings.editorTheme]}
-        extensions={extensions}
-        onChange={(value) => setCodeValue(value)}
-        style={{
-          height: '100%',
-          fontSize: `${settings.fontSize}px`,
-        }}
-        className="h-full overflow-auto"
-        basicSetup={{
-          lineNumbers: settings.lineNumbers,
-          foldGutter: false,
-          dropCursor: false,
-          allowMultipleSelections: false,
-          indentOnInput: false,
-          tabSize: settings.tabSize,
-          highlightActiveLine: settings.highlightActiveLine,
-          bracketMatching: settings.matchBrackets,
-        }}
-        indentWithTab={settings.indentWithTabs}
-        minimalSetup={{
-          minimap: settings.minimap ? { enabled: true } : { enabled: false },
-        }}
-      />
+      <div className="h-full flex flex-col">
+        <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
+          <div className="flex items-center">
+            <div className={`w-4 h-4 rounded-full mr-2 ${lang === 'html' ? 'bg-[#ff5f56]' : lang === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
+            <span className="text-sm font-semibold text-white">{lang.toUpperCase()}</span>
+          </div>
+          <button
+            onClick={() => setShowToolsPanel(true)}
+            className="p-1 rounded-full hover:bg-gray-700 transition-colors"
+            title={`Open ${lang.toUpperCase()} Tools`}
+          >
+            {lang === 'html' ? <Code className="w-4 h-4 text-white" /> : <Palette className="w-4 h-4 text-white" />}
+          </button>
+        </div>
+        <div className="flex-grow overflow-hidden">
+          <CodeMirror
+            value={codeValue}
+            height="100%"
+            theme={themes[settings.editorTheme]}
+            extensions={extensions}
+            onChange={(value) => setCodeValue(value)}
+            style={{
+              height: '100%',
+              fontSize: `${settings.fontSize}px`,
+            }}
+            className="h-full overflow-auto"
+            basicSetup={{
+              lineNumbers: settings.lineNumbers,
+              foldGutter: false,
+              dropCursor: false,
+              allowMultipleSelections: false,
+              indentOnInput: false,
+              tabSize: settings.tabSize,
+              highlightActiveLine: settings.highlightActiveLine,
+              bracketMatching: settings.matchBrackets,
+            }}
+            indentWithTab={settings.indentWithTabs}
+            minimalSetup={{
+              minimap: settings.minimap ? { enabled: true } : { enabled: false },
+            }}
+          />
+        </div>
+      </div>
     );
   };
 
@@ -116,13 +133,13 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       </TabsList>
       <div className="flex-grow overflow-hidden">
         <TabsContent value="html" className="h-full">
-          {renderEditor('html', htmlCode, setHtmlCode)}
+          {renderEditor('html', htmlCode, setHtmlCode, setShowHtmlToolsPanel)}
         </TabsContent>
         <TabsContent value="css" className="h-full">
-          {renderEditor('css', cssCode, setCssCode)}
+          {renderEditor('css', cssCode, setCssCode, setShowCssToolsPanel)}
         </TabsContent>
         <TabsContent value="js" className="h-full">
-          {renderEditor('javascript', jsCode, setJsCode)}
+          {renderEditor('javascript', jsCode, setJsCode, () => {})}
         </TabsContent>
       </div>
     </Tabs>
@@ -131,52 +148,15 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   const renderPanelMode = () => (
     <PanelGroup direction={settings.layout === 'stacked' ? 'horizontal' : 'vertical'}>
       <Panel minSize={5} defaultSize={33}>
-        <div className="h-full flex flex-col">
-          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
-            <div className="flex items-center">
-              <div className="w-4 h-4 rounded-full mr-2 bg-[#ff5f56]"></div>
-              <span className="text-sm font-semibold text-white">HTML</span>
-            </div>
-          </div>
-          <div className="flex-grow overflow-hidden">
-            {renderEditor('html', htmlCode, setHtmlCode)}
-          </div>
-        </div>
+        {renderEditor('html', htmlCode, setHtmlCode, setShowHtmlToolsPanel)}
       </Panel>
       <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
-        <div className="h-full flex flex-col">
-          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
-            <div className="flex items-center">
-              <div className="w-4 h-4 rounded-full mr-2 bg-[#27c93f]"></div>
-              <span className="text-sm font-semibold text-white">CSS</span>
-            </div>
-            <button
-              onClick={() => setShowToolsPanel(true)}
-              className="p-1 rounded-full hover:bg-gray-700 transition-colors"
-              title="Open CSS Tools"
-            >
-              <Palette className="w-4 h-4 text-white" />
-            </button>
-          </div>
-          <div className="flex-grow overflow-hidden">
-            {renderEditor('css', cssCode, setCssCode)}
-          </div>
-        </div>
+        {renderEditor('css', cssCode, setCssCode, setShowCssToolsPanel)}
       </Panel>
       <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
-        <div className="h-full flex flex-col">
-          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
-            <div className="flex items-center">
-              <div className="w-4 h-4 rounded-full mr-2 bg-[#ffbd2e]"></div>
-              <span className="text-sm font-semibold text-white">JavaScript</span>
-            </div>
-          </div>
-          <div className="flex-grow overflow-hidden">
-            {renderEditor('javascript', jsCode, setJsCode)}
-          </div>
-        </div>
+        {renderEditor('javascript', jsCode, setJsCode, () => {})}
       </Panel>
     </PanelGroup>
   );

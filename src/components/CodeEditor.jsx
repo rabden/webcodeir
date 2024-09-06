@@ -82,7 +82,8 @@ const CodeEditor = () => {
       setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
       setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
       settings={state.settings}
-      setShowToolsPanel={() => setState(s => ({ ...s, showToolsPanel: true }))}
+      setShowCssToolsPanel={() => setState(s => ({ ...s, showCssToolsPanel: true }))}
+      setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true }))}
       isMobile={state.isMobile}
     />
   );
@@ -177,8 +178,11 @@ const CodeEditor = () => {
       {state.showIconPanel && (
         <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} isMobile={state.iMobile} />
       )}
-      {state.showToolsPanel && (
-        <ToolsPanel onClose={() => setState(s => ({ ...s, showToolsPanel: false }))} />
+      {state.showCssToolsPanel && (
+        <ToolsPanel onClose={() => setState(s => ({ ...s, showCssToolsPanel: false }))} type="css" />
+      )}
+      {state.showHtmlToolsPanel && (
+        <ToolsPanel onClose={() => setState(s => ({ ...s, showHtmlToolsPanel: false }))} type="html" />
       )}
       <MobileMenu
         isOpen={state.isMenuOpen}
@@ -187,7 +191,8 @@ const CodeEditor = () => {
         setShowSavedCodes={() => setState(s => ({ ...s, showSavedCodes: true, isMenuOpen: false }))}
         setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true, isMenuOpen: false }))}
         setShowIconPanel={() => setState(s => ({ ...s, showIconPanel: true, isMenuOpen: false }))}
-        setShowToolsPanel={() => setState(s => ({ ...s, showToolsPanel: true, isMenuOpen: false }))}
+        setShowCssToolsPanel={() => setState(s => ({ ...s, showCssToolsPanel: true, isMenuOpen: false }))}
+        setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true, isMenuOpen: false }))}
         saveCurrentCode={() => { saveCurrentCode(); setState(s => ({ ...s, isMenuOpen: false })); }}
       />
     </div>
