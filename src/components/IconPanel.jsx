@@ -14,26 +14,26 @@ const IconPanel = ({ onClose, isMobile }) => {
   const [copiedIcon, setCopiedIcon] = useState(null);
 
   useEffect(() => {
-    const fetchIcons = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch(`https://api.fontawesome.com/v6/search?query=${searchTerm}&family=classic&style=solid&token=${FONTAWESOME_API_KEY}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setIcons(data.results || []);
-      } catch (error) {
-        console.error('Error fetching icons:', error);
-        setError('Failed to fetch icons. Please try again.');
-        setIcons([]);
-      }
-      setLoading(false);
-    };
-
     fetchIcons();
   }, [searchTerm]);
+
+  const fetchIcons = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`https://api.fontawesome.com/v6/search?query=${searchTerm}&family=classic&style=solid&token=${FONTAWESOME_API_KEY}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setIcons(data.results || []);
+    } catch (error) {
+      console.error('Error fetching icons:', error);
+      setError('Failed to fetch icons. Please try again.');
+      setIcons([]);
+    }
+    setLoading(false);
+  };
 
   const copyToClipboard = (iconName) => {
     const iconTag = `<i class="fas fa-${iconName}"></i>`;
