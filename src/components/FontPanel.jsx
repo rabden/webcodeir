@@ -16,6 +16,15 @@ const FontPanel = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedStates, setCopiedStates] = useState({});
   const [filteredFonts, setFilteredFonts] = useState(fonts);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const results = fonts.filter(font =>
@@ -33,9 +42,9 @@ const FontPanel = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-y-4 right-4 w-96 bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden">
+    <div className={`fixed inset-y-4 right-4 ${isMobile ? 'left-4' : 'w-96'} bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden`}>
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
-        <h2 className="text-xl font-bold text-white">Font Library</h2>
+        <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-white`}>Font Library</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
           <X className="w-5 h-5 text-white" />
         </button>
@@ -54,15 +63,15 @@ const FontPanel = ({ onClose }) => {
       </div>
       <div className="flex-grow overflow-y-auto">
         {filteredFonts.map((font) => (
-          <div key={font} className="bg-gray-700 rounded-lg p-4 flex justify-between items-center mb-2 mx-4">
-            <h3 className="text-lg font-bold text-white" style={{ fontFamily: font }}>{font}</h3>
+          <div key={font} className={`bg-gray-700 rounded-lg p-3 flex justify-between items-center mb-2 mx-4 ${isMobile ? 'text-sm' : ''}`}>
+            <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-white`} style={{ fontFamily: font }}>{font}</h3>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <MoreVertical className="h-4 w-4 text-white" />
+                <Button variant="ghost" className={`h-8 w-8 p-0 ${isMobile ? 'h-6 w-6' : ''}`}>
+                  <MoreVertical className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} text-white`} />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-56 bg-gray-700 text-white border-gray-600">
+              <PopoverContent className={`w-56 bg-gray-700 text-white border-gray-600 ${isMobile ? 'text-sm' : ''}`}>
                 {['link', 'import', 'font-family'].map((type) => (
                   <button
                     key={type}
@@ -79,7 +88,7 @@ const FontPanel = ({ onClose }) => {
                   >
                     {copiedStates[font + type] ? (
                       <>
-                        <Check className="w-4 h-4 text-green-500" />
+                        <Check className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-green-500`} />
                         <span className="text-green-500">Copied!</span>
                       </>
                     ) : (

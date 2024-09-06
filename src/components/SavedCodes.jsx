@@ -4,10 +4,17 @@ import { X, Trash2, ChevronDown, ChevronUp, Play } from 'lucide-react';
 const SavedCodes = ({ onClose, onLoad }) => {
   const [savedCodes, setSavedCodes] = useState([]);
   const [expandedCode, setExpandedCode] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
     const codes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
     setSavedCodes(codes);
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const handleDelete = (id) => {
@@ -43,9 +50,9 @@ const SavedCodes = ({ onClose, onLoad }) => {
   };
 
   return (
-    <div className="fixed inset-y-4 right-4 w-96 bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden">
+    <div className={`fixed inset-y-4 right-4 ${isMobile ? 'left-4' : 'w-96'} bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden`}>
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
-        <h2 className="text-xl font-bold text-white">Saved Codes</h2>
+        <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-white`}>Saved Codes</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
           <X className="w-5 h-5 text-white" />
         </button>
@@ -56,35 +63,38 @@ const SavedCodes = ({ onClose, onLoad }) => {
         ) : (
           <ul className="space-y-4">
             {savedCodes.map((code) => (
-              <li key={code.id} className="p-4 rounded-lg bg-gray-700 shadow">
+              <li key={code.id} className={`p-3 rounded-lg bg-gray-700 shadow ${isMobile ? 'text-sm' : ''}`}>
                 <div className="flex items-center justify-between mb-2">
                   <input
                     type="text"
                     value={code.name}
                     onChange={(e) => handleRename(code.id, e.target.value)}
-                    className="text-lg font-semibold mr-2 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold mr-2 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                   />
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => onLoad(code)}
-                      className="p-2 rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                      className={`p-2 rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors ${isMobile ? 'p-1' : ''}`}
                       title="Load"
                     >
-                      <Play className="w-4 h-4" />
+                      <Play className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
                     </button>
                     <button
                       onClick={() => handleDelete(code.id)}
-                      className="p-2 rounded hover:bg-red-700 transition-colors"
+                      className={`p-2 rounded hover:bg-red-700 transition-colors ${isMobile ? 'p-1' : ''}`}
                       title="Delete"
                     >
-                      <Trash2 className="text-red-500 w-4 h-4" />
+                      <Trash2 className={`text-red-500 ${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
                     </button>
                     <button
                       onClick={() => toggleExpand(code.id)}
-                      className="p-2 rounded hover:bg-gray-600 transition-colors"
+                      className={`p-2 rounded hover:bg-gray-600 transition-colors ${isMobile ? 'p-1' : ''}`}
                       title={expandedCode === code.id ? "Collapse" : "Expand"}
                     >
-                      {expandedCode === code.id ? <ChevronUp className="w-4 h-4 text-white" /> : <ChevronDown className="w-4 h-4 text-white" />}
+                      {expandedCode === code.id ? 
+                        <ChevronUp className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-white`} /> : 
+                        <ChevronDown className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-white`} />
+                      }
                     </button>
                   </div>
                 </div>
