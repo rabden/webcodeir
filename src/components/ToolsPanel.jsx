@@ -8,11 +8,19 @@ import HtmlStructureGenerator from './tools/HtmlStructureGenerator';
 import FormGenerator from './tools/FormGenerator';
 import TableGenerator from './tools/TableGenerator';
 import MetaTagGenerator from './tools/MetaTagGenerator';
+import JsSnippetGenerator from './tools/JsSnippetGenerator';
+import EventListenerHelper from './tools/EventListenerHelper';
+import FetchApiHelper from './tools/FetchApiHelper';
+import LocalStorageHelper from './tools/LocalStorageHelper';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const ToolsPanel = ({ onClose, type }) => {
-  const [activeTab, setActiveTab] = useState(type === 'css' ? 'flexbox' : 'htmlStructure');
+  const [activeTab, setActiveTab] = useState(
+    type === 'css' ? 'flexbox' : 
+    type === 'html' ? 'htmlStructure' : 
+    'jsSnippet'
+  );
 
   const cssTabs = [
     { id: 'flexbox', label: 'Flexbox', component: FlexboxGenerator },
@@ -28,14 +36,21 @@ const ToolsPanel = ({ onClose, type }) => {
     { id: 'metaTag', label: 'Meta Tags', component: MetaTagGenerator },
   ];
 
-  const tabs = type === 'css' ? cssTabs : htmlTabs;
+  const jsTabs = [
+    { id: 'jsSnippet', label: 'JS Snippet', component: JsSnippetGenerator },
+    { id: 'eventListener', label: 'Event Listener', component: EventListenerHelper },
+    { id: 'fetchApi', label: 'Fetch API', component: FetchApiHelper },
+    { id: 'localStorage', label: 'Local Storage', component: LocalStorageHelper },
+  ];
+
+  const tabs = type === 'css' ? cssTabs : type === 'html' ? htmlTabs : jsTabs;
 
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || (() => null);
 
   return (
     <div className="fixed inset-0 bg-gray-800 z-50 flex flex-col md:inset-y-4 md:right-4 md:left-auto md:w-96 md:rounded-lg overflow-hidden">
       <div className="p-4 border-b border-gray-700 flex justify-between items-center">
-        <h2 className="text-xl font-bold text-white">{type === 'css' ? 'CSS' : 'HTML'} Tools</h2>
+        <h2 className="text-xl font-bold text-white">{type.toUpperCase()} Tools</h2>
         <div className="flex items-center space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

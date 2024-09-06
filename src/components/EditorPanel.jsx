@@ -11,10 +11,10 @@ import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
-import { Palette, Code } from 'lucide-react';
+import { Palette, Code, Wrench } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowCssToolsPanel, setShowHtmlToolsPanel, isMobile }) => {
+const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, isMobile }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
 
   const getLanguageExtension = (lang) => {
@@ -89,7 +89,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             className="p-1 rounded-full hover:bg-gray-700 transition-colors"
             title={`Open ${lang.toUpperCase()} Tools`}
           >
-            {lang === 'html' ? <Code className="w-4 h-4 text-white" /> : <Palette className="w-4 h-4 text-white" />}
+            {lang === 'html' ? <Code className="w-4 h-4 text-white" /> : lang === 'css' ? <Palette className="w-4 h-4 text-white" /> : <Wrench className="w-4 h-4 text-white" />}
           </button>
         </div>
         <div className="flex-grow overflow-hidden">
@@ -139,7 +139,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           {renderEditor('css', cssCode, setCssCode, setShowCssToolsPanel)}
         </TabsContent>
         <TabsContent value="js" className="h-full">
-          {renderEditor('javascript', jsCode, setJsCode, () => {})}
+          {renderEditor('javascript', jsCode, setJsCode, setShowJsToolsPanel)}
         </TabsContent>
       </div>
     </Tabs>
@@ -156,7 +156,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       </Panel>
       <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
-        {renderEditor('javascript', jsCode, setJsCode, () => {})}
+        {renderEditor('javascript', jsCode, setJsCode, setShowJsToolsPanel)}
       </Panel>
     </PanelGroup>
   );
