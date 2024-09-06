@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Search, ExternalLink } from 'lucide-react';
+import { X, Search, ExternalLink, Copy, Check } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 
 const PEXELS_API_KEY = 'SlQp2QTvSTt9CB9Fa6AMAZaNo3kC7IYvENxUJTWaSJzrs1kls0B5z3fX';
 
@@ -14,6 +15,8 @@ const PexelsImagePanel = ({ onClose }) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const { toast } = useToast();
 
   const observer = useRef();
   const lastImageElementRef = useCallback(node => {
@@ -26,6 +29,12 @@ const PexelsImagePanel = ({ onClose }) => {
     });
     if (node) observer.current.observe(node);
   }, [loading, hasMore, isSearching]);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const fetchImages = async (query = '', newPage = 1) => {
     setLoading(true);
@@ -79,8 +88,13 @@ const PexelsImagePanel = ({ onClose }) => {
     }
   };
 
-  const copyImageUrl = (url) => {
-    navigator.clipboard.writeText(url);
+  const copyImageTag = (url, alt) => {
+    const imgTag = `<img src="${url}" alt="${alt}" />`;
+    navigator.clipboard.writeText(imgTag);
+    toast({
+      title: "Copied!",
+      description: "Image tag copied to clipboard",
+    });
   };
 
   useEffect(() => {
@@ -94,8 +108,6 @@ const PexelsImagePanel = ({ onClose }) => {
     }, 100);
     return () => clearTimeout(timer);
   }, [visibleImages, images]);
-
-  const isMobile = window.innerWidth <= 768;
 
   return (
     <div className={`fixed inset-y-4 right-4 ${isMobile ? 'left-4' : 'w-96'} bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg`}>
@@ -119,7 +131,7 @@ const PexelsImagePanel = ({ onClose }) => {
       </div>
       <div className="flex-grow overflow-y-auto p-4 space-y-4">
         {error && <p className="text-red-500">{error}</p>}
-        <div className={`grid ${isMobile ? 'grid-cols-2 gap-2' : 'grid-cols-2 gap-4'}`}>
+        <div className={`grid ${isMobile ? 'grid-cols-2 gap-2' : 'grid-cols-1 gap-4'}`}>
           {visibleImages.map((image, index) => (
             <div 
               key={image.id} 
@@ -134,8 +146,9 @@ const PexelsImagePanel = ({ onClose }) => {
                 />
               </div>
               <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button onClick={() => copyImageUrl(image.src.original)} className="mb-2 text-xs">
-                  Copy URL
+                <Button onClick={() => copyImageTag(image.src.original, image.alt)} className="mb-2 text-xs">
+                  <Copy className="w-3 h-3 mr-1" />
+                  Copy Tag
                 </Button>
                 <a href={image.url} target="_blank" rel="noopener noreferrer" className="text-white text-xs">
                   <Button size="sm">
