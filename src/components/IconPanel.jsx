@@ -4,6 +4,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Button } from "@/components/ui/button";
 import { topIcons } from '../data/iconData';
 import { additionalIcons } from '../data/iconData2';
+import ReactDOMServer from 'react-dom/server';
 
 const IconPanel = ({ onClose, isMobile }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,11 +22,17 @@ const IconPanel = ({ onClose, isMobile }) => {
 
   const copyToClipboard = (iconName) => {
     const IconComponent = allIcons[iconName];
-    const tempContainer = document.createElement('div');
     const iconElement = React.createElement(IconComponent, { width: 24, height: 24 });
-    React.render(iconElement, tempContainer);
-    const svgString = tempContainer.innerHTML;
-    navigator.clipboard.writeText(svgString);
+    const svgString = ReactDOMServer.renderToStaticMarkup(iconElement);
+    
+    // Create a temporary textarea element to copy the SVG string
+    const tempTextArea = document.createElement('textarea');
+    tempTextArea.value = svgString;
+    document.body.appendChild(tempTextArea);
+    tempTextArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempTextArea);
+
     setCopiedIcon(iconName);
     setTimeout(() => setCopiedIcon(null), 2000);
   };
