@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Search, ExternalLink, Copy, Check } from 'lucide-react';
+import { X, Search, ExternalLink, Copy, MoreVertical } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const PEXELS_API_KEY = 'SlQp2QTvSTt9CB9Fa6AMAZaNo3kC7IYvENxUJTWaSJzrs1kls0B5z3fX';
 
@@ -88,12 +89,11 @@ const PexelsImagePanel = ({ onClose }) => {
     }
   };
 
-  const copyImageTag = (url, alt) => {
-    const imgTag = `<img src="${url}" alt="${alt}" />`;
-    navigator.clipboard.writeText(imgTag);
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
     toast({
       title: "Copied!",
-      description: "Image tag copied to clipboard",
+      description: "Copied to clipboard",
     });
   };
 
@@ -142,20 +142,31 @@ const PexelsImagePanel = ({ onClose }) => {
                 <img 
                   src={image.src.medium} 
                   alt={image.alt} 
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button onClick={() => copyImageTag(image.src.original, image.alt)} className="mb-2 text-xs">
-                  <Copy className="w-3 h-3 mr-1" />
-                  Copy Tag
-                </Button>
-                <a href={image.url} target="_blank" rel="noopener noreferrer" className="text-white text-xs">
-                  <Button size="sm">
-                    <ExternalLink className="w-3 h-3 mr-1" />
-                    View on Pexels
-                  </Button>
-                </a>
+              <div className="absolute top-2 right-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="bg-black bg-opacity-50 text-white hover:bg-opacity-75">
+                      <MoreVertical className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-gray-800 text-white border-gray-700">
+                    <DropdownMenuItem onSelect={() => copyToClipboard(image.src.original)}>
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy Link
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => copyToClipboard(`<img src="${image.src.original}" alt="${image.alt}" />`)}>
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy Image Tag
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => window.open(image.url, '_blank')}>
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      View on Pexels
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           ))}
