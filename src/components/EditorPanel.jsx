@@ -79,19 +79,21 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
 
     return (
       <div className="h-full flex flex-col">
-        <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
-          <div className="flex items-center">
-            <div className={`w-4 h-4 rounded-full mr-2 ${lang === 'html' ? 'bg-[#ff5f56]' : lang === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
-            <span className="text-sm font-semibold text-white">{lang.toUpperCase()}</span>
+        {!isMobile && (
+          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center">
+              <div className={`w-4 h-4 rounded-full mr-2 ${lang === 'html' ? 'bg-[#ff5f56]' : lang === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
+              <span className="text-sm font-semibold text-white">{lang.toUpperCase()}</span>
+            </div>
+            <button
+              onClick={() => setShowToolsPanel(true)}
+              className="p-1 rounded-full hover:bg-gray-700 transition-colors"
+              title={`Open ${lang.toUpperCase()} Tools`}
+            >
+              {lang === 'html' ? <Code className="w-4 h-4 text-white" /> : lang === 'css' ? <Palette className="w-4 h-4 text-white" /> : <Wrench className="w-4 h-4 text-white" />}
+            </button>
           </div>
-          <button
-            onClick={() => setShowToolsPanel(true)}
-            className="p-1 rounded-full hover:bg-gray-700 transition-colors"
-            title={`Open ${lang.toUpperCase()} Tools`}
-          >
-            {lang === 'html' ? <Code className="w-4 h-4 text-white" /> : lang === 'css' ? <Palette className="w-4 h-4 text-white" /> : <Wrench className="w-4 h-4 text-white" />}
-          </button>
-        </div>
+        )}
         <div className="flex-grow overflow-hidden">
           <CodeMirror
             value={codeValue}
