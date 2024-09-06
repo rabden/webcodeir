@@ -16,7 +16,7 @@ const Header = ({
   toggleLayout,
   layout,
   setShowKeyboardShortcuts,
-  setShowUnsplashPanel
+  setShowPexelsPanel
 }) => {
   const getLayoutIcon = () => {
     switch (layout) {
@@ -167,14 +167,14 @@ const Header = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setShowUnsplashPanel(true)}
+                  onClick={() => setShowPexelsPanel(true)}
                   className="text-white hover:bg-gray-700"
                 >
                   <Image className="w-5 h-5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Unsplash Images (Ctrl + U)</p>
+                <p>Pexels Images (Ctrl + U)</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

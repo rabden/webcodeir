@@ -11,7 +11,7 @@ import IconPanel from './IconPanel';
 import ToolsPanel from './ToolsPanel';
 import MobilePreviewButton from './MobilePreviewButton';
 import KeyboardShortcutsPanel from './KeyboardShortcutsPanel';
-import UnsplashImagePanel from './UnsplashImagePanel';
+import PexelsImagePanel from './PexelsImagePanel';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
@@ -38,66 +38,19 @@ const CodeEditor = () => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey) {
         switch (e.key) {
-          case 's':
-            e.preventDefault();
-            saveCurrentCode();
-            break;
-          case 'o':
-            e.preventDefault();
-            setState(s => ({ ...s, showSavedCodes: true }));
-            break;
-          case 'f':
-            e.preventDefault();
-            setState(s => ({ ...s, showFontPanel: true }));
-            break;
-          case 'i':
-            e.preventDefault();
-            setState(s => ({ ...s, showIconPanel: true }));
-            break;
-          case ',':
-            e.preventDefault();
-            setState(s => ({ ...s, showSettings: true }));
-            break;
-          case 'l':
-            e.preventDefault();
-            toggleLayout();
-            break;
-          case '1':
-            e.preventDefault();
-            // Focus HTML editor
-            break;
-          case '2':
-            e.preventDefault();
-            // Focus CSS editor
-            break;
-          case '3':
-            e.preventDefault();
-            // Focus JavaScript editor
-            break;
-          case 'p':
-            e.preventDefault();
-            if (state.isMobile) {
-              setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }));
-            }
-            break;
-          case 'm':
-            e.preventDefault();
-            if (state.isMobile) {
-              setState(s => ({ ...s, isMenuOpen: !s.isMenuOpen }));
-            }
-            break;
-          case '/':
-            e.preventDefault();
-            setState(s => ({ ...s, showKeyboardShortcuts: !s.showKeyboardShortcuts }));
-            break;
-          case 'u':
-            e.preventDefault();
-            setState(s => ({ ...s, showUnsplashPanel: !s.showUnsplashPanel }));
-            break;
+          case 's': e.preventDefault(); saveCurrentCode(); break;
+          case 'o': e.preventDefault(); setState(s => ({ ...s, showSavedCodes: true })); break;
+          case 'f': e.preventDefault(); setState(s => ({ ...s, showFontPanel: true })); break;
+          case 'i': e.preventDefault(); setState(s => ({ ...s, showIconPanel: true })); break;
+          case ',': e.preventDefault(); setState(s => ({ ...s, showSettings: true })); break;
+          case 'l': e.preventDefault(); toggleLayout(); break;
+          case 'p': e.preventDefault(); if (state.isMobile) setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview })); break;
+          case 'm': e.preventDefault(); if (state.isMobile) setState(s => ({ ...s, isMenuOpen: !s.isMenuOpen })); break;
+          case '/': e.preventDefault(); setState(s => ({ ...s, showKeyboardShortcuts: !s.showKeyboardShortcuts })); break;
+          case 'u': e.preventDefault(); setState(s => ({ ...s, showPexelsPanel: !s.showPexelsPanel })); break;
         }
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [state.isMobile]);
@@ -172,19 +125,17 @@ const CodeEditor = () => {
       );
     } else {
       return (
-        <div className="h-full">
-          <PanelGroup direction={state.settings.layout === 'stacked' ? 'vertical' : 'horizontal'}>
-            <Panel minSize={0} defaultSize={50}>
-              {state.settings.layout === 'horizontal' ? previewPanel : editorPanel}
-            </Panel>
-            <PanelResizeHandle className={state.settings.layout === 'stacked' ? 'h-2' : 'w-2'}>
-              <div className={`${state.settings.layout === 'stacked' ? 'h-0.5 w-full' : 'w-0.5 h-full'} bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200`}></div>
-            </PanelResizeHandle>
-            <Panel minSize={0} defaultSize={50}>
-              {state.settings.layout === 'horizontal' ? editorPanel : previewPanel}
-            </Panel>
-          </PanelGroup>
-        </div>
+        <PanelGroup direction={state.settings.layout === 'stacked' ? 'vertical' : 'horizontal'}>
+          <Panel minSize={0} defaultSize={50}>
+            {state.settings.layout === 'horizontal' ? previewPanel : editorPanel}
+          </Panel>
+          <PanelResizeHandle className={state.settings.layout === 'stacked' ? 'h-2' : 'w-2'}>
+            <div className={`${state.settings.layout === 'stacked' ? 'h-0.5 w-full' : 'w-0.5 h-full'} bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200`}></div>
+          </PanelResizeHandle>
+          <Panel minSize={0} defaultSize={50}>
+            {state.settings.layout === 'horizontal' ? editorPanel : previewPanel}
+          </Panel>
+        </PanelGroup>
       );
     }
   };
@@ -204,7 +155,7 @@ const CodeEditor = () => {
         toggleLayout={toggleLayout}
         layout={state.settings.layout}
         setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true }))}
-        setShowUnsplashPanel={() => setState(s => ({ ...s, showUnsplashPanel: true }))}
+        setShowPexelsPanel={() => setState(s => ({ ...s, showPexelsPanel: true }))}
       />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
@@ -217,7 +168,7 @@ const CodeEditor = () => {
       {state.showHtmlToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showHtmlToolsPanel: false }))} type="html" />}
       {state.showJsToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showJsToolsPanel: false }))} type="js" />}
       {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
-      {state.showUnsplashPanel && <UnsplashImagePanel onClose={() => setState(s => ({ ...s, showUnsplashPanel: false }))} />}
+      {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
@@ -229,7 +180,7 @@ const CodeEditor = () => {
         setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true, isMenuOpen: false }))}
         setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true, isMenuOpen: false }))}
         setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true, isMenuOpen: false }))}
-        setShowUnsplashPanel={() => setState(s => ({ ...s, showUnsplashPanel: true, isMenuOpen: false }))}
+        setShowPexelsPanel={() => setState(s => ({ ...s, showPexelsPanel: true, isMenuOpen: false }))}
         saveCurrentCode={() => { saveCurrentCode(); setState(s => ({ ...s, isMenuOpen: false })); }}
       />
     </div>
