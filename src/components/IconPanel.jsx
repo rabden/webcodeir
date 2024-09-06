@@ -21,7 +21,10 @@ const IconPanel = ({ onClose, isMobile }) => {
 
   const copyToClipboard = (iconName) => {
     const IconComponent = allIcons[iconName];
-    const svgString = `<${iconName} />`;
+    const tempContainer = document.createElement('div');
+    const iconInstance = <IconComponent />;
+    require('react-dom').render(iconInstance, tempContainer);
+    const svgString = tempContainer.innerHTML;
     navigator.clipboard.writeText(svgString);
     setCopiedIcon(iconName);
     setTimeout(() => setCopiedIcon(null), 2000);
