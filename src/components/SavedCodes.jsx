@@ -43,14 +43,14 @@ const SavedCodes = ({ onClose, onLoad, isMobile }) => {
   };
 
   return (
-    <div className={`fixed inset-y-4 ${isMobile ? 'inset-x-4' : 'right-4'} bg-gray-800 ${isMobile ? 'w-auto' : 'w-[700px]'} shadow-lg z-50 flex flex-col rounded-lg`}>
-      <div className="p-4 flex justify-between items-center border-b border-gray-700">
+    <div className={`fixed inset-0 bg-gray-800 z-50 flex flex-col ${isMobile ? 'p-4' : 'inset-y-4 right-4 w-[700px] rounded-lg'}`}>
+      <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold text-white">Saved Codes</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
           <X className="w-5 h-5" />
         </button>
       </div>
-      <div className="flex-grow overflow-y-auto p-4 space-y-4">
+      <div className="flex-grow overflow-y-auto">
         {savedCodes.length === 0 ? (
           <p className="text-center text-gray-400 text-xl">No saved codes yet.</p>
         ) : (
