@@ -43,14 +43,20 @@ const IconPanel = ({ onClose, isMobile }) => {
 
   const copyToClipboard = async (iconName, prefix) => {
     try {
-      const response = await fetch(`https://api.iconify.design/${prefix}/${iconName}.svg`);
+      const response = await fetch(`https://api.iconify.design/${prefix}.json?icons=${iconName}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch SVG');
+        throw new Error('Failed to fetch icon data');
       }
-      const svgString = await response.text();
-      await navigator.clipboard.writeText(svgString);
-      setCopiedIcon(iconName);
-      setTimeout(() => setCopiedIcon(null), 2000);
+      const data = await response.json();
+      if (data && data.icons && data.icons[iconName]) {
+        const svgPath = data.icons[iconName];
+        const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">${svgPath}</svg>`;
+        await navigator.clipboard.writeText(svgString);
+        setCopiedIcon(iconName);
+        setTimeout(() => setCopiedIcon(null), 2000);
+      } else {
+        throw new Error('Icon data not found');
+      }
     } catch (error) {
       console.error('Error copying icon:', error);
       setError('Failed to copy icon. Please try again.');
