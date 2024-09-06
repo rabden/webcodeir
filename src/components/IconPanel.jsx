@@ -3,21 +3,24 @@ import { X, Search, Check } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { topIcons } from '../data/iconData';
+import { additionalIcons } from '../data/iconData2';
 
 const IconPanel = ({ onClose, isMobile }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedIcon, setCopiedIcon] = useState(null);
-  const [filteredIcons, setFilteredIcons] = useState(Object.keys(topIcons));
+  const [filteredIcons, setFilteredIcons] = useState([]);
+
+  const allIcons = { ...topIcons, ...additionalIcons };
 
   useEffect(() => {
-    const results = Object.keys(topIcons).filter(iconName => 
+    const results = Object.keys(allIcons).filter(iconName => 
       iconName.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredIcons(results);
   }, [searchTerm]);
 
   const copyToClipboard = (iconName) => {
-    const IconComponent = topIcons[iconName];
+    const IconComponent = allIcons[iconName];
     const svgString = `<${iconName} />`;
     navigator.clipboard.writeText(svgString);
     setCopiedIcon(iconName);
@@ -47,7 +50,7 @@ const IconPanel = ({ onClose, isMobile }) => {
       <div className="flex-grow overflow-y-auto p-6">
         <div className="grid grid-cols-4 gap-4">
           {filteredIcons.map((iconName) => {
-            const IconComponent = topIcons[iconName];
+            const IconComponent = allIcons[iconName];
             return (
               <TooltipProvider key={iconName}>
                 <Tooltip>
