@@ -3,6 +3,8 @@ import { X, Search, ExternalLink } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+const UNSPLASH_ACCESS_KEY = 'YOUR_UNSPLASH_ACCESS_KEY'; // Replace this with your actual Unsplash API key
+
 const UnsplashImagePanel = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [images, setImages] = useState([]);
@@ -10,10 +12,15 @@ const UnsplashImagePanel = ({ onClose }) => {
   const [error, setError] = useState(null);
 
   const searchImages = async () => {
+    if (!UNSPLASH_ACCESS_KEY || UNSPLASH_ACCESS_KEY === 'YOUR_UNSPLASH_ACCESS_KEY') {
+      setError('Unsplash API key is not configured. Please add your API key to the component.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`https://api.unsplash.com/search/photos?query=${searchTerm}&client_id=YOUR_UNSPLASH_ACCESS_KEY`);
+      const response = await fetch(`https://api.unsplash.com/search/photos?query=${searchTerm}&client_id=${UNSPLASH_ACCESS_KEY}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
