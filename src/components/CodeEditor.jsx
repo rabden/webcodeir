@@ -18,6 +18,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 const CodeEditor = () => {
   const [state, setState] = useCodeEditorState();
   const { saveToLocalStorage, loadFromLocalStorage } = useLocalStorage(setState);
+  const [activeTab, setActiveTab] = useState('html');
 
   useEffect(() => {
     loadFromLocalStorage();
@@ -106,6 +107,8 @@ const CodeEditor = () => {
         setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true }))}
         setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true }))}
         isMobile={state.isMobile}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
       />
     );
     const previewPanel = <PreviewPanel preview={state.preview} />;
@@ -156,6 +159,8 @@ const CodeEditor = () => {
         layout={state.settings.layout}
         setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true }))}
         setShowPexelsPanel={() => setState(s => ({ ...s, showPexelsPanel: true }))}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
       />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}

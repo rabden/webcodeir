@@ -14,7 +14,7 @@ import { EditorView } from '@codemirror/view';
 import { Palette, Code, Wrench } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, isMobile }) => {
+const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, isMobile, activeTab, setActiveTab }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
 
   const getLanguageExtension = (lang) => {
@@ -127,12 +127,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   };
 
   const renderTabMode = () => (
-    <Tabs defaultValue="html" className="w-full h-full flex flex-col">
-      <TabsList className="bg-gray-800 text-white">
-        <TabsTrigger value="html" className="data-[state=active]:bg-gray-700">HTML</TabsTrigger>
-        <TabsTrigger value="css" className="data-[state=active]:bg-gray-700">CSS</TabsTrigger>
-        <TabsTrigger value="js" className="data-[state=active]:bg-gray-700">JavaScript</TabsTrigger>
-      </TabsList>
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
       <div className="flex-grow overflow-hidden">
         <TabsContent value="html" className="h-full">
           {renderEditor('html', htmlCode, setHtmlCode, setShowHtmlToolsPanel)}
