@@ -57,16 +57,13 @@ const IconPanel = ({ onClose, isMobile }) => {
                 <TooltipTrigger asChild>
                   <Button
                     variant="outline"
-                    className={`w-full ${isMobile ? 'h-12' : 'h-16'} flex flex-col items-center justify-center bg-gray-700 hover:bg-gray-600 border-gray-600`}
+                    className={`w-full ${isMobile ? 'h-12' : 'h-16'} flex items-center justify-center bg-gray-700 hover:bg-gray-600 border-gray-600`}
                     onClick={() => copyToClipboard(iconName)}
                   >
                     {copiedIcon === iconName ? (
                       <Check className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'} text-green-500`} />
                     ) : (
-                      <>
-                        <FontAwesomeIcon icon={['fas', iconName]} className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'} mb-1`} />
-                        <span className="text-xs truncate w-full text-center">{iconName}</span>
-                      </>
+                      <FontAwesomeIcon icon={['fas', iconName]} className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'}`} />
                     )}
                   </Button>
                 </TooltipTrigger>
