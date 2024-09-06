@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Search, ExternalLink } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,12 +10,28 @@ const PexelsImagePanel = ({ onClose }) => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
 
-  const searchImages = async () => {
+  const observer = useRef();
+  const lastImageElementRef = useCallback(node => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        setPage(prevPage => prevPage + 1);
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading]);
+
+  const fetchImages = async (pageNum, query = '') => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`https://api.pexels.com/v1/search?query=${searchTerm}&per_page=15`, {
+      const url = query
+        ? `https://api.pexels.com/v1/search?query=${query}&per_page=15&page=${pageNum}`
+        : `https://api.pexels.com/v1/curated?per_page=15&page=${pageNum}`;
+      const response = await fetch(url, {
         headers: {
           Authorization: PEXELS_API_KEY
         }
@@ -24,12 +40,22 @@ const PexelsImagePanel = ({ onClose }) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setImages(data.photos || []);
+      setImages(prevImages => [...prevImages, ...data.photos]);
     } catch (error) {
       console.error('Error fetching images:', error);
       setError('Failed to fetch images. Please try again.');
     }
     setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchImages(page);
+  }, [page]);
+
+  const handleSearch = () => {
+    setImages([]);
+    setPage(1);
+    fetchImages(1, searchTerm);
   };
 
   const copyImageUrl = (url) => {
@@ -52,17 +78,14 @@ const PexelsImagePanel = ({ onClose }) => {
           placeholder="Search images..."
           className="flex-grow bg-gray-700 text-white border-gray-600"
         />
-        <Button onClick={searchImages} disabled={loading} className="bg-blue-600 text-white hover:bg-blue-700">
+        <Button onClick={handleSearch} disabled={loading} className="bg-blue-600 text-white hover:bg-blue-700">
           {loading ? 'Searching...' : 'Search'}
         </Button>
       </div>
       <div className="flex-grow overflow-y-auto p-4 space-y-4">
         {error && <p className="text-red-500">{error}</p>}
-        {images.length === 0 && !loading && !error && (
-          <p className="text-gray-400">No images found. Try searching for something!</p>
-        )}
-        {images.map((image) => (
-          <div key={image.id} className="relative group">
+        {images.map((image, index) => (
+          <div key={image.id} className="relative group" ref={index === images.length - 1 ? lastImageElementRef : null}>
             <img src={image.src.medium} alt={image.alt} className="w-full rounded-lg" />
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <Button onClick={() => copyImageUrl(image.src.original)} className="mr-2">
@@ -77,6 +100,7 @@ const PexelsImagePanel = ({ onClose }) => {
             </div>
           </div>
         ))}
+        {loading && <p className="text-center text-white">Loading more images...</p>}
       </div>
     </div>
   );
