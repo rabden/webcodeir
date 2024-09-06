@@ -7,16 +7,28 @@ const IconPanel = ({ onClose, isMobile }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedIcon, setCopiedIcon] = useState(null);
   const [icons, setIcons] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchIcons = async () => {
       if (searchTerm.length > 1) {
+        setIsLoading(true);
+        setError(null);
         try {
           const response = await fetch(`https://api.iconify.design/search?query=${searchTerm}&limit=50`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch icons');
+          }
           const data = await response.json();
-          setIcons(data);
+          // Ensure that we're working with an array of icons
+          const iconArray = Array.isArray(data) ? data : Object.values(data).flat();
+          setIcons(iconArray);
         } catch (error) {
           console.error('Error fetching icons:', error);
+          setError('Failed to load icons. Please try again.');
+        } finally {
+          setIsLoading(false);
         }
       } else {
         setIcons([]);
@@ -30,12 +42,16 @@ const IconPanel = ({ onClose, isMobile }) => {
   const copyToClipboard = async (iconName, prefix) => {
     try {
       const response = await fetch(`https://api.iconify.design/${prefix}/${iconName}.svg`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch SVG');
+      }
       const svgString = await response.text();
       await navigator.clipboard.writeText(svgString);
       setCopiedIcon(iconName);
       setTimeout(() => setCopiedIcon(null), 2000);
     } catch (error) {
       console.error('Error copying icon:', error);
+      setError('Failed to copy icon. Please try again.');
     }
   };
 
@@ -60,6 +76,11 @@ const IconPanel = ({ onClose, isMobile }) => {
         </div>
       </div>
       <div className="flex-grow overflow-y-auto p-6">
+        {isLoading && <p className="text-white">Loading icons...</p>}
+        {error && <p className="text-red-500">{error}</p>}
+        {!isLoading && !error && icons.length === 0 && searchTerm.length > 1 && (
+          <p className="text-white">No icons found. Try a different search term.</p>
+        )}
         <div className="grid grid-cols-4 gap-4">
           {icons.map((icon) => (
             <TooltipProvider key={`${icon.prefix}:${icon.name}`}>
