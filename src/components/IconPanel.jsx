@@ -18,9 +18,10 @@ const IconPanel = ({ onClose, isMobile }) => {
       try {
         const response = await fetch(`https://api.fontawesome.com/v5.0/icons?family=solid&access_token=${FONTAWESOME_API_KEY}`);
         const data = await response.json();
-        setIcons(data.icons);
+        setIcons(data.icons || []);
       } catch (error) {
         console.error('Error fetching icons:', error);
+        setIcons([]);
       }
       setLoading(false);
     };
@@ -59,7 +60,7 @@ const IconPanel = ({ onClose, isMobile }) => {
           <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-400" />
         </div>
       </div>
-      <div className="flex-grow overflow-y-auto p-4">
+      <div className="flex-grow overflow-y-auto p-4 space-y-4">
         {loading ? (
           <p className="text-white text-center">Loading icons...</p>
         ) : (
