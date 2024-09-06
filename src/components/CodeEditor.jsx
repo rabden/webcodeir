@@ -9,7 +9,6 @@ import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
 import IconPanel from './IconPanel';
 import ToolsPanel from './ToolsPanel';
-import SearchPanel from './SearchPanel';
 import MobilePreviewButton from './MobilePreviewButton';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
@@ -141,7 +140,6 @@ const CodeEditor = () => {
         setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true }))}
         setShowIconPanel={() => setState(s => ({ ...s, showIconPanel: true }))}
         setShowSettings={() => setState(s => ({ ...s, showSettings: true }))}
-        setShowSearchPanel={() => setState(s => ({ ...s, showSearchPanel: true }))}
         setIsMenuOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
         toggleLayout={toggleLayout}
         layout={state.settings.layout}
@@ -182,9 +180,6 @@ const CodeEditor = () => {
       {state.showToolsPanel && (
         <ToolsPanel onClose={() => setState(s => ({ ...s, showToolsPanel: false }))} />
       )}
-      {state.showSearchPanel && (
-        <SearchPanel onClose={() => setState(s => ({ ...s, showSearchPanel: false }))} isMobile={state.isMobile} />
-      )}
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
@@ -192,7 +187,6 @@ const CodeEditor = () => {
         setShowSavedCodes={() => setState(s => ({ ...s, showSavedCodes: true, isMenuOpen: false }))}
         setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true, isMenuOpen: false }))}
         setShowIconPanel={() => setState(s => ({ ...s, showIconPanel: true, isMenuOpen: false }))}
-        setShowSearchPanel={() => setState(s => ({ ...s, showSearchPanel: true, isMenuOpen: false }))}
         saveCurrentCode={() => { saveCurrentCode(); setState(s => ({ ...s, isMenuOpen: false })); }}
       />
     </div>
