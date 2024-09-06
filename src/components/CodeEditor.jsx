@@ -121,25 +121,27 @@ const CodeEditor = () => {
 
   return (
     <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
-      <Header
-        currentCodeName={state.currentCodeName}
-        setCurrentCodeName={(name) => setState(s => ({ ...s, currentCodeName: name }))}
-        isMobile={state.isMobile}
-        saveCurrentCode={saveCurrentCode}
-        setShowSavedCodes={() => setState(s => ({ ...s, showSavedCodes: true }))}
-        setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true }))}
-        setShowIconPanel={() => setState(s => ({ ...s, showIconPanel: true }))}
-        setShowSettings={() => setState(s => ({ ...s, showSettings: true }))}
-        setIsMenuOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
-        toggleLayout={toggleLayout}
-        layout={state.settings.layout}
-      />
+      {!state.isMobile && (
+        <Header
+          currentCodeName={state.currentCodeName}
+          setCurrentCodeName={(name) => setState(s => ({ ...s, currentCodeName: name }))}
+          isMobile={state.isMobile}
+          saveCurrentCode={saveCurrentCode}
+          setShowSavedCodes={() => setState(s => ({ ...s, showSavedCodes: true }))}
+          setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true }))}
+          setShowIconPanel={() => setState(s => ({ ...s, showIconPanel: true }))}
+          setShowSettings={() => setState(s => ({ ...s, showSettings: true }))}
+          setIsMenuOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
+          toggleLayout={toggleLayout}
+          layout={state.settings.layout}
+        />
+      )}
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
       </div>
       {state.showSettings && <Settings settings={state.settings} setSettings={(newSettings) => setState(s => ({ ...s, settings: newSettings }))} onClose={() => setState(s => ({ ...s, showSettings: false }))} isMobile={state.isMobile} />}
-      {state.showSavedCodes && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html, cssCode: code.css, jsCode: code.js, currentCodeName: code.name, showSavedCodes: false }))} isMobile={state.isMobile} />}
-      {state.showFontPanel && <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.isMobile} />}
+      {state.showSavedCodes && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html, cssCode: code.css, jsCode: code.js, currentCodeName: code.name, showSavedCodes: false }))} isMobile={state.iMobile} />}
+      {state.showFontPanel && <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.iMobile} />}
       {state.showIconPanel && <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} isMobile={state.iMobile} />}
       {state.showCssToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showCssToolsPanel: false }))} type="css" />}
       {state.showHtmlToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showHtmlToolsPanel: false }))} type="html" />}
