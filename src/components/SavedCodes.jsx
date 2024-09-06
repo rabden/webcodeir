@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Trash2, ChevronDown, ChevronUp, Play } from 'lucide-react';
+import { X, Trash2, ChevronDown, ChevronUp, Play, Eye, EyeOff } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 
 const SavedCodes = ({ onClose, onLoad }) => {
   const [savedCodes, setSavedCodes] = useState([]);
@@ -86,19 +87,21 @@ const SavedCodes = ({ onClose, onLoad }) => {
                     >
                       <Trash2 className={`text-red-500 ${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
                     </button>
-                    <button
-                      onClick={() => toggleExpand(code.id)}
-                      className={`p-2 rounded hover:bg-gray-600 transition-colors ${isMobile ? 'p-1' : ''}`}
-                      title={expandedCode === code.id ? "Collapse" : "Expand"}
-                    >
-                      {expandedCode === code.id ? 
-                        <ChevronUp className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-white`} /> : 
-                        <ChevronDown className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-white`} />
-                      }
-                    </button>
+                    {!isMobile && (
+                      <button
+                        onClick={() => toggleExpand(code.id)}
+                        className="p-2 rounded hover:bg-gray-600 transition-colors"
+                        title={expandedCode === code.id ? "Hide Preview" : "Show Preview"}
+                      >
+                        {expandedCode === code.id ? 
+                          <EyeOff className="w-4 h-4 text-white" /> : 
+                          <Eye className="w-4 h-4 text-white" />
+                        }
+                      </button>
+                    )}
                   </div>
                 </div>
-                {expandedCode === code.id && (
+                {!isMobile && expandedCode === code.id && (
                   <div className="mt-2">
                     <iframe
                       srcDoc={generatePreviewCode(code.html, code.css, code.js)}
