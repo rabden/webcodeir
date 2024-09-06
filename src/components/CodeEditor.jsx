@@ -95,21 +95,29 @@ const CodeEditor = () => {
 
   const renderLayout = () => {
     const editorPanel = (
-      <EditorPanel
-        htmlCode={state.htmlCode}
-        cssCode={state.cssCode}
-        jsCode={state.jsCode}
-        setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
-        setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
-        setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
-        settings={state.settings}
-        setShowCssToolsPanel={() => setState(s => ({ ...s, showCssToolsPanel: true }))}
-        setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true }))}
-        setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true }))}
-        isMobile={state.isMobile}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
+      <div className="relative h-full">
+        <EditorPanel
+          htmlCode={state.htmlCode}
+          cssCode={state.cssCode}
+          jsCode={state.jsCode}
+          setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
+          setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
+          setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
+          settings={state.settings}
+          setShowCssToolsPanel={() => setState(s => ({ ...s, showCssToolsPanel: true }))}
+          setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true }))}
+          setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true }))}
+          isMobile={state.isMobile}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+        {state.isMobile && (
+          <MobilePreviewButton
+            onClick={() => setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }))}
+            isPreviewVisible={state.showMobilePreview}
+          />
+        )}
+      </div>
     );
     const previewPanel = <PreviewPanel preview={state.preview} />;
 
@@ -117,11 +125,13 @@ const CodeEditor = () => {
       return (
         <div className="h-full relative">
           {editorPanel}
-          <MobilePreviewButton onClick={() => setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }))} isPreviewVisible={state.showMobilePreview} />
           {state.showMobilePreview && (
             <div className="fixed inset-0 z-40 bg-gray-900">
               {previewPanel}
-              <MobilePreviewButton onClick={() => setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }))} isPreviewVisible={state.showMobilePreview} />
+              <MobilePreviewButton
+                onClick={() => setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }))}
+                isPreviewVisible={state.showMobilePreview}
+              />
             </div>
           )}
         </div>

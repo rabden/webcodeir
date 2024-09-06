@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 const MobilePreviewButton = ({ onClick, isPreviewVisible }) => {
   return (
     <Button
-      className="fixed bottom-4 right-4 z-50 rounded-full p-2 w-12 h-12 flex items-center justify-center"
+      className="absolute top-2 right-2 z-50 rounded-full p-1 w-8 h-8 flex items-center justify-center"
       onClick={onClick}
       variant="secondary"
+      size="icon"
     >
-      {isPreviewVisible ? <EyeOff size={24} /> : <Eye size={24} />}
+      {isPreviewVisible ? <EyeOff size={16} /> : <Eye size={16} />}
     </Button>
   );
 };
