@@ -100,6 +100,9 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           bracketMatching: settings.matchBrackets,
         }}
         indentWithTab={settings.indentWithTabs}
+        minimalSetup={{
+          minimap: settings.minimap ? { enabled: true } : { enabled: false },
+        }}
       />
     );
   };
