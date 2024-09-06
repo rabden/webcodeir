@@ -4,6 +4,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Button } from "@/components/ui/button";
 import { topIcons } from '../data/iconData';
 import { additionalIcons } from '../data/iconData2';
+import { customBrandIcons } from '../data/customBrandIcons';
 import ReactDOMServer from 'react-dom/server';
 
 const IconPanel = ({ onClose, isMobile }) => {
@@ -11,7 +12,7 @@ const IconPanel = ({ onClose, isMobile }) => {
   const [copiedIcon, setCopiedIcon] = useState(null);
   const [filteredIcons, setFilteredIcons] = useState([]);
 
-  const allIcons = { ...topIcons, ...additionalIcons };
+  const allIcons = { ...topIcons, ...additionalIcons, ...customBrandIcons };
 
   useEffect(() => {
     const results = Object.keys(allIcons).filter(iconName => 
@@ -22,19 +23,28 @@ const IconPanel = ({ onClose, isMobile }) => {
 
   const copyToClipboard = (iconName) => {
     const IconComponent = allIcons[iconName];
-    const iconElement = React.createElement(IconComponent, { width: 24, height: 24 });
-    const svgString = ReactDOMServer.renderToStaticMarkup(iconElement);
+    let svgString;
     
-    // Create a temporary textarea element to copy the SVG string
-    const tempTextArea = document.createElement('textarea');
-    tempTextArea.value = svgString;
-    document.body.appendChild(tempTextArea);
-    tempTextArea.select();
-    document.execCommand('copy');
-    document.body.removeChild(tempTextArea);
-
+    if (typeof IconComponent === 'function') {
+      const iconElement = React.createElement(IconComponent, { width: 24, height: 24 });
+      svgString = ReactDOMServer.renderToStaticMarkup(iconElement);
+    } else if (typeof IconComponent === 'string') {
+      svgString = IconComponent;
+    }
+    
+    navigator.clipboard.writeText(svgString);
     setCopiedIcon(iconName);
     setTimeout(() => setCopiedIcon(null), 2000);
+  };
+
+  const renderIcon = (iconName) => {
+    const IconComponent = allIcons[iconName];
+    if (typeof IconComponent === 'function') {
+      return <IconComponent className="w-6 h-6" />;
+    } else if (typeof IconComponent === 'string') {
+      return <div className="w-6 h-6" dangerouslySetInnerHTML={{ __html: IconComponent }} />;
+    }
+    return null;
   };
 
   return (
@@ -59,31 +69,28 @@ const IconPanel = ({ onClose, isMobile }) => {
       </div>
       <div className="flex-grow overflow-y-auto p-6">
         <div className="grid grid-cols-4 gap-4">
-          {filteredIcons.map((iconName) => {
-            const IconComponent = allIcons[iconName];
-            return (
-              <TooltipProvider key={iconName}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full h-12 flex items-center justify-center bg-gray-700 hover:bg-gray-600 border-gray-600"
-                      onClick={() => copyToClipboard(iconName)}
-                    >
-                      {copiedIcon === iconName ? (
-                        <Check className="w-6 h-6 text-green-500" />
-                      ) : (
-                        <IconComponent className="w-6 h-6" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{iconName}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            );
-          })}
+          {filteredIcons.map((iconName) => (
+            <TooltipProvider key={iconName}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full h-12 flex items-center justify-center bg-gray-700 hover:bg-gray-600 border-gray-600"
+                    onClick={() => copyToClipboard(iconName)}
+                  >
+                    {copiedIcon === iconName ? (
+                      <Check className="w-6 h-6 text-green-500" />
+                    ) : (
+                      renderIcon(iconName)
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{iconName}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ))}
         </div>
       </div>
     </div>
