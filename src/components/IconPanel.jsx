@@ -49,7 +49,7 @@ const IconPanel = ({ onClose, isMobile }) => {
       }
       const data = await response.json();
       if (data && data.icons && data.icons[iconName]) {
-        const svgPath = data.icons[iconName];
+        const svgPath = data.icons[iconName].body;
         const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">${svgPath}</svg>`;
         await navigator.clipboard.writeText(svgString);
         setCopiedIcon(iconName);
