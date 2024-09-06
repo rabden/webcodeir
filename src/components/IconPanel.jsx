@@ -21,9 +21,11 @@ const IconPanel = ({ onClose, isMobile }) => {
             throw new Error('Failed to fetch icons');
           }
           const data = await response.json();
-          // Ensure that we're working with an array of icons
-          const iconArray = Array.isArray(data) ? data : Object.values(data).flat();
-          setIcons(iconArray);
+          if (data && data.icons && Array.isArray(data.icons)) {
+            setIcons(data.icons);
+          } else {
+            setIcons([]);
+          }
         } catch (error) {
           console.error('Error fetching icons:', error);
           setError('Failed to load icons. Please try again.');
@@ -94,7 +96,15 @@ const IconPanel = ({ onClose, isMobile }) => {
                     {copiedIcon === icon.name ? (
                       <Check className="w-6 h-6 text-green-500" />
                     ) : (
-                      <img src={`https://api.iconify.design/${icon.prefix}/${icon.name}.svg`} alt={icon.name} className="w-6 h-6" />
+                      <img 
+                        src={`https://api.iconify.design/${icon.prefix}/${icon.name}.svg`} 
+                        alt={icon.name} 
+                        className="w-6 h-6"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFsZXJ0LWNpcmNsZSI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48bGluZSB4MT0iMTIiIHkxPSI4IiB4Mj0iMTIiIHkyPSIxMiIvPjxsaW5lIHgxPSIxMiIgeTE9IjE2IiB4Mj0iMTIuMDEiIHkyPSIxNiIvPjwvc3ZnPg==';
+                        }}
+                      />
                     )}
                   </Button>
                 </TooltipTrigger>
