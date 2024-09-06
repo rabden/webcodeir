@@ -22,7 +22,7 @@ const IconPanel = ({ onClose, isMobile }) => {
   }, [searchTerm]);
 
   const copyToClipboard = (iconName) => {
-    const iconTag = `<i class="fas fa-${iconName.replace('fa-', '')}"></i>`;
+    const iconTag = `<i class="fas fa-${iconName.replace('fa', '')}"></i>`;
     navigator.clipboard.writeText(iconTag);
 
     setCopiedIcon(iconName);
@@ -66,12 +66,12 @@ const IconPanel = ({ onClose, isMobile }) => {
                       <FontAwesomeIcon icon={['fas', iconName]} className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'}`} />
                     )}
                     <span className={`mt-1 text-xs text-gray-300 truncate ${isMobile ? 'w-full' : 'w-20'}`}>
-                      {iconName.replace('fa-', '')}
+                      {iconName.replace('fa', '')}
                     </span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{iconName.replace('fa-', '')}</p>
+                  <p>{iconName.replace('fa', '')}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
