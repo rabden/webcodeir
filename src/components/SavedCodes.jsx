@@ -106,7 +106,7 @@ const SavedCodes = ({ onClose, onLoad }) => {
                     <iframe
                       srcDoc={generatePreviewCode(code.html, code.css, code.js)}
                       title={`Preview of ${code.name}`}
-                      className="w-full h-[500px] rounded border border-gray-600"
+                      className="w-full h-[400px] rounded border border-gray-600"
                       sandbox="allow-scripts"
                     />
                   </div>

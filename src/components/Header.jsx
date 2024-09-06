@@ -39,7 +39,6 @@ const Header = ({
             <Menu className="h-6 w-6" />
           </Button>
         )}
-        <div className="w-6 h-6 bg-white rounded-sm"></div>
         <input
           type="text"
           value={currentCodeName}
