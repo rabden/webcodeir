@@ -17,12 +17,13 @@ import {
   TrendingUp, Truck, Tv, Twitter, Type, Umbrella, Unlock, Upload, User, 
   UserCheck, UserMinus, UserPlus, UserX, Users, Video, Voicemail, Volume, 
   Watch, Wifi, Wind, X, XCircle, Youtube, Zap, ZoomIn, ZoomOut,
-  // Additional 30 icons
+  // Additional icons
   Airplay, Aperture, ArrowLeft, ArrowRight, AtSign, BellOff, Bold, 
-  ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Circle, Clipboard, 
-  Copy, CornerDownLeft, CornerDownRight, CornerLeftDown, CornerLeftUp, 
+  ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Circle, Copy, 
+  CornerDownLeft, CornerDownRight, CornerLeftDown, CornerLeftUp, 
   CornerRightDown, CornerRightUp, CornerUpLeft, CornerUpRight, Divide, 
-  ExternalLink, EyeOff, Feather, FileText, Frown, HardDrive, Hash
+  ExternalLink, EyeOff, Feather, Frown, HardDrive, Hash, Italic,
+  Underline
 } from 'lucide-react';
 
 export const topIcons = {
@@ -46,9 +47,9 @@ export const topIcons = {
   Trello, TrendingDown, TrendingUp, Truck, Tv, Twitter, Type, Umbrella, UserCheck,
   UserMinus, UserPlus, UserX, Users, Voicemail, Watch, Wind, XCircle, Youtube,
   Zap, ZoomIn, ZoomOut,
-  // Additional 30 icons
-  Airplay, Aperture, AtSign, BellOff, Bold, Circle, Copy, CornerDownLeft,
+  // Additional icons
+  Airplay, Aperture, AtSign, BellOff, Bold, Circle, CornerDownLeft,
   CornerDownRight, CornerLeftDown, CornerLeftUp, CornerRightDown, CornerRightUp,
   CornerUpLeft, CornerUpRight, Divide, ExternalLink, EyeOff, Feather, Frown,
-  HardDrive, Hash
+  HardDrive, Hash, Italic, Underline
 };
