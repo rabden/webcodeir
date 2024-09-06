@@ -17,8 +17,8 @@ import {
   TrendingUp, Truck, Tv, Twitter, Type, Umbrella, Unlock, Upload, User, 
   UserCheck, UserMinus, UserPlus, UserX, Users, Video, Voicemail, Volume, 
   Watch, Wifi, Wind, X, XCircle, Youtube, Zap, ZoomIn, ZoomOut,
-  // Adding available brand icons
-  Linkedin, Github, Figma, Framer, Slack, Spotify, Apple, Chrome, Twitter, Youtube
+  // Brand icons
+  Linkedin, Github, Figma, Framer, Slack, Spotify, Apple
 } from 'lucide-react';
 
 export const topIcons = {
@@ -43,6 +43,6 @@ export const topIcons = {
   Trello, TrendingDown, TrendingUp, Truck, Tv, Twitter, Type, Umbrella, UserCheck,
   UserMinus, UserPlus, UserX, Users, Voicemail, Watch, Wind, XCircle, Youtube,
   Zap, ZoomIn, ZoomOut,
-  // Adding available brand icons
-  Linkedin, Github, Figma, Framer, Slack, Spotify, Apple, Chrome, Twitter, Youtube
+  // Brand icons
+  Linkedin, Github, Figma, Framer, Slack, Spotify, Apple
 };
