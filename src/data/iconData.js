@@ -36,7 +36,18 @@ import {
   Watch, Wifi, Wind, 
   X, XCircle, XOctagon, 
   Youtube, 
-  Zap, ZapOff, ZoomIn, ZoomOut
+  Zap, ZapOff, ZoomIn, ZoomOut,
+  // Adding 60 more icons
+  Accessibility, Airplay, AlarmCheck, AlarmMinus, AlarmPlus, Album, Ampersand, Aperture,
+  Apple, ArrowDownLeftFromCircle, ArrowDownRightFromCircle, ArrowUpLeftFromCircle,
+  ArrowUpRightFromCircle, Asterisk, AtSign, Atom, Backpack, BadgeAlert, BadgeCheck,
+  BadgeDollarSign, BadgeHelp, BadgeInfo, BadgeMinus, BadgePercent, BadgePlus, BadgeX,
+  BaggageClaim, Banana, Banknote, BarChartHorizontal, Baseline, Bath, BatteryFull,
+  BatteryLow, BatteryMedium, Beaker, BeanOff, Bean, BellPlus, BellRing, Bike,
+  Binary, Biohazard, Bird, Bitcoin, Blinds, Bluetooth, BluetoothConnected,
+  BluetoothOff, BluetoothSearching, Bold, Bomb, Bone, BookCopy, BookDown,
+  BookKey, BookLock, BookMarked, BookMinus, BookOpen, BookPlus, BookTemplate,
+  BookUp, BookX
 } from 'lucide-react';
 
 export const topIcons = {
@@ -77,5 +88,16 @@ export const topIcons = {
   Watch, Wifi, Wind, 
   X, XCircle, XOctagon, 
   Youtube, 
-  Zap, ZapOff, ZoomIn, ZoomOut
+  Zap, ZapOff, ZoomIn, ZoomOut,
+  // Adding 60 more icons
+  Accessibility, Airplay, AlarmCheck, AlarmMinus, AlarmPlus, Album, Ampersand, Aperture,
+  Apple, ArrowDownLeftFromCircle, ArrowDownRightFromCircle, ArrowUpLeftFromCircle,
+  ArrowUpRightFromCircle, Asterisk, AtSign, Atom, Backpack, BadgeAlert, BadgeCheck,
+  BadgeDollarSign, BadgeHelp, BadgeInfo, BadgeMinus, BadgePercent, BadgePlus, BadgeX,
+  BaggageClaim, Banana, Banknote, BarChartHorizontal, Baseline, Bath, BatteryFull,
+  BatteryLow, BatteryMedium, Beaker, BeanOff, Bean, BellPlus, BellRing, Bike,
+  Binary, Biohazard, Bird, Bitcoin, Blinds, BluetoothConnected,
+  BluetoothOff, BluetoothSearching, Bomb, Bone, BookCopy, BookDown,
+  BookKey, BookLock, BookMarked, BookMinus, BookOpen, BookPlus, BookTemplate,
+  BookUp, BookX
 };
