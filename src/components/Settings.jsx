@@ -95,62 +95,12 @@ const Settings = ({ settings, setSettings, onClose, isMobile }) => {
             onCheckedChange={(checked) => handleChange('highlightActiveLine', checked)}
           />
         </div>
-        <div>
-          <label className="block mb-2 text-white">Layout</label>
-          <select
-            value={settings.layout}
-            onChange={(e) => handleChange('layout', e.target.value)}
-            className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="horizontal">Preview on Left</option>
-            <option value="vertical">Editors on Left</option>
-          </select>
-        </div>
-        <div>
-          <label className="block mb-2 text-white">Cursor Style</label>
-          <select
-            value={settings.cursorStyle}
-            onChange={(e) => handleChange('cursorStyle', e.target.value)}
-            className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="line">Line</option>
-            <option value="block">Block</option>
-            <option value="underline">Underline</option>
-          </select>
-        </div>
         <div className="flex items-center justify-between">
           <label htmlFor="matchBrackets" className="text-white">Match Brackets</label>
           <Switch
             id="matchBrackets"
             checked={settings.matchBrackets}
             onCheckedChange={(checked) => handleChange('matchBrackets', checked)}
-          />
-        </div>
-        <div className="flex items-center justify-between">
-          <label htmlFor="minimap" className="text-white">Show Minimap</label>
-          <Switch
-            id="minimap"
-            checked={settings.minimap}
-            onCheckedChange={(checked) => handleChange('minimap', checked)}
-          />
-        </div>
-        <div>
-          <label className="block mb-2 text-white">Scroll Speed</label>
-          <input
-            type="range"
-            min="1"
-            max="10"
-            value={settings.scrollSpeed}
-            onChange={(e) => handleChange('scrollSpeed', parseInt(e.target.value))}
-            className="w-full"
-          />
-        </div>
-        <div className="flex items-center justify-between">
-          <label htmlFor="enableAutocompletion" className="text-white">Enable Autocompletion</label>
-          <Switch
-            id="enableAutocompletion"
-            checked={settings.enableAutocompletion}
-            onCheckedChange={(checked) => handleChange('enableAutocompletion', checked)}
           />
         </div>
       </div>
