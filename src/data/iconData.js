@@ -16,19 +16,24 @@ import {
   ThumbsUp, ToggleLeft, ToggleRight, Trash, Trello, TrendingDown, 
   TrendingUp, Truck, Tv, Twitter, Type, Umbrella, Unlock, Upload, User, 
   UserCheck, UserMinus, UserPlus, UserX, Users, Video, Voicemail, Volume, 
-  Watch, Wifi, Wind, X, XCircle, Youtube, Zap, ZoomIn, ZoomOut
+  Watch, Wifi, Wind, X, XCircle, Youtube, Zap, ZoomIn, ZoomOut,
+  // Additional 30 icons
+  Airplay, Aperture, ArrowLeft, ArrowRight, AtSign, BellOff, Bold, 
+  ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Circle, Clipboard, 
+  Copy, CornerDownLeft, CornerDownRight, CornerLeftDown, CornerLeftUp, 
+  CornerRightDown, CornerRightUp, CornerUpLeft, CornerUpRight, Divide, 
+  ExternalLink, EyeOff, Feather, FileText, Frown, HardDrive, Hash
 } from 'lucide-react';
 
 export const topIcons = {
   Home, Search, Settings, User, Mail, Bell, Calendar, Clock, Heart, Star,
   Phone, Camera, Video, Music, Map, File, Folder, Image, Link, Lock,
-  Unlock, Key, Flag, Globe, Send, Download, Upload, Trash, Edit, Copy: Clipboard,
+  Unlock, Key, Flag, Globe, Send, Download, Upload, Trash, Edit, Copy,
   Bookmark, Share, Printer, Wifi, Mic: Voicemail, Headphones, Volume, Mute: Volume,
   Play, Pause, Stop: StopCircle, FastForward: ArrowUpCircle, Rewind: ArrowDownCircle, Shuffle, Repeat,
   List, Grid, Menu: List, MoreHorizontal, MoreVertical, ArrowUp: ArrowUpCircle,
-  ArrowDown: ArrowDownCircle, ArrowLeft: ArrowUpCircle, ArrowRight: ArrowDownCircle,
-  ChevronUp: ArrowUpCircle, ChevronDown: ArrowDownCircle,
-  ChevronLeft: ArrowUpCircle, ChevronRight: ArrowDownCircle, Plus, Minus: Minimize,
+  ArrowDown: ArrowDownCircle, ArrowLeft, ArrowRight, ChevronUp,
+  ChevronDown, ChevronLeft, ChevronRight, Plus, Minus: Minimize,
   X, Check: User, Filter, Refresh: RefreshCw, Activity, AlertCircle, Archive,
   Award, BarChart, Battery, Book, Box, Briefcase, Cast, Chrome, Clipboard, Cloud,
   Code, Coffee, Command, Compass, Cpu, CreditCard, Crop, Database, Disc, DollarSign,
@@ -40,5 +45,10 @@ export const topIcons = {
   Terminal, Thermometer, ThumbsDown, ThumbsUp, ToggleLeft, ToggleRight,
   Trello, TrendingDown, TrendingUp, Truck, Tv, Twitter, Type, Umbrella, UserCheck,
   UserMinus, UserPlus, UserX, Users, Voicemail, Watch, Wind, XCircle, Youtube,
-  Zap, ZoomIn, ZoomOut
+  Zap, ZoomIn, ZoomOut,
+  // Additional 30 icons
+  Airplay, Aperture, AtSign, BellOff, Bold, Circle, Copy, CornerDownLeft,
+  CornerDownRight, CornerLeftDown, CornerLeftUp, CornerRightDown, CornerRightUp,
+  CornerUpLeft, CornerUpRight, Divide, ExternalLink, EyeOff, Feather, Frown,
+  HardDrive, Hash
 };
