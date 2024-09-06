@@ -119,14 +119,14 @@ const Header = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setShowSettings(true)}
+                  onClick={() => setShowPexelsPanel(true)}
                   className="text-white hover:bg-gray-700"
                 >
-                  <SettingsIcon className="w-5 h-5" />
+                  <Image className="w-5 h-5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Settings (Ctrl + ,)</p>
+                <p>Pexels Images (Ctrl + U)</p>
               </TooltipContent>
             </Tooltip>
 
@@ -167,14 +167,14 @@ const Header = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setShowPexelsPanel(true)}
+                  onClick={() => setShowSettings(true)}
                   className="text-white hover:bg-gray-700"
                 >
-                  <Image className="w-5 h-5" />
+                  <SettingsIcon className="w-5 h-5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Pexels Images (Ctrl + U)</p>
+                <p>Settings (Ctrl + ,)</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

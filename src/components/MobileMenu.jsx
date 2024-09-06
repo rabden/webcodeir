@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, SettingsIcon, BookOpen, Type, Save, Library, Palette, Code, Wrench, Keyboard, Image } from 'lucide-react';
+import { X, Save, BookOpen, Settings as SettingsIcon, Type, Library, Palette, Code, Wrench, Keyboard, Image } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, setShowKeyboardShortcuts, setShowPexelsPanel, saveCurrentCode }) => {
@@ -12,16 +12,16 @@ const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, set
         </Button>
       </div>
       <nav className="p-4 space-y-2">
-        <MenuButton icon={<SettingsIcon className="w-4 h-4" />} label="Settings" onClick={() => { setShowSettings(true); setIsOpen(false); }} />
+        <MenuButton icon={<Save className="w-4 h-4" />} label="Save Current Code" onClick={() => { saveCurrentCode(); setIsOpen(false); }} />
         <MenuButton icon={<BookOpen className="w-4 h-4" />} label="Saved Codes" onClick={() => { setShowSavedCodes(true); setIsOpen(false); }} />
         <MenuButton icon={<Type className="w-4 h-4" />} label="Font Library" onClick={() => { setShowFontPanel(true); setIsOpen(false); }} />
         <MenuButton icon={<Library className="w-4 h-4" />} label="Icon Library" onClick={() => { setShowIconPanel(true); setIsOpen(false); }} />
+        <MenuButton icon={<Image className="w-4 h-4" />} label="Pexels Images" onClick={() => { setShowPexelsPanel(true); setIsOpen(false); }} />
         <MenuButton icon={<Palette className="w-4 h-4" />} label="CSS Tools" onClick={() => { setShowCssToolsPanel(true); setIsOpen(false); }} />
         <MenuButton icon={<Code className="w-4 h-4" />} label="HTML Tools" onClick={() => { setShowHtmlToolsPanel(true); setIsOpen(false); }} />
         <MenuButton icon={<Wrench className="w-4 h-4" />} label="JS Tools" onClick={() => { setShowJsToolsPanel(true); setIsOpen(false); }} />
         <MenuButton icon={<Keyboard className="w-4 h-4" />} label="Keyboard Shortcuts" onClick={() => { setShowKeyboardShortcuts(true); setIsOpen(false); }} />
-        <MenuButton icon={<Image className="w-4 h-4" />} label="Pexels Images" onClick={() => { setShowPexelsPanel(true); setIsOpen(false); }} />
-        <MenuButton icon={<Save className="w-4 h-4" />} label="Save Current Code" onClick={() => { saveCurrentCode(); setIsOpen(false); }} />
+        <MenuButton icon={<SettingsIcon className="w-4 h-4" />} label="Settings" onClick={() => { setShowSettings(true); setIsOpen(false); }} />
       </nav>
     </div>
   );
