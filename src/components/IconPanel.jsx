@@ -9,29 +9,31 @@ const FONTAWESOME_API_KEY = '62706841-14C4-4659-88F2-25107E169A35';
 const IconPanel = ({ onClose, isMobile }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [icons, setIcons] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [copiedIcon, setCopiedIcon] = useState(null);
 
   useEffect(() => {
     const fetchIcons = async () => {
       setLoading(true);
+      setError(null);
       try {
-        const response = await fetch(`https://api.fontawesome.com/v5.0/icons?family=solid&access_token=${FONTAWESOME_API_KEY}`);
+        const response = await fetch(`https://api.fontawesome.com/v6/search?query=${searchTerm}&family=classic&style=solid&token=${FONTAWESOME_API_KEY}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
-        setIcons(data.icons || []);
+        setIcons(data.results || []);
       } catch (error) {
         console.error('Error fetching icons:', error);
+        setError('Failed to fetch icons. Please try again.');
         setIcons([]);
       }
       setLoading(false);
     };
 
     fetchIcons();
-  }, []);
-
-  const filteredIcons = icons.filter(icon => 
-    icon.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  }, [searchTerm]);
 
   const copyToClipboard = (iconName) => {
     const iconTag = `<i class="fas fa-${iconName}"></i>`;
@@ -61,34 +63,35 @@ const IconPanel = ({ onClose, isMobile }) => {
         </div>
       </div>
       <div className="flex-grow overflow-y-auto p-4 space-y-4">
-        {loading ? (
-          <p className="text-white text-center">Loading icons...</p>
-        ) : (
-          <div className={`grid ${isMobile ? 'grid-cols-4 gap-2' : 'grid-cols-3 gap-4'}`}>
-            {filteredIcons.map((icon) => (
-              <TooltipProvider key={icon.id}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={`w-full ${isMobile ? 'h-12' : 'h-16'} flex items-center justify-center bg-gray-700 hover:bg-gray-600 border-gray-600`}
-                      onClick={() => copyToClipboard(icon.name)}
-                    >
-                      {copiedIcon === icon.name ? (
-                        <Check className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'} text-green-500`} />
-                      ) : (
-                        <i className={`fas fa-${icon.name} ${isMobile ? 'text-lg' : 'text-2xl'}`} />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{icon.name}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            ))}
-          </div>
+        {loading && <p className="text-white text-center">Loading icons...</p>}
+        {error && <p className="text-red-500 text-center">{error}</p>}
+        {!loading && !error && icons.length === 0 && (
+          <p className="text-white text-center">No icons found. Try a different search term.</p>
         )}
+        <div className={`grid ${isMobile ? 'grid-cols-4 gap-2' : 'grid-cols-3 gap-4'}`}>
+          {icons.map((icon) => (
+            <TooltipProvider key={icon.id}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={`w-full ${isMobile ? 'h-12' : 'h-16'} flex items-center justify-center bg-gray-700 hover:bg-gray-600 border-gray-600`}
+                    onClick={() => copyToClipboard(icon.id)}
+                  >
+                    {copiedIcon === icon.id ? (
+                      <Check className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'} text-green-500`} />
+                    ) : (
+                      <i className={`fas fa-${icon.id} ${isMobile ? 'text-lg' : 'text-2xl'}`} />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{icon.id}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ))}
+        </div>
       </div>
     </div>
   );
