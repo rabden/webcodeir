@@ -15,13 +15,13 @@ const UnsplashImagePanel = ({ onClose }) => {
     try {
       const response = await fetch(`https://api.unsplash.com/search/photos?query=${searchTerm}&client_id=YOUR_UNSPLASH_ACCESS_KEY`);
       if (!response.ok) {
-        throw new Error('Failed to fetch images');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
       setImages(data.results || []);
     } catch (error) {
       console.error('Error fetching images:', error);
-      setError('Failed to fetch images. Please try again.');
+      setError('Failed to fetch images. Please check your API key and try again.');
     }
     setLoading(false);
   };
@@ -35,7 +35,7 @@ const UnsplashImagePanel = ({ onClose }) => {
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-xl font-bold text-white">Unsplash Images</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
-          <X className="w-5 h-5" />
+          <X className="w-5 h-5 text-white" />
         </button>
       </div>
       <div className="p-4 flex space-x-2">
