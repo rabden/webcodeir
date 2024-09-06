@@ -12,29 +12,28 @@ const PexelsImagePanel = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
 
   const observer = useRef();
   const lastImageElementRef = useCallback(node => {
     if (loading) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && visibleImages.length < images.length) {
-        setVisibleImages(prevVisible => [
-          ...prevVisible,
-          ...images.slice(prevVisible.length, prevVisible.length + 10)
-        ]);
+      if (entries[0].isIntersecting && hasMore && !isSearching) {
+        setPage(prevPage => prevPage + 1);
       }
     });
     if (node) observer.current.observe(node);
-  }, [loading, images, visibleImages]);
+  }, [loading, hasMore, isSearching]);
 
-  const fetchImages = async (query = '') => {
+  const fetchImages = async (query = '', newPage = 1) => {
     setLoading(true);
     setError(null);
     try {
       const url = query
-        ? `https://api.pexels.com/v1/search?query=${query}&per_page=50&page=${page}`
-        : `https://api.pexels.com/v1/curated?per_page=50&page=${page}`;
+        ? `https://api.pexels.com/v1/search?query=${query}&per_page=100&page=${newPage}`
+        : `https://api.pexels.com/v1/curated?per_page=100&page=${newPage}`;
       const response = await fetch(url, {
         headers: {
           Authorization: PEXELS_API_KEY
@@ -44,8 +43,14 @@ const PexelsImagePanel = ({ onClose }) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setImages(data.photos);
-      setVisibleImages(data.photos.slice(0, 10)); // Initially show first 10 images
+      if (newPage === 1) {
+        setImages(data.photos);
+        setVisibleImages(data.photos.slice(0, 10));
+      } else {
+        setImages(prevImages => [...prevImages, ...data.photos]);
+        setVisibleImages(prevImages => [...prevImages, ...data.photos.slice(0, 10)]);
+      }
+      setHasMore(data.photos.length === 100);
     } catch (error) {
       console.error('Error fetching images:', error);
       setError('Failed to fetch images. Please try again.');
@@ -55,18 +60,44 @@ const PexelsImagePanel = ({ onClose }) => {
 
   useEffect(() => {
     fetchImages();
-  }, [page]);
+  }, []);
+
+  useEffect(() => {
+    if (!isSearching && page > 1) {
+      fetchImages('', page);
+    }
+  }, [page, isSearching]);
 
   const handleSearch = () => {
     setImages([]);
     setVisibleImages([]);
     setPage(1);
+    setIsSearching(true);
     fetchImages(searchTerm);
+  };
+
+  const loadMore = () => {
+    if (isSearching) {
+      fetchImages(searchTerm, page + 1);
+    }
+    setPage(prevPage => prevPage + 1);
   };
 
   const copyImageUrl = (url) => {
     navigator.clipboard.writeText(url);
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (visibleImages.length < images.length) {
+        setVisibleImages(prevVisible => [
+          ...prevVisible,
+          ...images.slice(prevVisible.length, prevVisible.length + 10)
+        ]);
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [visibleImages, images]);
 
   const isMobile = window.innerWidth <= 768;
 
@@ -121,6 +152,11 @@ const PexelsImagePanel = ({ onClose }) => {
           ))}
         </div>
         {loading && <p className="text-center text-white">Loading images...</p>}
+        {!loading && hasMore && isSearching && (
+          <Button onClick={loadMore} className="w-full bg-blue-600 text-white hover:bg-blue-700">
+            Load More
+          </Button>
+        )}
       </div>
     </div>
   );
