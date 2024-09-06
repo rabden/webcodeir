@@ -121,21 +121,19 @@ const CodeEditor = () => {
 
   return (
     <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
-      {!state.isMobile && (
-        <Header
-          currentCodeName={state.currentCodeName}
-          setCurrentCodeName={(name) => setState(s => ({ ...s, currentCodeName: name }))}
-          isMobile={state.isMobile}
-          saveCurrentCode={saveCurrentCode}
-          setShowSavedCodes={() => setState(s => ({ ...s, showSavedCodes: true }))}
-          setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true }))}
-          setShowIconPanel={() => setState(s => ({ ...s, showIconPanel: true }))}
-          setShowSettings={() => setState(s => ({ ...s, showSettings: true }))}
-          setIsMenuOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
-          toggleLayout={toggleLayout}
-          layout={state.settings.layout}
-        />
-      )}
+      <Header
+        currentCodeName={state.currentCodeName}
+        setCurrentCodeName={(name) => setState(s => ({ ...s, currentCodeName: name }))}
+        isMobile={state.isMobile}
+        saveCurrentCode={saveCurrentCode}
+        setShowSavedCodes={() => setState(s => ({ ...s, showSavedCodes: true }))}
+        setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true }))}
+        setShowIconPanel={() => setState(s => ({ ...s, showIconPanel: true }))}
+        setShowSettings={() => setState(s => ({ ...s, showSettings: true }))}
+        setIsMenuOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
+        toggleLayout={toggleLayout}
+        layout={state.settings.layout}
+      />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
       </div>
