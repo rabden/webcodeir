@@ -99,12 +99,13 @@ const PexelsImagePanel = ({ onClose }) => {
               className="relative group" 
               ref={index === visibleImages.length - 1 ? lastImageElementRef : null}
             >
-              <img 
-                src={image.src.medium} 
-                alt={image.alt} 
-                className="w-full h-auto rounded-lg object-cover"
-                style={{ aspectRatio: '16 / 9' }}
-              />
+              <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-lg">
+                <img 
+                  src={image.src.medium} 
+                  alt={image.alt} 
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+              </div>
               <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <Button onClick={() => copyImageUrl(image.src.original)} className="mb-2 text-xs">
                   Copy URL
