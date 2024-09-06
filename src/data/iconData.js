@@ -18,7 +18,7 @@ import {
   UserCheck, UserMinus, UserPlus, UserX, Users, Video, Voicemail, Volume, 
   Watch, Wifi, Wind, X, XCircle, Youtube, Zap, ZoomIn, ZoomOut,
   // Brand icons
-  Linkedin, Github, Figma, Framer, Slack, Spotify, Apple
+  Linkedin, Github, Figma, Framer, Slack, Apple
 } from 'lucide-react';
 
 export const topIcons = {
@@ -44,5 +44,5 @@ export const topIcons = {
   UserMinus, UserPlus, UserX, Users, Voicemail, Watch, Wind, XCircle, Youtube,
   Zap, ZoomIn, ZoomOut,
   // Brand icons
-  Linkedin, Github, Figma, Framer, Slack, Spotify, Apple
+  Linkedin, Github, Figma, Framer, Slack, Apple
 };
