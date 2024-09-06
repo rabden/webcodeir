@@ -16,9 +16,7 @@ import {
   ThumbsUp, ToggleLeft, ToggleRight, Trash, Trello, TrendingDown, 
   TrendingUp, Truck, Tv, Twitter, Type, Umbrella, Unlock, Upload, User, 
   UserCheck, UserMinus, UserPlus, UserX, Users, Video, Voicemail, Volume, 
-  Watch, Wifi, Wind, X, XCircle, Youtube, Zap, ZoomIn, ZoomOut,
-  // Brand icons
-  Linkedin, Github, Figma, Framer, Slack, Apple
+  Watch, Wifi, Wind, X, XCircle, Youtube, Zap, ZoomIn, ZoomOut
 } from 'lucide-react';
 
 export const topIcons = {
@@ -42,11 +40,5 @@ export const topIcons = {
   Terminal, Thermometer, ThumbsDown, ThumbsUp, ToggleLeft, ToggleRight,
   Trello, TrendingDown, TrendingUp, Truck, Tv, Twitter, Type, Umbrella, UserCheck,
   UserMinus, UserPlus, UserX, Users, Voicemail, Watch, Wind, XCircle, Youtube,
-  Zap, ZoomIn, ZoomOut,
-  // Brand icons
-  Linkedin, Github, Figma, Framer, Slack, Apple
+  Zap, ZoomIn, ZoomOut
 };
-
-// Note: The following icons are not available in lucide-react:
-// Bitbucket, Twitch, Android, Behance, Sketch, Adobe, Notion, Discord, Windows, Linux, Amazon, Dropbox, Google, Microsoft, Paypal, Visa, Mastercard, Airbnb, Uber, Lyft, Netflix
-// You may need to use a different icon library or custom SVGs for these icons.
