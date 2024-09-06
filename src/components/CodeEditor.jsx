@@ -9,6 +9,7 @@ import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
 import IconPanel from './IconPanel';
 import ToolsPanel from './ToolsPanel';
+import MobilePreviewButton from './MobilePreviewButton';
 
 const CodeEditor = () => {
   const [state, setState] = useState({
@@ -41,6 +42,7 @@ const CodeEditor = () => {
     isMobile: window.innerWidth < 768,
     previewSize: 50,
     isMenuOpen: false,
+    showMobilePreview: false,
   });
 
   const resizerRef = useRef(null);
@@ -146,6 +148,10 @@ const CodeEditor = () => {
     }));
   };
 
+  const toggleMobilePreview = () => {
+    setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }));
+  };
+
   const renderEditors = () => (
     <EditorPanel
       htmlCode={state.htmlCode}
@@ -166,21 +172,21 @@ const CodeEditor = () => {
 
     if (state.isMobile) {
       return (
-        <PanelGroup direction="vertical" className="h-full">
-          <Panel minSize={0} maxSize={100} defaultSize={100 - state.previewSize}>
-            {editorPanel}
-          </Panel>
-          <PanelResizeHandle
-            className="h-2 bg-[#3a3a3a] hover:bg-[#5a5a5a] transition-colors duration-200 relative group"
-            onTouchStart={handleTouchStart}
-            ref={resizerRef}
-          >
-            <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200"></div>
-          </PanelResizeHandle>
-          <Panel minSize={0} maxSize={100} defaultSize={state.previewSize}>
-            {previewPanel}
-          </Panel>
-        </PanelGroup>
+        <div className="h-full relative">
+          {editorPanel}
+          <MobilePreviewButton onClick={toggleMobilePreview} isPreviewVisible={state.showMobilePreview} />
+          {state.showMobilePreview && (
+            <div className="fixed inset-0 z-50 bg-gray-900">
+              {previewPanel}
+              <button
+                onClick={toggleMobilePreview}
+                className="absolute top-4 right-4 bg-gray-800 text-white p-2 rounded-full"
+              >
+                Close
+              </button>
+            </div>
+          )}
+        </div>
       );
     } else {
       const panelConfig = {
