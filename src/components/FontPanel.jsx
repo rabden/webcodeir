@@ -12,7 +12,7 @@ const fonts = [
   'Prompt', 'IBM Plex Sans', 'Catamaran', 'Heebo', 'Overpass', 'Asap', 'Noto Serif'
 ];
 
-const FontPanel = ({ onClose, isMobile }) => {
+const FontPanel = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedStates, setCopiedStates] = useState({});
   const [filteredFonts, setFilteredFonts] = useState(fonts);
@@ -33,14 +33,14 @@ const FontPanel = ({ onClose, isMobile }) => {
   };
 
   return (
-    <div className={`fixed inset-0 bg-gray-800 z-50 flex flex-col ${isMobile ? 'p-4' : 'inset-y-4 right-4 w-96 rounded-lg'}`}>
-      <div className="flex justify-between items-center mb-4">
+    <div className="fixed inset-y-4 right-4 w-96 bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden">
+      <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-xl font-bold text-white">Font Library</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
-          <X className="w-5 h-5" />
+          <X className="w-5 h-5 text-white" />
         </button>
       </div>
-      <div className="mb-4">
+      <div className="p-4">
         <div className="relative">
           <input
             type="text"
@@ -54,15 +54,15 @@ const FontPanel = ({ onClose, isMobile }) => {
       </div>
       <div className="flex-grow overflow-y-auto">
         {filteredFonts.map((font) => (
-          <div key={font} className="bg-gray-700 rounded-lg p-4 flex justify-between items-center mb-2">
+          <div key={font} className="bg-gray-700 rounded-lg p-4 flex justify-between items-center mb-2 mx-4">
             <h3 className="text-lg font-bold text-white" style={{ fontFamily: font }}>{font}</h3>
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
-                  <MoreVertical className="h-4 w-4" />
+                  <MoreVertical className="h-4 w-4 text-white" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-56 bg-gray-700 border-gray-600">
+              <PopoverContent className="w-56 bg-gray-700 text-white border-gray-600">
                 {['link', 'import', 'font-family'].map((type) => (
                   <button
                     key={type}
