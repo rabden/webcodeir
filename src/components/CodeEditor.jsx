@@ -102,17 +102,19 @@ const CodeEditor = () => {
       );
     } else {
       return (
-        <PanelGroup direction={state.settings.layout === 'stacked' ? 'vertical' : 'horizontal'} className="h-full">
-          <Panel minSize={0} defaultSize={50}>
-            {state.settings.layout === 'horizontal' ? previewPanel : editorPanel}
-          </Panel>
-          <PanelResizeHandle className={state.settings.layout === 'stacked' ? 'h-2' : 'w-2'}>
-            <div className={`${state.settings.layout === 'stacked' ? 'h-0.5 w-full' : 'w-0.5 h-full'} bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200`}></div>
-          </PanelResizeHandle>
-          <Panel minSize={0} defaultSize={50}>
-            {state.settings.layout === 'horizontal' ? editorPanel : previewPanel}
-          </Panel>
-        </PanelGroup>
+        <div className="h-full">
+          <PanelGroup direction={state.settings.layout === 'stacked' ? 'vertical' : 'horizontal'}>
+            <Panel minSize={0} defaultSize={50}>
+              {state.settings.layout === 'horizontal' ? previewPanel : editorPanel}
+            </Panel>
+            <PanelResizeHandle className={state.settings.layout === 'stacked' ? 'h-2' : 'w-2'}>
+              <div className={`${state.settings.layout === 'stacked' ? 'h-0.5 w-full' : 'w-0.5 h-full'} bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200`}></div>
+            </PanelResizeHandle>
+            <Panel minSize={0} defaultSize={50}>
+              {state.settings.layout === 'horizontal' ? editorPanel : previewPanel}
+            </Panel>
+          </PanelGroup>
+        </div>
       );
     }
   };
