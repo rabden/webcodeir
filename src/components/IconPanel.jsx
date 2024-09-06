@@ -3,41 +3,28 @@ import { X, Search, Check } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const FONTAWESOME_API_KEY = '62706841-14C4-4659-88F2-25107E169A35';
+library.add(fas);
 
 const IconPanel = ({ onClose, isMobile }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [icons, setIcons] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [copiedIcon, setCopiedIcon] = useState(null);
+  const [filteredIcons, setFilteredIcons] = useState([]);
 
   useEffect(() => {
-    fetchIcons();
+    const results = Object.keys(fas).filter(iconName => 
+      iconName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredIcons(results);
   }, [searchTerm]);
-
-  const fetchIcons = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`https://api.fontawesome.com/v6/search?query=${searchTerm}&family=classic&style=solid&token=${FONTAWESOME_API_KEY}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setIcons(data.results || []);
-    } catch (error) {
-      console.error('Error fetching icons:', error);
-      setError('Failed to fetch icons. Please try again.');
-      setIcons([]);
-    }
-    setLoading(false);
-  };
 
   const copyToClipboard = (iconName) => {
     const iconTag = `<i class="fas fa-${iconName}"></i>`;
     navigator.clipboard.writeText(iconTag);
+
     setCopiedIcon(iconName);
     setTimeout(() => setCopiedIcon(null), 2000);
   };
@@ -45,7 +32,7 @@ const IconPanel = ({ onClose, isMobile }) => {
   return (
     <div className={`fixed inset-y-0 right-0 bg-gray-800 shadow-lg z-50 flex flex-col ${isMobile ? 'w-full' : 'w-96'}`}>
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
-        <h2 className="text-xl font-bold text-white">FontAwesome Icon Library</h2>
+        <h2 className="text-xl font-bold text-white">Icon Library</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
           <X className="w-5 h-5 text-white" />
         </button>
@@ -62,31 +49,26 @@ const IconPanel = ({ onClose, isMobile }) => {
           <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-400" />
         </div>
       </div>
-      <div className="flex-grow overflow-y-auto p-4 space-y-4">
-        {loading && <p className="text-white text-center">Loading icons...</p>}
-        {error && <p className="text-red-500 text-center">{error}</p>}
-        {!loading && !error && icons.length === 0 && (
-          <p className="text-white text-center">No icons found. Try a different search term.</p>
-        )}
+      <div className="flex-grow overflow-y-auto p-4">
         <div className={`grid ${isMobile ? 'grid-cols-4 gap-2' : 'grid-cols-3 gap-4'}`}>
-          {icons.map((icon) => (
-            <TooltipProvider key={icon.id}>
+          {filteredIcons.map((iconName) => (
+            <TooltipProvider key={iconName}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="outline"
                     className={`w-full ${isMobile ? 'h-12' : 'h-16'} flex items-center justify-center bg-gray-700 hover:bg-gray-600 border-gray-600`}
-                    onClick={() => copyToClipboard(icon.id)}
+                    onClick={() => copyToClipboard(iconName)}
                   >
-                    {copiedIcon === icon.id ? (
+                    {copiedIcon === iconName ? (
                       <Check className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'} text-green-500`} />
                     ) : (
-                      <i className={`fas fa-${icon.id} ${isMobile ? 'text-lg' : 'text-2xl'}`} />
+                      <FontAwesomeIcon icon={['fas', iconName]} className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'}`} />
                     )}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{icon.id}</p>
+                  <p>{iconName}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
