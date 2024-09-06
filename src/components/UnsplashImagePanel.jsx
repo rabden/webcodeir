@@ -7,15 +7,21 @@ const UnsplashImagePanel = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const searchImages = async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await fetch(`https://api.unsplash.com/search/photos?query=${searchTerm}&client_id=YOUR_UNSPLASH_ACCESS_KEY`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch images');
+      }
       const data = await response.json();
-      setImages(data.results);
+      setImages(data.results || []);
     } catch (error) {
       console.error('Error fetching images:', error);
+      setError('Failed to fetch images. Please try again.');
     }
     setLoading(false);
   };
@@ -45,6 +51,10 @@ const UnsplashImagePanel = ({ onClose }) => {
         </Button>
       </div>
       <div className="flex-grow overflow-y-auto p-4 space-y-4">
+        {error && <p className="text-red-500">{error}</p>}
+        {images.length === 0 && !loading && !error && (
+          <p className="text-gray-400">No images found. Try searching for something!</p>
+        )}
         {images.map((image) => (
           <div key={image.id} className="relative group">
             <img src={image.urls.small} alt={image.alt_description} className="w-full rounded-lg" />
