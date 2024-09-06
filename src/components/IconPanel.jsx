@@ -21,11 +21,21 @@ const IconPanel = ({ onClose, isMobile }) => {
 
   const copyToClipboard = (iconName) => {
     const IconComponent = allIcons[iconName];
-    const tempContainer = document.createElement('div');
-    const iconInstance = <IconComponent />;
-    require('react-dom').render(iconInstance, tempContainer);
-    const svgString = tempContainer.innerHTML;
-    navigator.clipboard.writeText(svgString);
+    const svgString = IconComponent().props.children;
+    const svgWrapper = document.createElement('div');
+    svgWrapper.innerHTML = svgString;
+    const svgElement = svgWrapper.firstChild;
+    
+    // Add width and height attributes if they don't exist
+    if (!svgElement.hasAttribute('width')) {
+      svgElement.setAttribute('width', '24');
+    }
+    if (!svgElement.hasAttribute('height')) {
+      svgElement.setAttribute('height', '24');
+    }
+    
+    const finalSvgString = svgWrapper.innerHTML;
+    navigator.clipboard.writeText(finalSvgString);
     setCopiedIcon(iconName);
     setTimeout(() => setCopiedIcon(null), 2000);
   };
