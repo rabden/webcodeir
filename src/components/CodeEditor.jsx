@@ -45,8 +45,6 @@ const CodeEditor = () => {
     showMobilePreview: false,
   });
 
-  const resizerRef = useRef(null);
-
   useEffect(() => {
     const handleResize = () => setState(s => ({ ...s, isMobile: window.innerWidth < 768 }));
     window.addEventListener('resize', handleResize);
@@ -117,27 +115,6 @@ const CodeEditor = () => {
     alert('Code saved successfully!');
   };
 
-  const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    const startY = touch.clientY;
-    const startPreviewSize = state.previewSize;
-
-    const handleTouchMove = (e) => {
-      const touch = e.touches[0];
-      const deltaY = touch.clientY - startY;
-      const newPreviewSize = Math.max(0, Math.min(100, startPreviewSize - (deltaY / window.innerHeight) * 100));
-      setState(s => ({ ...s, previewSize: newPreviewSize }));
-    };
-
-    const handleTouchEnd = () => {
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-    };
-
-    document.addEventListener('touchmove', handleTouchMove);
-    document.addEventListener('touchend', handleTouchEnd);
-  };
-
   const toggleLayout = () => {
     setState(s => ({
       ...s,
@@ -182,7 +159,7 @@ const CodeEditor = () => {
                 onClick={toggleMobilePreview}
                 className="absolute top-4 right-4 bg-gray-800 text-white p-2 rounded-full"
               >
-                Close
+                <EyeOff size={24} />
               </button>
             </div>
           )}
@@ -259,7 +236,7 @@ const CodeEditor = () => {
         <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.isMobile} />
       )}
       {state.showIconPanel && (
-        <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} isMobile={state.isMobile} />
+        <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} isMobile={state.iMobile} />
       )}
       {state.showToolsPanel && (
         <ToolsPanel onClose={() => setState(s => ({ ...s, showToolsPanel: false }))} />
