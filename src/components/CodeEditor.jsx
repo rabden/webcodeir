@@ -154,14 +154,9 @@ const CodeEditor = () => {
           {editorPanel}
           <MobilePreviewButton onClick={toggleMobilePreview} isPreviewVisible={state.showMobilePreview} />
           {state.showMobilePreview && (
-            <div className="fixed inset-0 z-50 bg-gray-900">
+            <div className="fixed inset-0 z-40 bg-gray-900">
               {previewPanel}
-              <button
-                onClick={toggleMobilePreview}
-                className="absolute top-4 right-4 bg-gray-800 text-white p-2 rounded-full"
-              >
-                <EyeOff size={24} />
-              </button>
+              <MobilePreviewButton onClick={toggleMobilePreview} isPreviewVisible={state.showMobilePreview} />
             </div>
           )}
         </div>
