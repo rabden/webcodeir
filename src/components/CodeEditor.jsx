@@ -69,62 +69,48 @@ const CodeEditor = () => {
     }));
   };
 
-  const toggleMobilePreview = () => {
-    setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }));
-  };
-
-  const renderEditors = () => (
-    <EditorPanel
-      htmlCode={state.htmlCode}
-      cssCode={state.cssCode}
-      jsCode={state.jsCode}
-      setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
-      setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
-      setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
-      settings={state.settings}
-      setShowCssToolsPanel={() => setState(s => ({ ...s, showCssToolsPanel: true }))}
-      setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true }))}
-      setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true }))}
-      isMobile={state.isMobile}
-    />
-  );
-
   const renderLayout = () => {
-    const editorPanel = renderEditors();
+    const editorPanel = (
+      <EditorPanel
+        htmlCode={state.htmlCode}
+        cssCode={state.cssCode}
+        jsCode={state.jsCode}
+        setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
+        setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
+        setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
+        settings={state.settings}
+        setShowCssToolsPanel={() => setState(s => ({ ...s, showCssToolsPanel: true }))}
+        setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true }))}
+        setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true }))}
+        isMobile={state.isMobile}
+      />
+    );
     const previewPanel = <PreviewPanel preview={state.preview} />;
 
     if (state.isMobile) {
       return (
         <div className="h-full relative">
           {editorPanel}
-          <MobilePreviewButton onClick={toggleMobilePreview} isPreviewVisible={state.showMobilePreview} />
+          <MobilePreviewButton onClick={() => setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }))} isPreviewVisible={state.showMobilePreview} />
           {state.showMobilePreview && (
             <div className="fixed inset-0 z-40 bg-gray-900">
               {previewPanel}
-              <MobilePreviewButton onClick={toggleMobilePreview} isPreviewVisible={state.showMobilePreview} />
+              <MobilePreviewButton onClick={() => setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }))} isPreviewVisible={state.showMobilePreview} />
             </div>
           )}
         </div>
       );
     } else {
-      const panelConfig = {
-        horizontal: [previewPanel, editorPanel],
-        vertical: [editorPanel, previewPanel],
-        stacked: [editorPanel, previewPanel]
-      };
-
-      const [leftPanel, rightPanel] = panelConfig[state.settings.layout];
-
       return (
         <PanelGroup direction={state.settings.layout === 'stacked' ? 'vertical' : 'horizontal'} className="h-full">
           <Panel minSize={0} defaultSize={50}>
-            {leftPanel}
+            {state.settings.layout === 'horizontal' ? previewPanel : editorPanel}
           </Panel>
           <PanelResizeHandle className={state.settings.layout === 'stacked' ? 'h-2' : 'w-2'}>
             <div className={`${state.settings.layout === 'stacked' ? 'h-0.5 w-full' : 'w-0.5 h-full'} bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200`}></div>
           </PanelResizeHandle>
           <Panel minSize={0} defaultSize={50}>
-            {rightPanel}
+            {state.settings.layout === 'horizontal' ? editorPanel : previewPanel}
           </Panel>
         </PanelGroup>
       );
@@ -149,45 +135,13 @@ const CodeEditor = () => {
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
       </div>
-      {state.showSettings && (
-        <Settings
-          settings={state.settings}
-          setSettings={(newSettings) => setState(s => ({ ...s, settings: newSettings }))}
-          onClose={() => setState(s => ({ ...s, showSettings: false }))}
-          isMobile={state.isMobile}
-        />
-      )}
-      {state.showSavedCodes && (
-        <SavedCodes
-          onClose={() => setState(s => ({ ...s, showSavedCodes: false }))}
-          onLoad={(code) => {
-            setState(s => ({
-              ...s,
-              htmlCode: code.html,
-              cssCode: code.css,
-              jsCode: code.js,
-              currentCodeName: code.name,
-              showSavedCodes: false
-            }));
-          }}
-          isMobile={state.isMobile}
-        />
-      )}
-      {state.showFontPanel && (
-        <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.isMobile} />
-      )}
-      {state.showIconPanel && (
-        <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} isMobile={state.iMobile} />
-      )}
-      {state.showCssToolsPanel && (
-        <ToolsPanel onClose={() => setState(s => ({ ...s, showCssToolsPanel: false }))} type="css" />
-      )}
-      {state.showHtmlToolsPanel && (
-        <ToolsPanel onClose={() => setState(s => ({ ...s, showHtmlToolsPanel: false }))} type="html" />
-      )}
-      {state.showJsToolsPanel && (
-        <ToolsPanel onClose={() => setState(s => ({ ...s, showJsToolsPanel: false }))} type="js" />
-      )}
+      {state.showSettings && <Settings settings={state.settings} setSettings={(newSettings) => setState(s => ({ ...s, settings: newSettings }))} onClose={() => setState(s => ({ ...s, showSettings: false }))} isMobile={state.isMobile} />}
+      {state.showSavedCodes && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html, cssCode: code.css, jsCode: code.js, currentCodeName: code.name, showSavedCodes: false }))} isMobile={state.isMobile} />}
+      {state.showFontPanel && <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.isMobile} />}
+      {state.showIconPanel && <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} isMobile={state.iMobile} />}
+      {state.showCssToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showCssToolsPanel: false }))} type="css" />}
+      {state.showHtmlToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showHtmlToolsPanel: false }))} type="html" />}
+      {state.showJsToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showJsToolsPanel: false }))} type="js" />}
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
