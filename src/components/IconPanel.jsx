@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, Check } from 'lucide-react';
+import { X, Search, Check, AlertCircle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
@@ -21,7 +21,7 @@ const IconPanel = ({ onClose, isMobile }) => {
             throw new Error('Failed to fetch icons');
           }
           const data = await response.json();
-          if (data && data.icons && Array.isArray(data.icons)) {
+          if (data && Array.isArray(data.icons)) {
             setIcons(data.icons);
           } else {
             setIcons([]);
@@ -41,18 +41,18 @@ const IconPanel = ({ onClose, isMobile }) => {
     return () => clearTimeout(debounceTimer);
   }, [searchTerm]);
 
-  const copyToClipboard = async (iconName, prefix) => {
+  const copyToClipboard = async (iconData) => {
     try {
-      const response = await fetch(`https://api.iconify.design/${prefix}.json?icons=${iconName}`);
+      const response = await fetch(`https://api.iconify.design/${iconData.provider}.json?icons=${iconData.name}`);
       if (!response.ok) {
         throw new Error('Failed to fetch icon data');
       }
       const data = await response.json();
-      if (data && data.icons && data.icons[iconName]) {
-        const svgPath = data.icons[iconName].body;
+      if (data && data.icons && data.icons[iconData.name]) {
+        const svgPath = data.icons[iconData.name].body;
         const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">${svgPath}</svg>`;
         await navigator.clipboard.writeText(svgString);
-        setCopiedIcon(iconName);
+        setCopiedIcon(iconData.name);
         setTimeout(() => setCopiedIcon(null), 2000);
       } else {
         throw new Error('Icon data not found');
@@ -91,19 +91,19 @@ const IconPanel = ({ onClose, isMobile }) => {
         )}
         <div className="grid grid-cols-4 gap-4">
           {icons.map((icon) => (
-            <TooltipProvider key={`${icon.prefix}:${icon.name}`}>
+            <TooltipProvider key={`${icon.provider}:${icon.name}`}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="outline"
                     className="w-full h-12 flex items-center justify-center bg-gray-700 hover:bg-gray-600 border-gray-600"
-                    onClick={() => copyToClipboard(icon.name, icon.prefix)}
+                    onClick={() => copyToClipboard(icon)}
                   >
                     {copiedIcon === icon.name ? (
                       <Check className="w-6 h-6 text-green-500" />
                     ) : (
                       <img 
-                        src={`https://api.iconify.design/${icon.prefix}/${icon.name}.svg`} 
+                        src={`https://api.iconify.design/${icon.provider}/${icon.name}.svg`} 
                         alt={icon.name} 
                         className="w-6 h-6"
                         onError={(e) => {
