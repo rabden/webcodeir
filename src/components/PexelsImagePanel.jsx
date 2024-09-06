@@ -8,6 +8,7 @@ const PEXELS_API_KEY = 'SlQp2QTvSTt9CB9Fa6AMAZaNo3kC7IYvENxUJTWaSJzrs1kls0B5z3fX
 const PexelsImagePanel = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [images, setImages] = useState([]);
+  const [visibleImages, setVisibleImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
@@ -17,20 +18,23 @@ const PexelsImagePanel = ({ onClose }) => {
     if (loading) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        setPage(prevPage => prevPage + 1);
+      if (entries[0].isIntersecting && visibleImages.length < images.length) {
+        setVisibleImages(prevVisible => [
+          ...prevVisible,
+          ...images.slice(prevVisible.length, prevVisible.length + 10)
+        ]);
       }
     });
     if (node) observer.current.observe(node);
-  }, [loading]);
+  }, [loading, images, visibleImages]);
 
-  const fetchImages = async (pageNum, query = '') => {
+  const fetchImages = async (query = '') => {
     setLoading(true);
     setError(null);
     try {
       const url = query
-        ? `https://api.pexels.com/v1/search?query=${query}&per_page=50&page=${pageNum}`
-        : `https://api.pexels.com/v1/curated?per_page=50&page=${pageNum}`;
+        ? `https://api.pexels.com/v1/search?query=${query}&per_page=50&page=${page}`
+        : `https://api.pexels.com/v1/curated?per_page=50&page=${page}`;
       const response = await fetch(url, {
         headers: {
           Authorization: PEXELS_API_KEY
@@ -40,7 +44,8 @@ const PexelsImagePanel = ({ onClose }) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setImages(prevImages => [...prevImages, ...data.photos]);
+      setImages(data.photos);
+      setVisibleImages(data.photos.slice(0, 10)); // Initially show first 10 images
     } catch (error) {
       console.error('Error fetching images:', error);
       setError('Failed to fetch images. Please try again.');
@@ -49,13 +54,14 @@ const PexelsImagePanel = ({ onClose }) => {
   };
 
   useEffect(() => {
-    fetchImages(page);
+    fetchImages();
   }, [page]);
 
   const handleSearch = () => {
     setImages([]);
+    setVisibleImages([]);
     setPage(1);
-    fetchImages(1, searchTerm);
+    fetchImages(searchTerm);
   };
 
   const copyImageUrl = (url) => {
@@ -86,10 +92,19 @@ const PexelsImagePanel = ({ onClose }) => {
       </div>
       <div className="flex-grow overflow-y-auto p-4 space-y-4">
         {error && <p className="text-red-500">{error}</p>}
-        <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-3'} gap-4`}>
-          {images.map((image, index) => (
-            <div key={image.id} className="relative group" ref={index === images.length - 1 ? lastImageElementRef : null}>
-              <img src={image.src.medium} alt={image.alt} className="w-full h-auto rounded-lg" />
+        <div className={`grid ${isMobile ? 'grid-cols-2 gap-2' : 'grid-cols-2 gap-4'}`}>
+          {visibleImages.map((image, index) => (
+            <div 
+              key={image.id} 
+              className="relative group" 
+              ref={index === visibleImages.length - 1 ? lastImageElementRef : null}
+            >
+              <img 
+                src={image.src.medium} 
+                alt={image.alt} 
+                className="w-full h-auto rounded-lg object-cover"
+                style={{ aspectRatio: '16 / 9' }}
+              />
               <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <Button onClick={() => copyImageUrl(image.src.original)} className="mb-2 text-xs">
                   Copy URL
@@ -104,7 +119,7 @@ const PexelsImagePanel = ({ onClose }) => {
             </div>
           ))}
         </div>
-        {loading && <p className="text-center text-white">Loading more images...</p>}
+        {loading && <p className="text-center text-white">Loading images...</p>}
       </div>
     </div>
   );
