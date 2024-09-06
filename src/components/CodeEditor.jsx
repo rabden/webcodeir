@@ -187,6 +187,7 @@ const CodeEditor = () => {
         setShowSavedCodes={() => setState(s => ({ ...s, showSavedCodes: true, isMenuOpen: false }))}
         setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true, isMenuOpen: false }))}
         setShowIconPanel={() => setState(s => ({ ...s, showIconPanel: true, isMenuOpen: false }))}
+        setShowToolsPanel={() => setState(s => ({ ...s, showToolsPanel: true, isMenuOpen: false }))}
         saveCurrentCode={() => { saveCurrentCode(); setState(s => ({ ...s, isMenuOpen: false })); }}
       />
     </div>
