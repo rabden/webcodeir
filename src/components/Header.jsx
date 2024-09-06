@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Library } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Library, Search } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
@@ -12,6 +12,7 @@ const Header = ({
   setShowFontPanel,
   setShowIconPanel,
   setShowSettings,
+  setShowSearchPanel,
   setIsMenuOpen,
   toggleLayout,
   layout
@@ -125,6 +126,22 @@ const Header = ({
               </TooltipTrigger>
               <TooltipContent>
                 <p>Settings</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowSearchPanel(true)}
+                  className="text-white hover:bg-gray-700"
+                >
+                  <Search className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Search Google</p>
               </TooltipContent>
             </Tooltip>
 
