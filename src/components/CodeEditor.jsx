@@ -11,6 +11,7 @@ import IconPanel from './IconPanel';
 import ToolsPanel from './ToolsPanel';
 import MobilePreviewButton from './MobilePreviewButton';
 import KeyboardShortcutsPanel from './KeyboardShortcutsPanel';
+import UnsplashImagePanel from './UnsplashImagePanel';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
@@ -88,6 +89,10 @@ const CodeEditor = () => {
           case '/':
             e.preventDefault();
             setState(s => ({ ...s, showKeyboardShortcuts: !s.showKeyboardShortcuts }));
+            break;
+          case 'u':
+            e.preventDefault();
+            setState(s => ({ ...s, showUnsplashPanel: !s.showUnsplashPanel }));
             break;
         }
       }
@@ -199,6 +204,7 @@ const CodeEditor = () => {
         toggleLayout={toggleLayout}
         layout={state.settings.layout}
         setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true }))}
+        setShowUnsplashPanel={() => setState(s => ({ ...s, showUnsplashPanel: true }))}
       />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
@@ -211,6 +217,7 @@ const CodeEditor = () => {
       {state.showHtmlToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showHtmlToolsPanel: false }))} type="html" />}
       {state.showJsToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showJsToolsPanel: false }))} type="js" />}
       {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
+      {state.showUnsplashPanel && <UnsplashImagePanel onClose={() => setState(s => ({ ...s, showUnsplashPanel: false }))} />}
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
@@ -222,6 +229,7 @@ const CodeEditor = () => {
         setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true, isMenuOpen: false }))}
         setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true, isMenuOpen: false }))}
         setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true, isMenuOpen: false }))}
+        setShowUnsplashPanel={() => setState(s => ({ ...s, showUnsplashPanel: true, isMenuOpen: false }))}
         saveCurrentCode={() => { saveCurrentCode(); setState(s => ({ ...s, isMenuOpen: false })); }}
       />
     </div>

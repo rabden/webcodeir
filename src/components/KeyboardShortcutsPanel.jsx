@@ -15,6 +15,7 @@ const KeyboardShortcutsPanel = ({ onClose }) => {
     { key: 'Ctrl + P', description: 'Toggle preview (mobile)' },
     { key: 'Ctrl + M', description: 'Toggle mobile menu' },
     { key: 'Ctrl + /', description: 'Toggle keyboard shortcuts panel' },
+    { key: 'Ctrl + U', description: 'Toggle Unsplash image panel' },
   ];
 
   return (

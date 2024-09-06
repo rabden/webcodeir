@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Library, Keyboard } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Library, Keyboard, Image } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
@@ -15,7 +15,8 @@ const Header = ({
   setIsMenuOpen,
   toggleLayout,
   layout,
-  setShowKeyboardShortcuts
+  setShowKeyboardShortcuts,
+  setShowUnsplashPanel
 }) => {
   const getLayoutIcon = () => {
     switch (layout) {
@@ -158,6 +159,22 @@ const Header = ({
               </TooltipTrigger>
               <TooltipContent>
                 <p>Keyboard Shortcuts (Ctrl + /)</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowUnsplashPanel(true)}
+                  className="text-white hover:bg-gray-700"
+                >
+                  <Image className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Unsplash Images (Ctrl + U)</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
