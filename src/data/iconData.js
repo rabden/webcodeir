@@ -17,11 +17,8 @@ import {
   TrendingUp, Truck, Tv, Twitter, Type, Umbrella, Unlock, Upload, User, 
   UserCheck, UserMinus, UserPlus, UserX, Users, Video, Voicemail, Volume, 
   Watch, Wifi, Wind, X, XCircle, Youtube, Zap, ZoomIn, ZoomOut,
-  // Adding 30 more brand icons
-  Linkedin, Github, Gitlab, Bitbucket, Dribbble, Behance, Figma, Framer,
-  Sketch, Adobe, Notion, Slack, Discord, Twitch, Spotify, Apple, Android,
-  Windows, Linux, Amazon, Dropbox, Google, Microsoft, Paypal, Visa,
-  Mastercard, Airbnb, Uber, Lyft, Netflix
+  // Adding available brand icons
+  Linkedin, Github, Figma, Framer, Slack, Spotify, Apple, Chrome, Twitter, Youtube
 } from 'lucide-react';
 
 export const topIcons = {
@@ -46,9 +43,6 @@ export const topIcons = {
   Trello, TrendingDown, TrendingUp, Truck, Tv, Twitter, Type, Umbrella, UserCheck,
   UserMinus, UserPlus, UserX, Users, Voicemail, Watch, Wind, XCircle, Youtube,
   Zap, ZoomIn, ZoomOut,
-  // Adding the new brand icons
-  Linkedin, Github, Gitlab, Bitbucket, Dribbble, Behance, Figma, Framer,
-  Sketch, Adobe, Notion, Slack, Discord, Twitch, Spotify, Apple, Android,
-  Windows, Linux, Amazon, Dropbox, Google, Microsoft, Paypal, Visa,
-  Mastercard, Airbnb, Uber, Lyft, Netflix
+  // Adding available brand icons
+  Linkedin, Github, Figma, Framer, Slack, Spotify, Apple, Chrome, Twitter, Youtube
 };
