@@ -42,7 +42,7 @@ const CodeSnippetLibrary = ({ onClose, isMobile }) => {
   };
 
   return (
-    <div className={`fixed inset-y-4 right-4 ${isMobile ? 'left-4' : 'w-96'} bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden`}>
+    <div className="fixed inset-y-4 right-4 w-80 bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden">
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-xl font-bold text-white">Code Snippet Library</h2>
         <div className="flex items-center space-x-2">
@@ -78,7 +78,7 @@ const CodeSnippetLibrary = ({ onClose, isMobile }) => {
           placeholder="Search snippets..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="bg-gray-700 text-white border-gray-600"
+          className="w-full bg-gray-700 text-white border-gray-600"
         />
       </div>
       <ScrollArea className="flex-grow">
@@ -92,7 +92,7 @@ const CodeSnippetLibrary = ({ onClose, isMobile }) => {
                   Copy
                 </Button>
               </div>
-              <pre className="bg-gray-800 p-2 rounded text-sm text-white overflow-x-auto">
+              <pre className="bg-gray-800 p-2 rounded text-sm text-white overflow-x-auto whitespace-pre-wrap">
                 <code>{snippet.code}</code>
               </pre>
             </div>
