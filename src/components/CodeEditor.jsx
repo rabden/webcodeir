@@ -161,7 +161,7 @@ const CodeEditor = () => {
       {state.showJsToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showJsToolsPanel: false }))} type="js" />}
       {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
       {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
-      {state.showConsolePanel && <ConsolePanel onClose={() => setState(s => ({ ...s, showConsolePanel: false }))} />}
+      {state.showConsolePanel && <ConsolePanel onClose={() => setState(s => ({ ...s, showConsolePanel: false }))} isMobile={state.isMobile} />}
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}

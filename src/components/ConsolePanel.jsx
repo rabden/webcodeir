@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-const ConsolePanel = ({ onClose }) => {
+const ConsolePanel = ({ onClose, isMobile }) => {
   const [logs, setLogs] = useState([]);
   const [input, setInput] = useState('');
   const scrollAreaRef = useRef(null);
@@ -63,7 +63,7 @@ const ConsolePanel = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 h-64 bg-gray-900 text-white shadow-lg z-50 flex flex-col">
+    <div className={`fixed ${isMobile ? 'inset-0' : 'inset-x-0 bottom-0 h-64'} bg-gray-900 text-white shadow-lg z-50 flex flex-col`}>
       <div className="flex justify-between items-center p-2 border-b border-gray-700">
         <h3 className="text-lg font-semibold">Console</h3>
         <div className="flex space-x-2">
