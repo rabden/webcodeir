@@ -92,7 +92,7 @@ const CodeSnippetLibrary = ({ onClose, isMobile }) => {
                   Copy
                 </Button>
               </div>
-              <pre className="bg-gray-800 p-2 rounded text-sm text-white overflow-x-auto whitespace-pre-wrap">
+              <pre className="bg-gray-800 p-2 rounded text-sm text-white overflow-x-auto whitespace-pre-wrap break-all">
                 <code>{snippet.code}</code>
               </pre>
             </div>
