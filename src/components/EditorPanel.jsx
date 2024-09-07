@@ -32,9 +32,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       EditorView.theme({
         "&": { height: "100%", overflow: "auto" },
         ".cm-scroller": { overflow: "auto" },
-        ".cm-content": { whiteSpace: "pre !important", paddingBottom: "50vh" }
+        ".cm-content": { whiteSpace: "pre !important", paddingBottom: "50vh" },
+        "&::-webkit-scrollbar": { height: "0px" },
+        "&::-webkit-scrollbar-track": { background: "transparent" },
+        "&::-webkit-scrollbar-thumb": { background: "transparent" },
       }),
-      EditorView.lineWrapping
     ];
 
     if (settings.enableAutocompletion) {
