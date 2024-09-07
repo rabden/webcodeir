@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Library, Keyboard, Image, Terminal } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Library, Keyboard, Image, Terminal, BookMarked } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,7 +21,9 @@ const Header = ({
   activeTab,
   setActiveTab,
   toggleConsole,
-  showConsole
+  showConsole,
+  toggleSnippetLibrary,
+  showSnippetLibrary
 }) => {
   const getLayoutIcon = () => {
     switch (layout) {
@@ -89,6 +91,7 @@ const Header = ({
             {renderButton(getLayoutIcon(), toggleLayout, "Toggle Layout (Ctrl + L)")}
             {renderButton(<Keyboard className="w-5 h-5" />, () => setShowKeyboardShortcuts(true), "Keyboard Shortcuts (Ctrl + /)")}
             {renderButton(<Terminal className="w-5 h-5" />, toggleConsole, `${showConsole ? 'Hide' : 'Show'} Console (Ctrl + J)`)}
+            {renderButton(<BookMarked className="w-5 h-5" />, toggleSnippetLibrary, `${showSnippetLibrary ? 'Hide' : 'Show'} Snippet Library (Ctrl + B)`)}
             {renderButton(<SettingsIcon className="w-5 h-5" />, () => setShowSettings(true), "Settings (Ctrl + ,)")}
           </TooltipProvider>
         </div>

@@ -13,6 +13,7 @@ import MobilePreviewButton from './MobilePreviewButton';
 import KeyboardShortcutsPanel from './KeyboardShortcutsPanel';
 import PexelsImagePanel from './PexelsImagePanel';
 import ConsolePanel from './ConsolePanel';
+import CodeSnippetLibrary from './CodeSnippetLibrary';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
@@ -21,6 +22,7 @@ const CodeEditor = () => {
   const { saveToLocalStorage, loadFromLocalStorage } = useLocalStorage(setState);
   const [activeTab, setActiveTab] = useState('html');
   const [showConsole, setShowConsole] = useState(false);
+  const [showSnippetLibrary, setShowSnippetLibrary] = useState(false);
 
   useEffect(() => {
     loadFromLocalStorage();
@@ -52,6 +54,7 @@ const CodeEditor = () => {
           case '/': e.preventDefault(); setState(s => ({ ...s, showKeyboardShortcuts: !s.showKeyboardShortcuts })); break;
           case 'u': e.preventDefault(); setState(s => ({ ...s, showPexelsPanel: !s.showPexelsPanel })); break;
           case 'j': e.preventDefault(); setShowConsole(s => !s); break;
+          case 'b': e.preventDefault(); setShowSnippetLibrary(s => !s); break;
         }
       }
     };
@@ -172,6 +175,8 @@ const CodeEditor = () => {
         setActiveTab={setActiveTab}
         toggleConsole={() => setShowConsole(s => !s)}
         showConsole={showConsole}
+        toggleSnippetLibrary={() => setShowSnippetLibrary(s => !s)}
+        showSnippetLibrary={showSnippetLibrary}
       />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
@@ -186,6 +191,7 @@ const CodeEditor = () => {
       {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
       {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
       {showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.isMobile} />}
+      {showSnippetLibrary && <CodeSnippetLibrary onClose={() => setShowSnippetLibrary(false)} isMobile={state.isMobile} />}
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
@@ -201,6 +207,8 @@ const CodeEditor = () => {
         saveCurrentCode={() => { saveCurrentCode(); setState(s => ({ ...s, isMenuOpen: false })); }}
         toggleConsole={() => { setShowConsole(s => !s); setState(s => ({ ...s, isMenuOpen: false })); }}
         showConsole={showConsole}
+        toggleSnippetLibrary={() => { setShowSnippetLibrary(s => !s); setState(s => ({ ...s, isMenuOpen: false })); }}
+        showSnippetLibrary={showSnippetLibrary}
       />
     </div>
   );
