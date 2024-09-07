@@ -54,9 +54,9 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         "&": { height: "100%", overflow: "auto" },
         ".cm-scroller": { overflow: "auto" },
         ".cm-content": { whiteSpace: "pre !important", paddingBottom: "50vh" },
-        "&::-webkit-scrollbar": { width: "6px", height: "6px" },
+        "&::-webkit-scrollbar": { width: "2px", height: "2px" },
         "&::-webkit-scrollbar-track": { background: "transparent" },
-        "&::-webkit-scrollbar-thumb": { background: "rgba(255, 255, 255, 0.1)", borderRadius: "3px" },
+        "&::-webkit-scrollbar-thumb": { background: "rgba(255, 255, 255, 0.1)", borderRadius: "1px" },
       }),
     ];
 
