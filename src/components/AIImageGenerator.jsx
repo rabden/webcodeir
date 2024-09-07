@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X } from 'lucide-react';
+import { X, MoreVertical, Download, Copy, Image } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/components/ui/use-toast";
 
 const AIImageGenerator = ({ onClose }) => {
   const [prompt, setPrompt] = useState('');
@@ -15,6 +17,7 @@ const AIImageGenerator = ({ onClose }) => {
   const [numInferenceSteps, setNumInferenceSteps] = useState(4);
   const [generatedImages, setGeneratedImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   async function query(data) {
     const response = await fetch(
@@ -46,12 +49,38 @@ const AIImageGenerator = ({ onClose }) => {
         }
       });
       const imageUrl = URL.createObjectURL(result);
-      setGeneratedImages(prevImages => [imageUrl, ...prevImages]);
+      setGeneratedImages(prevImages => [{ url: imageUrl, seed: currentSeed }, ...prevImages]);
       setSeed(currentSeed);
     } catch (error) {
       console.error("Error generating image:", error);
     }
     setIsLoading(false);
+  };
+
+  const handleDownload = (imageUrl) => {
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = `generated-image-${Date.now()}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleCopyLink = (imageUrl) => {
+    navigator.clipboard.writeText(imageUrl);
+    toast({
+      title: "Link Copied",
+      description: "Image link has been copied to clipboard",
+    });
+  };
+
+  const handleCopyImgTag = (imageUrl) => {
+    const imgTag = `<img src="${imageUrl}" alt="Generated AI Image" />`;
+    navigator.clipboard.writeText(imgTag);
+    toast({
+      title: "Image Tag Copied",
+      description: "Image tag has been copied to clipboard",
+    });
   };
 
   return (
@@ -135,9 +164,35 @@ const AIImageGenerator = ({ onClose }) => {
         <div className="w-full md:w-2/3 p-4">
           <ScrollArea className="h-full">
             <div className="space-y-4">
-              {generatedImages.map((imageUrl, index) => (
+              {generatedImages.map((image, index) => (
                 <div key={index} className="relative">
-                  <img src={imageUrl} alt={`Generated image ${index + 1}`} className="w-full rounded-lg" />
+                  <img src={image.url} alt={`Generated image ${index + 1}`} className="w-full rounded-lg" />
+                  <div className="absolute top-2 right-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="secondary" size="icon">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleDownload(image.url)}>
+                          <Download className="mr-2 h-4 w-4" />
+                          <span>Download</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleCopyLink(image.url)}>
+                          <Copy className="mr-2 h-4 w-4" />
+                          <span>Copy Link</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleCopyImgTag(image.url)}>
+                          <Image className="mr-2 h-4 w-4" />
+                          <span>Copy &lt;img&gt; Tag</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                  <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
+                    Seed: {image.seed}
+                  </div>
                 </div>
               ))}
             </div>
