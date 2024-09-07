@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { X, Save, BookOpen, Settings as SettingsIcon, ChevronDown, ChevronUp, Library, Wrench } from 'lucide-react';
+import { X, Save, BookOpen, Settings as SettingsIcon, ChevronDown, ChevronUp, Library, Wrench, Image } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, setShowKeyboardShortcuts, setShowPexelsPanel, saveCurrentCode, toggleConsole, showConsole, toggleSnippetLibrary, showSnippetLibrary }) => {
+const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, setShowKeyboardShortcuts, setShowPexelsPanel, saveCurrentCode, toggleConsole, showConsole, toggleSnippetLibrary, showSnippetLibrary, toggleAIImagePanel, showAIImagePanel }) => {
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
 
@@ -34,6 +34,7 @@ const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, set
             <MenuButton label="Icon Library" onClick={() => { setShowIconPanel(true); setIsOpen(false); }} />
             <MenuButton label="Pexels Images" onClick={() => { setShowPexelsPanel(true); setIsOpen(false); }} />
             <MenuButton label={`${showSnippetLibrary ? 'Hide' : 'Show'} Snippet Library`} onClick={() => { toggleSnippetLibrary(); setIsOpen(false); }} />
+            <MenuButton label={`${showAIImagePanel ? 'Hide' : 'Show'} AI Image Generator`} onClick={() => { toggleAIImagePanel(); setIsOpen(false); }} />
           </CollapsibleContent>
         </Collapsible>
 

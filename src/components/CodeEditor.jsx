@@ -14,6 +14,7 @@ import KeyboardShortcutsPanel from './KeyboardShortcutsPanel';
 import PexelsImagePanel from './PexelsImagePanel';
 import ConsolePanel from './ConsolePanel';
 import CodeSnippetLibrary from './CodeSnippetLibrary';
+import FluxAIImageGenerator from './FluxAIImageGenerator';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
@@ -23,6 +24,7 @@ const CodeEditor = () => {
   const [activeTab, setActiveTab] = useState('html');
   const [showConsole, setShowConsole] = useState(false);
   const [showSnippetLibrary, setShowSnippetLibrary] = useState(false);
+  const [showAIImagePanel, setShowAIImagePanel] = useState(false);
 
   useEffect(() => {
     loadFromLocalStorage();
@@ -38,29 +40,6 @@ const CodeEditor = () => {
     }, 300);
     return () => clearTimeout(debounce);
   }, [state.htmlCode, state.cssCode, state.jsCode, state.settings.autoSave]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.ctrlKey) {
-        switch (e.key) {
-          case 's': e.preventDefault(); saveCurrentCode(); break;
-          case 'o': e.preventDefault(); setState(s => ({ ...s, showSavedCodes: true })); break;
-          case 'f': e.preventDefault(); setState(s => ({ ...s, showFontPanel: true })); break;
-          case 'i': e.preventDefault(); setState(s => ({ ...s, showIconPanel: true })); break;
-          case ',': e.preventDefault(); setState(s => ({ ...s, showSettings: true })); break;
-          case 'l': e.preventDefault(); toggleLayout(); break;
-          case 'p': e.preventDefault(); if (state.isMobile) setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview })); break;
-          case 'm': e.preventDefault(); if (state.isMobile) setState(s => ({ ...s, isMenuOpen: !s.isMenuOpen })); break;
-          case '/': e.preventDefault(); setState(s => ({ ...s, showKeyboardShortcuts: !s.showKeyboardShortcuts })); break;
-          case 'u': e.preventDefault(); setState(s => ({ ...s, showPexelsPanel: !s.showPexelsPanel })); break;
-          case 'j': e.preventDefault(); setShowConsole(s => !s); break;
-          case 'b': e.preventDefault(); setShowSnippetLibrary(s => !s); break;
-        }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [state.isMobile]);
 
   const updatePreview = () => {
     setState(s => ({
@@ -177,6 +156,8 @@ const CodeEditor = () => {
         showConsole={showConsole}
         toggleSnippetLibrary={() => setShowSnippetLibrary(s => !s)}
         showSnippetLibrary={showSnippetLibrary}
+        toggleAIImagePanel={() => setShowAIImagePanel(s => !s)}
+        showAIImagePanel={showAIImagePanel}
       />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
@@ -191,7 +172,8 @@ const CodeEditor = () => {
       {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
       {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
       {showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.isMobile} />}
-      {showSnippetLibrary && <CodeSnippetLibrary onClose={() => setShowSnippetLibrary(false)} isMobile={state.isMobile} />}
+      {showSnippetLibrary && <CodeSnippetLibrary onClose={() => setShowSnippetLibrary(false)} isMobile={state.iMobile} />}
+      {showAIImagePanel && <FluxAIImageGenerator onClose={() => setShowAIImagePanel(false)} isMobile={state.iMobile} />}
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
@@ -209,6 +191,8 @@ const CodeEditor = () => {
         showConsole={showConsole}
         toggleSnippetLibrary={() => { setShowSnippetLibrary(s => !s); setState(s => ({ ...s, isMenuOpen: false })); }}
         showSnippetLibrary={showSnippetLibrary}
+        toggleAIImagePanel={() => { setShowAIImagePanel(s => !s); setState(s => ({ ...s, isMenuOpen: false })); }}
+        showAIImagePanel={showAIImagePanel}
       />
     </div>
   );
