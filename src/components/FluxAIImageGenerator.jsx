@@ -6,7 +6,8 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
-import { Download, Link, Image as ImageIcon } from 'lucide-react';
+import { Download, Link, Image as ImageIcon, MoreVertical } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const FluxAIImageGenerator = ({ onClose, isMobile }) => {
   const [prompt, setPrompt] = useState('');
@@ -141,21 +142,30 @@ const FluxAIImageGenerator = ({ onClose, isMobile }) => {
   const renderImages = () => (
     <div className="grid grid-cols-2 gap-4">
       {generatedImages.map((imageUrl, index) => (
-        <div key={index} className="space-y-2">
+        <div key={index} className="relative">
           <img src={imageUrl} alt={`Generated ${index + 1}`} className="w-full rounded-lg" />
-          <div className="flex space-x-2">
-            <Button onClick={() => handleImageAction('download', imageUrl)} size="sm">
-              <Download className="w-4 h-4 mr-2" />
-              Download
-            </Button>
-            <Button onClick={() => handleImageAction('copyLink', imageUrl)} size="sm">
-              <Link className="w-4 h-4 mr-2" />
-              Copy Link
-            </Button>
-            <Button onClick={() => handleImageAction('copyTag', imageUrl)} size="sm">
-              <ImageIcon className="w-4 h-4 mr-2" />
-              Copy Tag
-            </Button>
+          <div className="absolute top-2 right-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="bg-black bg-opacity-50 text-white hover:bg-opacity-75">
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-gray-800 text-white border-gray-700">
+                <DropdownMenuItem onSelect={() => handleImageAction('download', imageUrl)}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Download
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => handleImageAction('copyLink', imageUrl)}>
+                  <Link className="w-4 h-4 mr-2" />
+                  Copy Link
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => handleImageAction('copyTag', imageUrl)}>
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  Copy Image Tag
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       ))}
