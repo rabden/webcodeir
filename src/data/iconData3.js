@@ -11,7 +11,7 @@ import {
   Cloud, Sun, Moon, Wind, Rainbow, Umbrella, Snowflake, Droplet, Thermometer,
 
   // Technology and devices
-  Smartphone, Tablet, Laptop, Desktop, Tv, Radio, Headphones, Speaker, Battery, Wifi,
+  Smartphone, Tablet, Laptop, Tv, Radio, Headphones, Speaker, Battery, Wifi,
 
   // Communication and social
   Mail, MessageCircle, MessageSquare, Send, Share, Phone, Video, Camera, Mic, VolumeX,
@@ -63,7 +63,7 @@ export const extraIcons = {
   Cloud, Sun, Moon, Wind, Rainbow, Umbrella, Snowflake, Droplet, Thermometer,
 
   // Technology and devices
-  Smartphone, Tablet, Laptop, Desktop, Tv, Radio, Headphones, Speaker, Battery, Wifi,
+  Smartphone, Tablet, Laptop, Tv, Radio, Headphones, Speaker, Battery, Wifi,
 
   // Communication and social
   Mail, MessageCircle, MessageSquare, Send, Share, Phone, Video, Camera, Mic, VolumeX,
