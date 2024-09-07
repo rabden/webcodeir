@@ -14,7 +14,6 @@ import KeyboardShortcutsPanel from './KeyboardShortcutsPanel';
 import PexelsImagePanel from './PexelsImagePanel';
 import ConsolePanel from './ConsolePanel';
 import CodeSnippetLibrary from './CodeSnippetLibrary';
-import FluxAIImageGenerator from './FluxAIImageGenerator';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
@@ -24,7 +23,6 @@ const CodeEditor = () => {
   const [activeTab, setActiveTab] = useState('html');
   const [showConsole, setShowConsole] = useState(false);
   const [showSnippetLibrary, setShowSnippetLibrary] = useState(false);
-  const [showAIImagePanel, setShowAIImagePanel] = useState(false);
 
   useEffect(() => {
     loadFromLocalStorage();
@@ -156,8 +154,6 @@ const CodeEditor = () => {
         showConsole={showConsole}
         toggleSnippetLibrary={() => setShowSnippetLibrary(s => !s)}
         showSnippetLibrary={showSnippetLibrary}
-        toggleAIImagePanel={() => setShowAIImagePanel(s => !s)}
-        showAIImagePanel={showAIImagePanel}
       />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
@@ -173,7 +169,6 @@ const CodeEditor = () => {
       {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
       {showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.isMobile} />}
       {showSnippetLibrary && <CodeSnippetLibrary onClose={() => setShowSnippetLibrary(false)} isMobile={state.iMobile} />}
-      {showAIImagePanel && <FluxAIImageGenerator onClose={() => setShowAIImagePanel(false)} isMobile={state.iMobile} />}
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
@@ -191,8 +186,6 @@ const CodeEditor = () => {
         showConsole={showConsole}
         toggleSnippetLibrary={() => { setShowSnippetLibrary(s => !s); setState(s => ({ ...s, isMenuOpen: false })); }}
         showSnippetLibrary={showSnippetLibrary}
-        toggleAIImagePanel={() => { setShowAIImagePanel(s => !s); setState(s => ({ ...s, isMenuOpen: false })); }}
-        showAIImagePanel={showAIImagePanel}
       />
     </div>
   );

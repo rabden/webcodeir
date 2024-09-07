@@ -28,8 +28,6 @@ const Header = ({
   setShowCssToolsPanel,
   setShowHtmlToolsPanel,
   setShowJsToolsPanel,
-  toggleAIImagePanel,
-  showAIImagePanel
 }) => {
   const getLayoutIcon = () => {
     switch (layout) {
@@ -116,10 +114,6 @@ const Header = ({
                 <DropdownMenuItem onSelect={toggleSnippetLibrary}>
                   <Code className="w-4 h-4 mr-2" />
                   <span>{showSnippetLibrary ? 'Hide' : 'Show'} Snippet Library</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={toggleAIImagePanel}>
-                  <Image className="w-4 h-4 mr-2" />
-                  <span>{showAIImagePanel ? 'Hide' : 'Show'} AI Image Generator</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
