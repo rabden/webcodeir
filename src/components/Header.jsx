@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Keyboard, ChevronDown } from 'lucide-react';
+import { Settings as SettingsIcon, Save, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Keyboard, Library, Wrench, BookOpen, Font, Image, Code, Terminal, Palette } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -90,33 +90,56 @@ const Header = ({
             {renderButton(<Save className="w-5 h-5" />, saveCurrentCode, "Save current code (Ctrl + S)")}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="text-white hover:bg-gray-700">
-                  Library <ChevronDown className="ml-1 h-4 w-4" />
+                <Button variant="ghost" size="icon" className="text-white hover:bg-gray-700">
+                  <Library className="w-5 h-5" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-gray-700 text-white">
-                <DropdownMenuItem onSelect={() => setShowSavedCodes(true)}>Saved Codes</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowFontPanel(true)}>Font Library</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowIconPanel(true)}>Icon Library</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowPexelsPanel(true)}>Pexels Images</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowSavedCodes(true)}>
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  <span>Saved Codes</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowFontPanel(true)}>
+                  <Font className="w-4 h-4 mr-2" />
+                  <span>Font Library</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowIconPanel(true)}>
+                  <Image className="w-4 h-4 mr-2" />
+                  <span>Icon Library</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowPexelsPanel(true)}>
+                  <Image className="w-4 h-4 mr-2" />
+                  <span>Pexels Images</span>
+                </DropdownMenuItem>
                 <DropdownMenuItem onSelect={toggleSnippetLibrary}>
-                  {showSnippetLibrary ? 'Hide' : 'Show'} Snippet Library
+                  <Code className="w-4 h-4 mr-2" />
+                  <span>{showSnippetLibrary ? 'Hide' : 'Show'} Snippet Library</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="text-white hover:bg-gray-700">
-                  Tools <ChevronDown className="ml-1 h-4 w-4" />
+                <Button variant="ghost" size="icon" className="text-white hover:bg-gray-700">
+                  <Wrench className="w-5 h-5" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-gray-700 text-white">
                 <DropdownMenuItem onSelect={toggleConsole}>
-                  {showConsole ? 'Hide' : 'Show'} Console
+                  <Terminal className="w-4 h-4 mr-2" />
+                  <span>{showConsole ? 'Hide' : 'Show'} Console</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowHtmlToolsPanel(true)}>HTML Tools</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowCssToolsPanel(true)}>CSS Tools</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowJsToolsPanel(true)}>JS Tools</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowHtmlToolsPanel(true)}>
+                  <Code className="w-4 h-4 mr-2" />
+                  <span>HTML Tools</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowCssToolsPanel(true)}>
+                  <Palette className="w-4 h-4 mr-2" />
+                  <span>CSS Tools</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowJsToolsPanel(true)}>
+                  <Code className="w-4 h-4 mr-2" />
+                  <span>JS Tools</span>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             {renderButton(getLayoutIcon(), toggleLayout, "Toggle Layout (Ctrl + L)")}
