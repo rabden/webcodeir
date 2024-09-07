@@ -19,14 +19,10 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
 
   const getLanguageExtension = (lang) => {
     switch (lang) {
-      case 'html':
-        return html();
-      case 'css':
-        return css();
-      case 'javascript':
-        return javascript();
-      default:
-        return null;
+      case 'html': return html();
+      case 'css': return css();
+      case 'javascript': return javascript();
+      default: return null;
     }
   };
 
@@ -34,18 +30,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     const languageExtension = getLanguageExtension(lang);
     const extensions = [
       languageExtension,
-      EditorView.lineWrapping,
+      EditorView.lineWrapping.of(false),
       EditorView.theme({
-        "&": {
-          height: "100%",
-          overflow: "auto"
-        },
-        ".cm-scroller": {
-          overflow: "auto"
-        },
-        ".cm-content": {
-          paddingBottom: "50vh"
-        }
+        "&": { height: "100%", overflow: "auto" },
+        ".cm-scroller": { overflow: "auto" },
+        ".cm-content": { paddingBottom: "50vh" }
       })
     ];
 
@@ -117,9 +106,6 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               bracketMatching: settings.matchBrackets,
             }}
             indentWithTab={settings.indentWithTabs}
-            minimalSetup={{
-              minimap: settings.minimap ? { enabled: true } : { enabled: false },
-            }}
           />
         </div>
       </div>
@@ -128,6 +114,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
 
   const renderTabMode = () => (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
+      <TabsList className="bg-gray-800 p-1">
+        <TabsTrigger value="html" className="text-white">HTML</TabsTrigger>
+        <TabsTrigger value="css" className="text-white">CSS</TabsTrigger>
+        <TabsTrigger value="js" className="text-white">JS</TabsTrigger>
+      </TabsList>
       <div className="flex-grow overflow-hidden">
         <TabsContent value="html" className="h-full">
           {renderEditor('html', htmlCode, setHtmlCode, setShowHtmlToolsPanel)}
