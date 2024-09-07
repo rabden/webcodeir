@@ -54,8 +54,8 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         "&": { height: "100%", overflow: "auto" },
         ".cm-scroller": { overflow: "auto" },
         ".cm-content": { 
-          whiteSpace: isMobile ? "pre !important" : "pre-wrap !important",
-          wordBreak: isMobile ? "normal" : "break-word",
+          whiteSpace: isMobile || activeTab ? "pre !important" : "pre-wrap !important",
+          wordBreak: isMobile || activeTab ? "normal" : "break-word",
           paddingBottom: "50vh"
         },
         "&::-webkit-scrollbar": { width: "2px", height: "2px" },
