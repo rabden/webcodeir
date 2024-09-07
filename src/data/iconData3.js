@@ -29,7 +29,7 @@ import {
   Clock, Calendar, Watch, Hourglass, Sunrise, Sunset,
 
   // Tools and utilities
-  Tool, Wrench, Scissors, Key, Lock, Unlock, Map, Compass, Flag, Bookmark,
+  Wrench, Scissors, Key, Lock, Unlock, Map, Compass, Flag, Bookmark,
 
   // Media controls
   Play, Pause, Stop, SkipBack, SkipForward, Volume, Volume1, Volume2,
@@ -81,7 +81,7 @@ export const extraIcons = {
   Clock, Calendar, Watch, Hourglass, Sunrise, Sunset,
 
   // Tools and utilities
-  Tool, Wrench, Scissors, Key, Lock, Unlock, Map, Compass, Flag, Bookmark,
+  Wrench, Scissors, Key, Lock, Unlock, Map, Compass, Flag, Bookmark,
 
   // Media controls
   Play, Pause, Stop, SkipBack, SkipForward, Volume, Volume1, Volume2,
