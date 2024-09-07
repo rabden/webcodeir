@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Keyboard, Library, Wrench, BookOpen, Font, Image, Code, Terminal, Palette } from 'lucide-react';
+import { Settings as SettingsIcon, Save, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Keyboard, Library, Wrench, BookOpen, Type, Image, Code, Terminal, Palette } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -100,7 +100,7 @@ const Header = ({
                   <span>Saved Codes</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setShowFontPanel(true)}>
-                  <Font className="w-4 h-4 mr-2" />
+                  <Type className="w-4 h-4 mr-2" />
                   <span>Font Library</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setShowIconPanel(true)}>
