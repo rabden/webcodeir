@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { Download, Link, Image as ImageIcon, MoreVertical } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const FluxAIImageGenerator = ({ onClose, isMobile }) => {
   const [prompt, setPrompt] = useState('');
@@ -147,36 +148,38 @@ const FluxAIImageGenerator = ({ onClose, isMobile }) => {
   );
 
   const renderImages = () => (
-    <div className="grid grid-cols-2 gap-4">
-      {generatedImages.map((imageUrl, index) => (
-        <div key={index} className="relative">
-          <img src={imageUrl} alt={`Generated ${index + 1}`} className="w-full rounded-lg" />
-          <div className="absolute top-2 right-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="bg-black bg-opacity-50 text-white hover:bg-opacity-75">
-                  <MoreVertical className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-gray-800 text-white border-gray-700">
-                <DropdownMenuItem onSelect={() => handleImageAction('download', imageUrl)}>
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => handleImageAction('copyLink', imageUrl)}>
-                  <Link className="w-4 h-4 mr-2" />
-                  Copy Link
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => handleImageAction('copyTag', imageUrl)}>
-                  <ImageIcon className="w-4 h-4 mr-2" />
-                  Copy Image Tag
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+    <ScrollArea className="h-[400px] w-full">
+      <div className="grid grid-cols-2 gap-4 p-4">
+        {generatedImages.map((imageUrl, index) => (
+          <div key={index} className="relative">
+            <img src={imageUrl} alt={`Generated ${index + 1}`} className="w-full rounded-lg" />
+            <div className="absolute top-2 right-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="bg-black bg-opacity-50 text-white hover:bg-opacity-75">
+                    <MoreVertical className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-gray-800 text-white border-gray-700">
+                  <DropdownMenuItem onSelect={() => handleImageAction('download', imageUrl)}>
+                    <Download className="w-4 h-4 mr-2" />
+                    Download
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => handleImageAction('copyLink', imageUrl)}>
+                    <Link className="w-4 h-4 mr-2" />
+                    Copy Link
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => handleImageAction('copyTag', imageUrl)}>
+                    <ImageIcon className="w-4 h-4 mr-2" />
+                    Copy Image Tag
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </ScrollArea>
   );
 
   return (
