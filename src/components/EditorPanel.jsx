@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
@@ -15,6 +15,7 @@ import { Palette, Code, Wrench } from 'lucide-react';
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, isMobile, activeTab }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
+  const editorRef = useRef(null);
 
   const getLanguageExtension = (lang) => {
     switch (lang) {
@@ -25,6 +26,26 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     }
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (editorRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = editorRef.current;
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px threshold
+        editorRef.current.style.overflowX = isAtBottom ? 'auto' : 'hidden';
+      }
+    };
+
+    if (editorRef.current) {
+      editorRef.current.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (editorRef.current) {
+        editorRef.current.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);
+
   const renderEditor = (lang, codeValue, setCodeValue, setShowToolsPanel) => {
     const languageExtension = getLanguageExtension(lang);
     const extensions = [
@@ -33,9 +54,9 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         "&": { height: "100%", overflow: "auto" },
         ".cm-scroller": { overflow: "auto" },
         ".cm-content": { whiteSpace: "pre !important", paddingBottom: "50vh" },
-        "&::-webkit-scrollbar": { height: "0px" },
+        "&::-webkit-scrollbar": { width: "6px", height: "6px" },
         "&::-webkit-scrollbar-track": { background: "transparent" },
-        "&::-webkit-scrollbar-thumb": { background: "transparent" },
+        "&::-webkit-scrollbar-thumb": { background: "rgba(255, 255, 255, 0.1)", borderRadius: "3px" },
       }),
     ];
 
@@ -84,7 +105,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             </button>
           </div>
         )}
-        <div className="flex-grow overflow-hidden">
+        <div className="flex-grow overflow-hidden" ref={editorRef}>
           <CodeMirror
             value={codeValue}
             height="100%"
