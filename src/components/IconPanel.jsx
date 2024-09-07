@@ -2,47 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { X, Search, Check } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { topIcons } from '../data/iconData';
 import { additionalIcons } from '../data/iconData2';
 import { extraIcons } from '../data/iconData3';
 import ReactDOMServer from 'react-dom/server';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-library.add(fas);
 
 const IconPanel = ({ onClose, isMobile }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedIcon, setCopiedIcon] = useState(null);
   const [filteredIcons, setFilteredIcons] = useState([]);
-  const [iconSource, setIconSource] = useState('lucide');
 
-  const allLucideIcons = { ...topIcons, ...additionalIcons, ...extraIcons };
-  const allFontAwesomeIcons = Object.keys(fas);
+  const allIcons = { ...topIcons, ...additionalIcons, ...extraIcons };
 
   useEffect(() => {
-    const results = iconSource === 'lucide'
-      ? Object.keys(allLucideIcons).filter(iconName => 
-          iconName.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      : allFontAwesomeIcons.filter(iconName => 
-          iconName.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+    const results = Object.keys(allIcons).filter(iconName => 
+      iconName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
     setFilteredIcons(results);
-  }, [searchTerm, iconSource]);
+  }, [searchTerm]);
 
   const copyToClipboard = (iconName) => {
-    let svgString;
-    if (iconSource === 'lucide') {
-      const IconComponent = allLucideIcons[iconName];
-      const iconElement = React.createElement(IconComponent, { width: 24, height: 24 });
-      svgString = ReactDOMServer.renderToStaticMarkup(iconElement);
-    } else {
-      const iconElement = <FontAwesomeIcon icon={['fas', iconName]} size="lg" />;
-      svgString = ReactDOMServer.renderToStaticMarkup(iconElement);
-    }
+    const IconComponent = allIcons[iconName];
+    const iconElement = React.createElement(IconComponent, { width: 24, height: 24 });
+    const svgString = ReactDOMServer.renderToStaticMarkup(iconElement);
     
     navigator.clipboard.writeText(svgString);
 
@@ -58,16 +40,7 @@ const IconPanel = ({ onClose, isMobile }) => {
           <X className="w-5 h-5 text-white" />
         </button>
       </div>
-      <div className="p-4 space-y-4">
-        <Select value={iconSource} onValueChange={setIconSource}>
-          <SelectTrigger className="w-full bg-gray-700 text-white border-gray-600">
-            <SelectValue placeholder="Select Icon Source" />
-          </SelectTrigger>
-          <SelectContent className="bg-gray-700 text-white border-gray-600">
-            <SelectItem value="lucide">Lucide Icons</SelectItem>
-            <SelectItem value="fontawesome">Font Awesome Icons</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="p-4">
         <div className="relative">
           <input
             type="text"
@@ -82,7 +55,7 @@ const IconPanel = ({ onClose, isMobile }) => {
       <div className="flex-grow overflow-y-auto p-4">
         <div className={`grid ${isMobile ? 'grid-cols-5 gap-2' : 'grid-cols-4 gap-4'}`}>
           {filteredIcons.map((iconName) => {
-            const IconComponent = iconSource === 'lucide' ? allLucideIcons[iconName] : FontAwesomeIcon;
+            const IconComponent = allIcons[iconName];
             return (
               <TooltipProvider key={iconName}>
                 <Tooltip>
@@ -95,11 +68,7 @@ const IconPanel = ({ onClose, isMobile }) => {
                       {copiedIcon === iconName ? (
                         <Check className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'} text-green-500`} />
                       ) : (
-                        iconSource === 'lucide' ? (
-                          <IconComponent className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'}`} />
-                        ) : (
-                          <FontAwesomeIcon icon={['fas', iconName]} className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'}`} />
-                        )
+                        <IconComponent className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'}`} />
                       )}
                     </Button>
                   </TooltipTrigger>
