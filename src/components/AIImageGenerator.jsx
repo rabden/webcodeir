@@ -75,11 +75,13 @@ const AIImageGenerator = ({ onClose }) => {
           </div>
           <div>
             <label className="text-sm font-medium text-white">Seed: {seed}</label>
-            <Input
-              type="number"
-              value={seed}
-              onChange={(e) => setSeed(parseInt(e.target.value))}
-              className="bg-gray-700 text-white border-gray-600"
+            <Slider
+              value={[seed]}
+              onValueChange={(value) => setSeed(value[0])}
+              min={0}
+              max={1000000}
+              step={1}
+              className="bg-gray-700"
               disabled={randomizeSeed}
             />
           </div>
