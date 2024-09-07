@@ -68,14 +68,6 @@ const Settings = ({ settings, setSettings, onClose, isMobile }) => {
             onCheckedChange={(checked) => handleChange('lineNumbers', checked)}
           />
         </div>
-        <div className="flex items-center justify-between">
-          <label htmlFor="wordWrap" className="text-white">Word Wrap</label>
-          <Switch
-            id="wordWrap"
-            checked={settings.wordWrap}
-            onCheckedChange={(checked) => handleChange('wordWrap', checked)}
-          />
-        </div>
         <div>
           <label className="block mb-2 text-white">Indentation</label>
           <select

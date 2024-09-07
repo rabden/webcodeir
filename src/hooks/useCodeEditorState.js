@@ -17,7 +17,6 @@ export const useCodeEditorState = () => {
       autoSave: true,
       tabSize: 2,
       lineNumbers: true,
-      wordWrap: false,
       indentWithTabs: true,
       highlightActiveLine: true,
       layout: 'horizontal',
