@@ -1,8 +1,12 @@
-import React from 'react';
-import { X, Save, BookOpen, Settings as SettingsIcon, Type, Library, Palette, Code, Wrench, Keyboard, Image, Terminal, BookMarked } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Save, BookOpen, Settings as SettingsIcon, ChevronDown, ChevronUp, Library, Wrench } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, setShowKeyboardShortcuts, setShowPexelsPanel, saveCurrentCode, toggleConsole, showConsole, toggleSnippetLibrary, showSnippetLibrary }) => {
+  const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+  const [isToolsOpen, setIsToolsOpen] = useState(false);
+
   return (
     <div className={`fixed inset-y-0 left-0 w-64 bg-gray-900 shadow-lg z-50 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out overflow-y-auto`}>
       <div className="sticky top-0 bg-gray-900 p-4 flex justify-between items-center border-b border-gray-800">
@@ -14,15 +18,43 @@ const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, set
       <nav className="p-4 space-y-2">
         <MenuButton icon={<Save className="w-4 h-4" />} label="Save Current Code" onClick={() => { saveCurrentCode(); setIsOpen(false); }} />
         <MenuButton icon={<BookOpen className="w-4 h-4" />} label="Saved Codes" onClick={() => { setShowSavedCodes(true); setIsOpen(false); }} />
-        <MenuButton icon={<Type className="w-4 h-4" />} label="Font Library" onClick={() => { setShowFontPanel(true); setIsOpen(false); }} />
-        <MenuButton icon={<Library className="w-4 h-4" />} label="Icon Library" onClick={() => { setShowIconPanel(true); setIsOpen(false); }} />
-        <MenuButton icon={<Image className="w-4 h-4" />} label="Pexels Images" onClick={() => { setShowPexelsPanel(true); setIsOpen(false); }} />
-        <MenuButton icon={<Palette className="w-4 h-4" />} label="CSS Tools" onClick={() => { setShowCssToolsPanel(true); setIsOpen(false); }} />
-        <MenuButton icon={<Code className="w-4 h-4" />} label="HTML Tools" onClick={() => { setShowHtmlToolsPanel(true); setIsOpen(false); }} />
-        <MenuButton icon={<Wrench className="w-4 h-4" />} label="JS Tools" onClick={() => { setShowJsToolsPanel(true); setIsOpen(false); }} />
-        <MenuButton icon={<Keyboard className="w-4 h-4" />} label="Keyboard Shortcuts" onClick={() => { setShowKeyboardShortcuts(true); setIsOpen(false); }} />
-        <MenuButton icon={<Terminal className="w-4 h-4" />} label={`${showConsole ? 'Hide' : 'Show'} Console`} onClick={() => { toggleConsole(); setIsOpen(false); }} />
-        <MenuButton icon={<BookMarked className="w-4 h-4" />} label={`${showSnippetLibrary ? 'Hide' : 'Show'} Snippet Library`} onClick={() => { toggleSnippetLibrary(); setIsOpen(false); }} />
+        
+        <Collapsible open={isLibraryOpen} onOpenChange={setIsLibraryOpen}>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="w-full justify-between text-gray-300 hover:text-white hover:bg-gray-800">
+              <span className="flex items-center">
+                <Library className="w-4 h-4 mr-2" />
+                Library
+              </span>
+              {isLibraryOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-2 mt-2 ml-4">
+            <MenuButton label="Font Library" onClick={() => { setShowFontPanel(true); setIsOpen(false); }} />
+            <MenuButton label="Icon Library" onClick={() => { setShowIconPanel(true); setIsOpen(false); }} />
+            <MenuButton label="Pexels Images" onClick={() => { setShowPexelsPanel(true); setIsOpen(false); }} />
+            <MenuButton label={`${showSnippetLibrary ? 'Hide' : 'Show'} Snippet Library`} onClick={() => { toggleSnippetLibrary(); setIsOpen(false); }} />
+          </CollapsibleContent>
+        </Collapsible>
+
+        <Collapsible open={isToolsOpen} onOpenChange={setIsToolsOpen}>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="w-full justify-between text-gray-300 hover:text-white hover:bg-gray-800">
+              <span className="flex items-center">
+                <Wrench className="w-4 h-4 mr-2" />
+                Tools
+              </span>
+              {isToolsOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-2 mt-2 ml-4">
+            <MenuButton label={`${showConsole ? 'Hide' : 'Show'} Console`} onClick={() => { toggleConsole(); setIsOpen(false); }} />
+            <MenuButton label="HTML Tools" onClick={() => { setShowHtmlToolsPanel(true); setIsOpen(false); }} />
+            <MenuButton label="CSS Tools" onClick={() => { setShowCssToolsPanel(true); setIsOpen(false); }} />
+            <MenuButton label="JS Tools" onClick={() => { setShowJsToolsPanel(true); setIsOpen(false); }} />
+          </CollapsibleContent>
+        </Collapsible>
+
         <MenuButton icon={<SettingsIcon className="w-4 h-4" />} label="Settings" onClick={() => { setShowSettings(true); setIsOpen(false); }} />
       </nav>
     </div>
