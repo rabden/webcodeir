@@ -6,7 +6,23 @@ import {
   BadgeDollarSign, BadgeHelp, BadgeInfo, BadgeMinus, BadgePercent, BadgePlus,
   BadgeX, Banana, Banknote, BarChart, BarChart2, BarChart3,
   BarChart4, Baseline, Bath, Battery, BatteryCharging, BatteryFull,
-  BatteryLow, BatteryMedium, Beaker, Bean
+  BatteryLow, BatteryMedium, Beaker, Bean, Bell, BellDot,
+  BellMinus, BellOff, BellPlus, BellRing, Bike, Binary,
+  Bitcoin, Bluetooth, Bold, Book, BookCopy, BookDown,
+  BookKey, BookLock, BookMarked, BookMinus, BookOpen, BookPlus,
+  BookTemplate, BookUp, BookX, Bot, Box, BoxSelect,
+  Boxes, Braces, Brackets, Brain, BrainCircuit, BrainCog,
+  Briefcase, Brush, Bug, Building, Building2, Bus,
+  Cake, Calculator, Calendar, CalendarCheck, CalendarClock, CalendarDays,
+  CalendarHeart, CalendarMinus, CalendarOff, CalendarPlus, CalendarRange, CalendarSearch,
+  CalendarX, Camera, CameraOff, Candy, CandyCane, Car,
+  Carrot, Cast, Cat, Check, CheckCheck, CheckCircle,
+  CheckCircle2, CheckSquare, ChefHat, Cherry, ChevronDown, ChevronDownCircle,
+  ChevronFirst, ChevronLast, ChevronLeft, ChevronLeftCircle, ChevronRight, ChevronRightCircle,
+  ChevronUp, ChevronUpCircle, ChevronsDown, ChevronsDownUp, ChevronsLeft, ChevronsLeftRight,
+  ChevronsRight, ChevronsRightLeft, ChevronsUp, ChevronsUpDown, Chrome, Church,
+  Cigarette, CigaretteOff, Circle, CircleDashed, CircleDollarSign, CircleDot,
+  CircleEllipsis, CircleEqual, CircleOff, CircleSlash, CircleSlash2, CircleUser
 } from 'lucide-react';
 
 export const extraIcons = {
@@ -17,5 +33,21 @@ export const extraIcons = {
   BadgeDollarSign, BadgeHelp, BadgeInfo, BadgeMinus, BadgePercent, BadgePlus,
   BadgeX, Banana, Banknote, BarChart, BarChart2, BarChart3,
   BarChart4, Baseline, Bath, Battery, BatteryCharging, BatteryFull,
-  BatteryLow, BatteryMedium, Beaker, Bean
+  BatteryLow, BatteryMedium, Beaker, Bean, Bell, BellDot,
+  BellMinus, BellOff, BellPlus, BellRing, Bike, Binary,
+  Bitcoin, Bluetooth, Bold, Book, BookCopy, BookDown,
+  BookKey, BookLock, BookMarked, BookMinus, BookOpen, BookPlus,
+  BookTemplate, BookUp, BookX, Bot, Box, BoxSelect,
+  Boxes, Braces, Brackets, Brain, BrainCircuit, BrainCog,
+  Briefcase, Brush, Bug, Building, Building2, Bus,
+  Cake, Calculator, Calendar, CalendarCheck, CalendarClock, CalendarDays,
+  CalendarHeart, CalendarMinus, CalendarOff, CalendarPlus, CalendarRange, CalendarSearch,
+  CalendarX, Camera, CameraOff, Candy, CandyCane, Car,
+  Carrot, Cast, Cat, Check, CheckCheck, CheckCircle,
+  CheckCircle2, CheckSquare, ChefHat, Cherry, ChevronDown, ChevronDownCircle,
+  ChevronFirst, ChevronLast, ChevronLeft, ChevronLeftCircle, ChevronRight, ChevronRightCircle,
+  ChevronUp, ChevronUpCircle, ChevronsDown, ChevronsDownUp, ChevronsLeft, ChevronsLeftRight,
+  ChevronsRight, ChevronsRightLeft, ChevronsUp, ChevronsUpDown, Chrome, Church,
+  Cigarette, CigaretteOff, Circle, CircleDashed, CircleDollarSign, CircleDot,
+  CircleEllipsis, CircleEqual, CircleOff, CircleSlash, CircleSlash2, CircleUser
 };
