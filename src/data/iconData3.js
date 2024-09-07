@@ -32,7 +32,7 @@ import {
   Tool, Wrench, Scissors, Key, Lock, Unlock, Map, Compass, Flag, Bookmark,
 
   // Media controls
-  Play, Pause, Stop, SkipBack, SkipForward, Volume, Volume1, Volume2, Mute,
+  Play, Pause, Stop, SkipBack, SkipForward, Volume, Volume1, Volume2,
 
   // Text editing
   Bold, Italic, Underline, Type, List, AlignLeft, AlignCenter, AlignRight, AlignJustify,
@@ -84,7 +84,7 @@ export const extraIcons = {
   Tool, Wrench, Scissors, Key, Lock, Unlock, Map, Compass, Flag, Bookmark,
 
   // Media controls
-  Play, Pause, Stop, SkipBack, SkipForward, Volume, Volume1, Volume2, Mute,
+  Play, Pause, Stop, SkipBack, SkipForward, Volume, Volume1, Volume2,
 
   // Text editing
   Bold, Italic, Underline, Type, List, AlignLeft, AlignCenter, AlignRight, AlignJustify,
