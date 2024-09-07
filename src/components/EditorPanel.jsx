@@ -12,9 +12,8 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
 import { Palette, Code, Wrench } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, isMobile, activeTab, setActiveTab }) => {
+const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, isMobile, activeTab }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
 
   const getLanguageExtension = (lang) => {
@@ -30,13 +29,12 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     const languageExtension = getLanguageExtension(lang);
     const extensions = [
       languageExtension,
-      EditorView.lineWrapping,
       EditorView.theme({
         "&": { height: "100%", overflow: "auto" },
         ".cm-scroller": { overflow: "auto" },
-        ".cm-content": { paddingBottom: "50vh" }
+        ".cm-content": { whiteSpace: "pre !important", paddingBottom: "50vh" }
       }),
-      EditorView.contentAttributes.of({ style: "white-space: pre !important;" })
+      EditorView.lineWrapping
     ];
 
     if (settings.enableAutocompletion) {
@@ -113,26 +111,18 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     );
   };
 
-  const renderTabMode = () => (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
-      <TabsList className="bg-gray-800 p-1">
-        <TabsTrigger value="html" className="text-white">HTML</TabsTrigger>
-        <TabsTrigger value="css" className="text-white">CSS</TabsTrigger>
-        <TabsTrigger value="js" className="text-white">JS</TabsTrigger>
-      </TabsList>
-      <div className="flex-grow overflow-hidden">
-        <TabsContent value="html" className="h-full">
-          {renderEditor('html', htmlCode, setHtmlCode, setShowHtmlToolsPanel)}
-        </TabsContent>
-        <TabsContent value="css" className="h-full">
-          {renderEditor('css', cssCode, setCssCode, setShowCssToolsPanel)}
-        </TabsContent>
-        <TabsContent value="js" className="h-full">
-          {renderEditor('javascript', jsCode, setJsCode, setShowJsToolsPanel)}
-        </TabsContent>
-      </div>
-    </Tabs>
-  );
+  const renderMobileEditor = () => {
+    switch (activeTab) {
+      case 'html':
+        return renderEditor('html', htmlCode, setHtmlCode, setShowHtmlToolsPanel);
+      case 'css':
+        return renderEditor('css', cssCode, setCssCode, setShowCssToolsPanel);
+      case 'js':
+        return renderEditor('javascript', jsCode, setJsCode, setShowJsToolsPanel);
+      default:
+        return null;
+    }
+  };
 
   const renderPanelMode = () => (
     <PanelGroup direction={settings.layout === 'stacked' ? 'horizontal' : 'vertical'}>
@@ -150,7 +140,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     </PanelGroup>
   );
 
-  return isMobile ? renderTabMode() : renderPanelMode();
+  return isMobile ? renderMobileEditor() : renderPanelMode();
 };
 
 export default EditorPanel;
