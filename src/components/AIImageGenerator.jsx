@@ -13,7 +13,7 @@ const AIImageGenerator = ({ onClose }) => {
   const [width, setWidth] = useState(1024);
   const [height, setHeight] = useState(1024);
   const [numInferenceSteps, setNumInferenceSteps] = useState(4);
-  const [generatedImage, setGeneratedImage] = useState(null);
+  const [generatedImages, setGeneratedImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   async function query(data) {
@@ -46,7 +46,7 @@ const AIImageGenerator = ({ onClose }) => {
         }
       });
       const imageUrl = URL.createObjectURL(result);
-      setGeneratedImage(imageUrl);
+      setGeneratedImages(prevImages => [imageUrl, ...prevImages]);
       setSeed(currentSeed);
     } catch (error) {
       console.error("Error generating image:", error);
@@ -55,16 +55,16 @@ const AIImageGenerator = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-y-4 right-4 w-96 bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden">
+    <div className="fixed inset-4 bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden md:inset-10 lg:inset-20">
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-xl font-bold text-white">AI Image Generator</h2>
         <Button variant="ghost" size="icon" onClick={onClose} className="text-gray-400 hover:text-white">
           <X className="w-5 h-5" />
         </Button>
       </div>
-      <ScrollArea className="flex-grow p-4">
-        <div className="space-y-4">
-          <div>
+      <div className="flex-grow flex flex-col md:flex-row">
+        <div className="w-full md:w-1/3 p-4 space-y-4 overflow-y-auto">
+          <div className="space-y-2">
             <label className="text-sm font-medium text-white">Prompt</label>
             <Input
               value={prompt}
@@ -73,7 +73,7 @@ const AIImageGenerator = ({ onClose }) => {
               className="bg-gray-700 text-white border-gray-600"
             />
           </div>
-          <div>
+          <div className="space-y-2">
             <label className="text-sm font-medium text-white">Seed: {seed}</label>
             <Slider
               value={[seed]}
@@ -95,7 +95,7 @@ const AIImageGenerator = ({ onClose }) => {
               Randomize seed
             </label>
           </div>
-          <div>
+          <div className="space-y-2">
             <label className="text-sm font-medium text-white">Width: {width}</label>
             <Slider
               value={[width]}
@@ -106,7 +106,7 @@ const AIImageGenerator = ({ onClose }) => {
               className="bg-gray-700"
             />
           </div>
-          <div>
+          <div className="space-y-2">
             <label className="text-sm font-medium text-white">Height: {height}</label>
             <Slider
               value={[height]}
@@ -117,7 +117,7 @@ const AIImageGenerator = ({ onClose }) => {
               className="bg-gray-700"
             />
           </div>
-          <div>
+          <div className="space-y-2">
             <label className="text-sm font-medium text-white">Number of inference steps: {numInferenceSteps}</label>
             <Slider
               value={[numInferenceSteps]}
@@ -131,13 +131,19 @@ const AIImageGenerator = ({ onClose }) => {
           <Button onClick={generateImage} disabled={isLoading} className="w-full bg-blue-600 text-white hover:bg-blue-700">
             {isLoading ? 'Generating...' : 'Generate Image'}
           </Button>
-          {generatedImage && (
-            <div className="mt-4">
-              <img src={generatedImage} alt="Generated image" className="w-full rounded-lg" />
-            </div>
-          )}
         </div>
-      </ScrollArea>
+        <div className="w-full md:w-2/3 p-4">
+          <ScrollArea className="h-full">
+            <div className="space-y-4">
+              {generatedImages.map((imageUrl, index) => (
+                <div key={index} className="relative">
+                  <img src={imageUrl} alt={`Generated image ${index + 1}`} className="w-full rounded-lg" />
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
+      </div>
     </div>
   );
 };
