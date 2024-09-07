@@ -1,25 +1,21 @@
 import {
-  Accessibility, Alarm, AlarmCheck, AlarmMinus, AlarmPlus, Album, AlertOctagon,
-  AlignEndHorizontal, AlignEndVertical, AlignHorizontalDistributeCenter,
-  AlignHorizontalDistributeEnd, AlignHorizontalDistributeStart, AlignHorizontalJustifyCenter,
-  AlignHorizontalJustifyEnd, AlignHorizontalJustifyStart, AlignHorizontalSpaceAround,
-  AlignHorizontalSpaceBetween, AlignStartHorizontal, AlignStartVertical,
-  AlignVerticalDistributeCenter, AlignVerticalDistributeEnd, AlignVerticalDistributeStart,
-  AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, AlignVerticalJustifyStart,
-  AlignVerticalSpaceAround, AlignVerticalSpaceBetween, Ampersand, Anchor, Angry,
-  Annoyed, Aperture, Apple, ArchiveRestore, ArrowBigDown, ArrowBigLeft,
-  ArrowBigRight, ArrowBigUp, ArrowDown10, ArrowDown01
+  Accessibility, AlarmClock, AlertCircle, AlertTriangle, AlignCenter, AlignJustify,
+  AlignLeft, AlignRight, Anchor, Archive, ArrowDown, ArrowDownCircle,
+  ArrowLeft, ArrowLeftCircle, ArrowRight, ArrowRightCircle, ArrowUp, ArrowUpCircle,
+  AtSign, Award, Axe, Backpack, BadgeAlert, BadgeCheck,
+  BadgeDollarSign, BadgeHelp, BadgeInfo, BadgeMinus, BadgePercent, BadgePlus,
+  BadgeX, Banana, Banknote, BarChart, BarChart2, BarChart3,
+  BarChart4, Baseline, Bath, Battery, BatteryCharging, BatteryFull,
+  BatteryLow, BatteryMedium, Beaker, Bean
 } from 'lucide-react';
 
 export const extraIcons = {
-  Accessibility, Alarm, AlarmCheck, AlarmMinus, AlarmPlus, Album, AlertOctagon,
-  AlignEndHorizontal, AlignEndVertical, AlignHorizontalDistributeCenter,
-  AlignHorizontalDistributeEnd, AlignHorizontalDistributeStart, AlignHorizontalJustifyCenter,
-  AlignHorizontalJustifyEnd, AlignHorizontalJustifyStart, AlignHorizontalSpaceAround,
-  AlignHorizontalSpaceBetween, AlignStartHorizontal, AlignStartVertical,
-  AlignVerticalDistributeCenter, AlignVerticalDistributeEnd, AlignVerticalDistributeStart,
-  AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, AlignVerticalJustifyStart,
-  AlignVerticalSpaceAround, AlignVerticalSpaceBetween, Ampersand, Anchor, Angry,
-  Annoyed, Aperture, Apple, ArchiveRestore, ArrowBigDown, ArrowBigLeft,
-  ArrowBigRight, ArrowBigUp, ArrowDown10, ArrowDown01
+  Accessibility, AlarmClock, AlertCircle, AlertTriangle, AlignCenter, AlignJustify,
+  AlignLeft, AlignRight, Anchor, Archive, ArrowDown, ArrowDownCircle,
+  ArrowLeft, ArrowLeftCircle, ArrowRight, ArrowRightCircle, ArrowUp, ArrowUpCircle,
+  AtSign, Award, Axe, Backpack, BadgeAlert, BadgeCheck,
+  BadgeDollarSign, BadgeHelp, BadgeInfo, BadgeMinus, BadgePercent, BadgePlus,
+  BadgeX, Banana, Banknote, BarChart, BarChart2, BarChart3,
+  BarChart4, Baseline, Bath, Battery, BatteryCharging, BatteryFull,
+  BatteryLow, BatteryMedium, Beaker, Bean
 };
