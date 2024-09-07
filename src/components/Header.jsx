@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Library, Keyboard, Image, Terminal } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Library, Keyboard, Image } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,7 +18,6 @@ const Header = ({
   layout,
   setShowKeyboardShortcuts,
   setShowPexelsPanel,
-  setShowConsolePanel,
   activeTab,
   setActiveTab
 }) => {
@@ -171,22 +170,6 @@ const Header = ({
               </TooltipTrigger>
               <TooltipContent>
                 <p>Keyboard Shortcuts (Ctrl + /)</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowConsolePanel(true)}
-                  className="text-white hover:bg-gray-700"
-                >
-                  <Terminal className="w-5 h-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Console (Ctrl + `)</p>
               </TooltipContent>
             </Tooltip>
 
