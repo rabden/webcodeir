@@ -30,12 +30,13 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     const languageExtension = getLanguageExtension(lang);
     const extensions = [
       languageExtension,
-      EditorView.lineWrapping.of(false),
+      EditorView.lineWrapping,
       EditorView.theme({
         "&": { height: "100%", overflow: "auto" },
         ".cm-scroller": { overflow: "auto" },
         ".cm-content": { paddingBottom: "50vh" }
-      })
+      }),
+      EditorView.contentAttributes.of({ style: "white-space: pre !important;" })
     ];
 
     if (settings.enableAutocompletion) {
