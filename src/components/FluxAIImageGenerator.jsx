@@ -15,10 +15,10 @@ const FluxAIImageGenerator = ({ onClose, isMobile }) => {
   const [guidanceScale, setGuidanceScale] = useState(3.5);
   const [numImages, setNumImages] = useState(1);
   const [enableSafetyChecker, setEnableSafetyChecker] = useState(true);
-  const [generatedImage, setGeneratedImage] = useState(null);
+  const [generatedImages, setGeneratedImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const generateImage = async () => {
+  const generateImages = async () => {
     setIsLoading(true);
     try {
       const response = await fetch('https://fal.run/fal-ai/flux/dev', {
@@ -39,60 +39,128 @@ const FluxAIImageGenerator = ({ onClose, isMobile }) => {
 
       const data = await response.json();
       if (data.images && data.images.length > 0) {
-        setGeneratedImage(data.images[0].url);
+        setGeneratedImages(data.images.map(img => img.url));
       }
     } catch (error) {
-      console.error('Error generating image:', error);
+      console.error('Error generating images:', error);
       toast({
         title: "Error",
-        description: "Failed to generate image. Please try again.",
+        description: "Failed to generate images. Please try again.",
         variant: "destructive",
       });
     }
     setIsLoading(false);
   };
 
-  const downloadImage = async () => {
-    if (!generatedImage) return;
-    try {
-      const response = await fetch(generatedImage);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'generated-image.png';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading image:', error);
-      toast({
-        title: "Error",
-        description: "Failed to download image. Please try again.",
-        variant: "destructive",
-      });
+  const handleImageAction = (action, imageUrl) => {
+    switch (action) {
+      case 'download':
+        window.open(imageUrl, '_blank');
+        break;
+      case 'copyLink':
+        navigator.clipboard.writeText(imageUrl);
+        toast({ title: "Success", description: "Image link copied to clipboard." });
+        break;
+      case 'copyTag':
+        navigator.clipboard.writeText(`<img src="${imageUrl}" alt="Generated image" />`);
+        toast({ title: "Success", description: "Image tag copied to clipboard." });
+        break;
     }
   };
 
-  const copyImageLink = () => {
-    if (!generatedImage) return;
-    navigator.clipboard.writeText(generatedImage);
-    toast({
-      title: "Success",
-      description: "Image link copied to clipboard.",
-    });
-  };
+  const renderControls = () => (
+    <div className="space-y-4">
+      <Textarea
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        placeholder="Enter your image prompt here..."
+        className="bg-gray-700 text-white border-gray-600"
+      />
+      <Select value={imageSize} onValueChange={setImageSize}>
+        <SelectTrigger className="bg-gray-700 text-white border-gray-600">
+          <SelectValue placeholder="Select Image Size" />
+        </SelectTrigger>
+        <SelectContent className="bg-gray-700 text-white border-gray-600">
+          <SelectItem value="square_hd">Square HD</SelectItem>
+          <SelectItem value="square">Square</SelectItem>
+          <SelectItem value="portrait_4_3">Portrait 4:3</SelectItem>
+          <SelectItem value="portrait_16_9">Portrait 16:9</SelectItem>
+          <SelectItem value="landscape_4_3">Landscape 4:3</SelectItem>
+          <SelectItem value="landscape_16_9">Landscape 16:9</SelectItem>
+        </SelectContent>
+      </Select>
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-white">Inference Steps: {numInferenceSteps}</label>
+        <Slider
+          value={[numInferenceSteps]}
+          onValueChange={(value) => setNumInferenceSteps(value[0])}
+          min={1}
+          max={50}
+          step={1}
+          className="bg-gray-800"
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-white">Guidance Scale: {guidanceScale}</label>
+        <Slider
+          value={[guidanceScale]}
+          onValueChange={(value) => setGuidanceScale(value[0])}
+          min={1}
+          max={10}
+          step={0.1}
+          className="bg-gray-800"
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-white">Number of Images: {numImages}</label>
+        <Slider
+          value={[numImages]}
+          onValueChange={(value) => setNumImages(value[0])}
+          min={1}
+          max={8}
+          step={1}
+          className="bg-gray-800"
+        />
+      </div>
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="safety-checker"
+          checked={enableSafetyChecker}
+          onCheckedChange={setEnableSafetyChecker}
+        />
+        <label htmlFor="safety-checker" className="text-sm font-medium text-white">
+          Enable Safety Checker
+        </label>
+      </div>
+      <Button onClick={generateImages} disabled={isLoading} className="bg-blue-600 text-white hover:bg-blue-700">
+        {isLoading ? 'Generating...' : 'Generate Images'}
+      </Button>
+    </div>
+  );
 
-  const copyImageTag = () => {
-    if (!generatedImage) return;
-    const imgTag = `<img src="${generatedImage}" alt="Generated image" />`;
-    navigator.clipboard.writeText(imgTag);
-    toast({
-      title: "Success",
-      description: "Image tag copied to clipboard.",
-    });
-  };
+  const renderImages = () => (
+    <div className="grid grid-cols-2 gap-4">
+      {generatedImages.map((imageUrl, index) => (
+        <div key={index} className="space-y-2">
+          <img src={imageUrl} alt={`Generated ${index + 1}`} className="w-full rounded-lg" />
+          <div className="flex space-x-2">
+            <Button onClick={() => handleImageAction('download', imageUrl)} size="sm">
+              <Download className="w-4 h-4 mr-2" />
+              Download
+            </Button>
+            <Button onClick={() => handleImageAction('copyLink', imageUrl)} size="sm">
+              <Link className="w-4 h-4 mr-2" />
+              Copy Link
+            </Button>
+            <Button onClick={() => handleImageAction('copyTag', imageUrl)} size="sm">
+              <ImageIcon className="w-4 h-4 mr-2" />
+              Copy Tag
+            </Button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className={`fixed inset-0 bg-gray-800 z-50 flex flex-col ${isMobile ? 'p-4' : 'md:inset-y-4 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-[900px] md:rounded-lg'} overflow-hidden`}>
@@ -104,91 +172,12 @@ const FluxAIImageGenerator = ({ onClose, isMobile }) => {
       </div>
       <div className="flex-grow overflow-y-auto p-4 flex flex-col md:flex-row">
         <div className="md:w-1/2 md:pr-4 space-y-4">
-          <Textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Enter your image prompt here..."
-            className="bg-gray-700 text-white border-gray-600"
-          />
-          <Select value={imageSize} onValueChange={setImageSize}>
-            <SelectTrigger className="bg-gray-700 text-white border-gray-600">
-              <SelectValue placeholder="Select Image Size" />
-            </SelectTrigger>
-            <SelectContent className="bg-gray-700 text-white border-gray-600">
-              <SelectItem value="square_hd">Square HD</SelectItem>
-              <SelectItem value="square">Square</SelectItem>
-              <SelectItem value="portrait_4_3">Portrait 4:3</SelectItem>
-              <SelectItem value="portrait_16_9">Portrait 16:9</SelectItem>
-              <SelectItem value="landscape_4_3">Landscape 4:3</SelectItem>
-              <SelectItem value="landscape_16_9">Landscape 16:9</SelectItem>
-            </SelectContent>
-          </Select>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-white">Inference Steps: {numInferenceSteps}</label>
-            <Slider
-              value={[numInferenceSteps]}
-              onValueChange={(value) => setNumInferenceSteps(value[0])}
-              min={1}
-              max={50}
-              step={1}
-              className="bg-gray-800"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-white">Guidance Scale: {guidanceScale}</label>
-            <Slider
-              value={[guidanceScale]}
-              onValueChange={(value) => setGuidanceScale(value[0])}
-              min={1}
-              max={10}
-              step={0.1}
-              className="bg-gray-800"
-            />
-          </div>
-          <Input
-            type="number"
-            value={numImages}
-            onChange={(e) => setNumImages(parseInt(e.target.value))}
-            min={1}
-            max={4}
-            className="bg-gray-700 text-white border-gray-600"
-          />
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="safety-checker"
-              checked={enableSafetyChecker}
-              onCheckedChange={setEnableSafetyChecker}
-            />
-            <label htmlFor="safety-checker" className="text-sm font-medium text-white">
-              Enable Safety Checker
-            </label>
-          </div>
-          <Button onClick={generateImage} disabled={isLoading} className="bg-blue-600 text-white hover:bg-blue-700">
-            {isLoading ? 'Generating...' : 'Generate Image'}
-          </Button>
+          {renderControls()}
         </div>
         <div className="md:w-1/2 md:pl-4 mt-4 md:mt-0">
-          {generatedImage ? (
-            <div className="space-y-4">
-              <img src={generatedImage} alt="Generated" className="w-full rounded-lg" />
-              <div className="flex space-x-2">
-                <Button onClick={downloadImage} className="flex-1">
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
-                </Button>
-                <Button onClick={copyImageLink} className="flex-1">
-                  <Link className="w-4 h-4 mr-2" />
-                  Copy Link
-                </Button>
-                <Button onClick={copyImageTag} className="flex-1">
-                  <ImageIcon className="w-4 h-4 mr-2" />
-                  Copy Tag
-                </Button>
-              </div>
-            </div>
-          ) : (
+          {generatedImages.length > 0 ? renderImages() : (
             <div className="w-full h-full flex items-center justify-center bg-gray-700 rounded-lg">
-              <p className="text-white text-lg">Generated image will appear here</p>
+              <p className="text-white text-lg">Generated images will appear here</p>
             </div>
           )}
         </div>
