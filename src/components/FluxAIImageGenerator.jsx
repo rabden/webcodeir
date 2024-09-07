@@ -5,6 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/use-toast";
+import { Download, Link, Image as ImageIcon } from 'lucide-react';
 
 const FluxAIImageGenerator = ({ onClose, isMobile }) => {
   const [prompt, setPrompt] = useState('');
@@ -41,8 +43,55 @@ const FluxAIImageGenerator = ({ onClose, isMobile }) => {
       }
     } catch (error) {
       console.error('Error generating image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate image. Please try again.",
+        variant: "destructive",
+      });
     }
     setIsLoading(false);
+  };
+
+  const downloadImage = async () => {
+    if (!generatedImage) return;
+    try {
+      const response = await fetch(generatedImage);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'generated-image.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download image. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const copyImageLink = () => {
+    if (!generatedImage) return;
+    navigator.clipboard.writeText(generatedImage);
+    toast({
+      title: "Success",
+      description: "Image link copied to clipboard.",
+    });
+  };
+
+  const copyImageTag = () => {
+    if (!generatedImage) return;
+    const imgTag = `<img src="${generatedImage}" alt="Generated image" />`;
+    navigator.clipboard.writeText(imgTag);
+    toast({
+      title: "Success",
+      description: "Image tag copied to clipboard.",
+    });
   };
 
   return (
@@ -120,7 +169,23 @@ const FluxAIImageGenerator = ({ onClose, isMobile }) => {
         </div>
         <div className="md:w-1/2 md:pl-4 mt-4 md:mt-0">
           {generatedImage ? (
-            <img src={generatedImage} alt="Generated" className="w-full rounded-lg" />
+            <div className="space-y-4">
+              <img src={generatedImage} alt="Generated" className="w-full rounded-lg" />
+              <div className="flex space-x-2">
+                <Button onClick={downloadImage} className="flex-1">
+                  <Download className="w-4 h-4 mr-2" />
+                  Download
+                </Button>
+                <Button onClick={copyImageLink} className="flex-1">
+                  <Link className="w-4 h-4 mr-2" />
+                  Copy Link
+                </Button>
+                <Button onClick={copyImageTag} className="flex-1">
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  Copy Tag
+                </Button>
+              </div>
+            </div>
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gray-700 rounded-lg">
               <p className="text-white text-lg">Generated image will appear here</p>
