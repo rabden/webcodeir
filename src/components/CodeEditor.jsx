@@ -12,6 +12,7 @@ import ToolsPanel from './ToolsPanel';
 import MobilePreviewButton from './MobilePreviewButton';
 import KeyboardShortcutsPanel from './KeyboardShortcutsPanel';
 import PexelsImagePanel from './PexelsImagePanel';
+import ConsolePanel from './ConsolePanel';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
@@ -34,27 +35,6 @@ const CodeEditor = () => {
     }, 300);
     return () => clearTimeout(debounce);
   }, [state.htmlCode, state.cssCode, state.jsCode, state.settings.autoSave]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.ctrlKey) {
-        switch (e.key) {
-          case 's': e.preventDefault(); saveCurrentCode(); break;
-          case 'o': e.preventDefault(); setState(s => ({ ...s, showSavedCodes: true })); break;
-          case 'f': e.preventDefault(); setState(s => ({ ...s, showFontPanel: true })); break;
-          case 'i': e.preventDefault(); setState(s => ({ ...s, showIconPanel: true })); break;
-          case ',': e.preventDefault(); setState(s => ({ ...s, showSettings: true })); break;
-          case 'l': e.preventDefault(); toggleLayout(); break;
-          case 'p': e.preventDefault(); if (state.isMobile) setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview })); break;
-          case 'm': e.preventDefault(); if (state.isMobile) setState(s => ({ ...s, isMenuOpen: !s.isMenuOpen })); break;
-          case '/': e.preventDefault(); setState(s => ({ ...s, showKeyboardShortcuts: !s.showKeyboardShortcuts })); break;
-          case 'u': e.preventDefault(); setState(s => ({ ...s, showPexelsPanel: !s.showPexelsPanel })); break;
-        }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [state.isMobile]);
 
   const updatePreview = () => {
     setState(s => ({
@@ -165,6 +145,7 @@ const CodeEditor = () => {
         layout={state.settings.layout}
         setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true }))}
         setShowPexelsPanel={() => setState(s => ({ ...s, showPexelsPanel: true }))}
+        setShowConsolePanel={() => setState(s => ({ ...s, showConsolePanel: true }))}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       />
@@ -180,6 +161,7 @@ const CodeEditor = () => {
       {state.showJsToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showJsToolsPanel: false }))} type="js" />}
       {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
       {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
+      {state.showConsolePanel && <ConsolePanel onClose={() => setState(s => ({ ...s, showConsolePanel: false }))} />}
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
@@ -192,6 +174,7 @@ const CodeEditor = () => {
         setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true, isMenuOpen: false }))}
         setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true, isMenuOpen: false }))}
         setShowPexelsPanel={() => setState(s => ({ ...s, showPexelsPanel: true, isMenuOpen: false }))}
+        setShowConsolePanel={() => setState(s => ({ ...s, showConsolePanel: true, isMenuOpen: false }))}
         saveCurrentCode={() => { saveCurrentCode(); setState(s => ({ ...s, isMenuOpen: false })); }}
       />
     </div>
