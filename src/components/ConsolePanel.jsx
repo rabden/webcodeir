@@ -71,9 +71,9 @@ const ConsolePanel = ({ onClose, isMobile }) => {
   };
 
   return (
-    <div className={`bg-gray-800 text-white flex flex-col ${isMobile ? 'h-full' : 'h-64'}`}>
-      <div className="flex justify-between items-center p-2 border-b border-gray-700">
-        <h3 className="text-lg font-semibold">Console</h3>
+    <div className={`fixed ${isMobile ? 'inset-0' : 'inset-y-4 right-4 w-96'} bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden`}>
+      <div className="p-4 flex justify-between items-center border-b border-gray-700">
+        <h3 className="text-lg font-semibold text-white">Console</h3>
         <div className="flex space-x-2">
           <Button variant="ghost" size="icon" onClick={clearLogs}>
             <Trash className="h-4 w-4" />
@@ -86,8 +86,8 @@ const ConsolePanel = ({ onClose, isMobile }) => {
           </Button>
         </div>
       </div>
-      <ScrollArea className="flex-grow" ref={scrollAreaRef}>
-        <div className="p-2 space-y-1">
+      <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
+        <div className="space-y-1">
           {logs.map((log, index) => (
             <div key={index} className={`${log.type === 'error' ? 'text-red-400' : log.type === 'warn' ? 'text-yellow-400' : 'text-green-400'}`}>
               {log.content}
@@ -95,7 +95,7 @@ const ConsolePanel = ({ onClose, isMobile }) => {
           ))}
         </div>
       </ScrollArea>
-      <div className="p-2 flex">
+      <div className="p-4 flex">
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}

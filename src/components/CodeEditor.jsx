@@ -123,7 +123,6 @@ const CodeEditor = () => {
       </div>
     );
     const previewPanel = <PreviewPanel preview={state.preview} />;
-    const consolePanel = showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.isMobile} />;
 
     if (state.isMobile) {
       return (
@@ -134,7 +133,6 @@ const CodeEditor = () => {
               {previewPanel}
             </div>
           )}
-          {consolePanel}
         </div>
       );
     } else {
@@ -147,10 +145,7 @@ const CodeEditor = () => {
             <div className={`${state.settings.layout === 'stacked' ? 'h-0.5 w-full' : 'w-0.5 h-full'} bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200`}></div>
           </PanelResizeHandle>
           <Panel minSize={0} defaultSize={50}>
-            <div className="h-full flex flex-col">
-              {state.settings.layout === 'horizontal' ? editorPanel : previewPanel}
-              {consolePanel}
-            </div>
+            {state.settings.layout === 'horizontal' ? editorPanel : previewPanel}
           </Panel>
         </PanelGroup>
       );
@@ -190,6 +185,7 @@ const CodeEditor = () => {
       {state.showJsToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showJsToolsPanel: false }))} type="js" />}
       {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
       {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
+      {showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.isMobile} />}
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
