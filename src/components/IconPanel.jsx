@@ -4,6 +4,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Button } from "@/components/ui/button";
 import { topIcons } from '../data/iconData';
 import { additionalIcons } from '../data/iconData2';
+import { extraIcons } from '../data/iconData3';
 import ReactDOMServer from 'react-dom/server';
 
 const IconPanel = ({ onClose, isMobile }) => {
@@ -11,7 +12,7 @@ const IconPanel = ({ onClose, isMobile }) => {
   const [copiedIcon, setCopiedIcon] = useState(null);
   const [filteredIcons, setFilteredIcons] = useState([]);
 
-  const allIcons = { ...topIcons, ...additionalIcons };
+  const allIcons = { ...topIcons, ...additionalIcons, ...extraIcons };
 
   useEffect(() => {
     const results = Object.keys(allIcons).filter(iconName => 
