@@ -12,7 +12,7 @@ import JsSnippetGenerator from './JsSnippetGenerator';
 import EventListenerHelper from './EventListenerHelper';
 import FetchApiHelper from './FetchApiHelper';
 import LocalStorageHelper from './LocalStorageHelper';
-import FluxAIImageGenerator from './FluxAIImageGenerator';
+import AIImageGenerator from './AIImageGenerator';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -20,7 +20,8 @@ const ToolsPanel = ({ onClose, type }) => {
   const [activeTab, setActiveTab] = useState(
     type === 'css' ? 'flexbox' : 
     type === 'html' ? 'htmlStructure' : 
-    'jsSnippet'
+    type === 'js' ? 'jsSnippet' :
+    'aiImage'
   );
 
   const cssTabs = [
@@ -45,7 +46,7 @@ const ToolsPanel = ({ onClose, type }) => {
   ];
 
   const aiTabs = [
-    { id: 'fluxAI', label: 'Flux AI Image Generator', component: FluxAIImageGenerator },
+    { id: 'aiImage', label: 'AI Image Generator', component: AIImageGenerator },
   ];
 
   const tabs = type === 'css' ? cssTabs : type === 'html' ? htmlTabs : type === 'js' ? jsTabs : aiTabs;

@@ -154,6 +154,10 @@ const CodeEditor = () => {
         showConsole={showConsole}
         toggleSnippetLibrary={() => setShowSnippetLibrary(s => !s)}
         showSnippetLibrary={showSnippetLibrary}
+        setShowCssToolsPanel={() => setState(s => ({ ...s, showCssToolsPanel: true }))}
+        setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true }))}
+        setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true }))}
+        setShowAIImagePanel={() => setState(s => ({ ...s, showAIImagePanel: true }))}
       />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
@@ -165,6 +169,7 @@ const CodeEditor = () => {
       {state.showCssToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showCssToolsPanel: false }))} type="css" />}
       {state.showHtmlToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showHtmlToolsPanel: false }))} type="html" />}
       {state.showJsToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showJsToolsPanel: false }))} type="js" />}
+      {state.showAIImagePanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showAIImagePanel: false }))} type="ai" />}
       {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
       {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
       {showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.isMobile} />}
@@ -179,6 +184,7 @@ const CodeEditor = () => {
         setShowCssToolsPanel={() => setState(s => ({ ...s, showCssToolsPanel: true, isMenuOpen: false }))}
         setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true, isMenuOpen: false }))}
         setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true, isMenuOpen: false }))}
+        setShowAIImagePanel={() => setState(s => ({ ...s, showAIImagePanel: true, isMenuOpen: false }))}
         setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true, isMenuOpen: false }))}
         setShowPexelsPanel={() => setState(s => ({ ...s, showPexelsPanel: true, isMenuOpen: false }))}
         saveCurrentCode={() => { saveCurrentCode(); setState(s => ({ ...s, isMenuOpen: false })); }}
