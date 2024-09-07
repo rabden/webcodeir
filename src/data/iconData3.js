@@ -20,7 +20,7 @@ import {
   File, Folder, Image, Film, Music, Archive, Download, Upload, Trash, Save,
 
   // User interface
-  Menu, Settings, Search, ZoomIn, ZoomOut, Maximize, Minimize, Refresh, RotateCcw, RotateCw,
+  Menu, Settings, Search, ZoomIn, ZoomOut, Maximize, Minimize, RotateCcw, RotateCw,
 
   // E-commerce and finance
   ShoppingCart, CreditCard, DollarSign, Percent, Tag, Gift, Package, Truck,
@@ -72,7 +72,7 @@ export const extraIcons = {
   File, Folder, Image, Film, Music, Archive, Download, Upload, Trash, Save,
 
   // User interface
-  Menu, Settings, Search, ZoomIn, ZoomOut, Maximize, Minimize, Refresh, RotateCcw, RotateCw,
+  Menu, Settings, Search, ZoomIn, ZoomOut, Maximize, Minimize, RotateCcw, RotateCw,
 
   // E-commerce and finance
   ShoppingCart, CreditCard, DollarSign, Percent, Tag, Gift, Package, Truck,
