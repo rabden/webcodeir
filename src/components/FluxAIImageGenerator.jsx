@@ -18,37 +18,44 @@ const FluxAIImageGenerator = ({ onClose, isMobile }) => {
   const [enableSafetyChecker, setEnableSafetyChecker] = useState(true);
   const [generatedImages, setGeneratedImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const generateImages = async () => {
+  const generateImage = async () => {
     setIsLoading(true);
-    try {
-      const response = await fetch('https://fal.run/fal-ai/flux/dev', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Key 0f7ccc67-180a-4e34-a55c-a8c943103f86:d9a7113cbe3a04d8391e25223a2919a9',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt,
-          image_size: imageSize,
-          num_inference_steps: numInferenceSteps,
-          guidance_scale: guidanceScale,
-          num_images: numImages,
-          enable_safety_checker: enableSafetyChecker,
-        }),
-      });
+    setGeneratedImages([]);
+    setCurrentImageIndex(0);
 
-      const data = await response.json();
-      if (data.images && data.images.length > 0) {
-        setGeneratedImages(data.images.map(img => img.url));
+    for (let i = 0; i < numImages; i++) {
+      try {
+        const response = await fetch('https://fal.run/fal-ai/flux/dev', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Key 0f7ccc67-180a-4e34-a55c-a8c943103f86:d9a7113cbe3a04d8391e25223a2919a9',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            prompt,
+            image_size: imageSize,
+            num_inference_steps: numInferenceSteps,
+            guidance_scale: guidanceScale,
+            num_images: 1,
+            enable_safety_checker: enableSafetyChecker,
+          }),
+        });
+
+        const data = await response.json();
+        if (data.images && data.images.length > 0) {
+          setGeneratedImages(prevImages => [...prevImages, data.images[0].url]);
+          setCurrentImageIndex(i + 1);
+        }
+      } catch (error) {
+        console.error('Error generating image:', error);
+        toast({
+          title: "Error",
+          description: "Failed to generate image. Please try again.",
+          variant: "destructive",
+        });
       }
-    } catch (error) {
-      console.error('Error generating images:', error);
-      toast({
-        title: "Error",
-        description: "Failed to generate images. Please try again.",
-        variant: "destructive",
-      });
     }
     setIsLoading(false);
   };
@@ -133,8 +140,8 @@ const FluxAIImageGenerator = ({ onClose, isMobile }) => {
           Enable Safety Checker
         </label>
       </div>
-      <Button onClick={generateImages} disabled={isLoading} className="bg-blue-600 text-white hover:bg-blue-700">
-        {isLoading ? 'Generating...' : 'Generate Images'}
+      <Button onClick={generateImage} disabled={isLoading} className="bg-blue-600 text-white hover:bg-blue-700">
+        {isLoading ? `Generating Image ${currentImageIndex}/${numImages}...` : 'Generate Images'}
       </Button>
     </div>
   );
