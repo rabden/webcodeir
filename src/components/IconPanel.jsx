@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Search, Check } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { topIcons } from '../data/iconData';
 import { additionalIcons } from '../data/iconData2';
 import { extraIcons } from '../data/iconData3';
@@ -11,6 +12,7 @@ const IconPanel = ({ onClose, isMobile }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedIcon, setCopiedIcon] = useState(null);
   const [filteredIcons, setFilteredIcons] = useState([]);
+  const [iconSource, setIconSource] = useState('lucide');
 
   const allIcons = { ...topIcons, ...additionalIcons, ...extraIcons };
 
@@ -40,7 +42,16 @@ const IconPanel = ({ onClose, isMobile }) => {
           <X className="w-5 h-5 text-white" />
         </button>
       </div>
-      <div className="p-4">
+      <div className="p-4 space-y-4">
+        <Select value={iconSource} onValueChange={setIconSource}>
+          <SelectTrigger className="w-full bg-gray-700 text-white border-gray-600">
+            <SelectValue placeholder="Select Icon Source" />
+          </SelectTrigger>
+          <SelectContent className="bg-gray-700 text-white border-gray-600">
+            <SelectItem value="lucide">Lucide Icons</SelectItem>
+            <SelectItem value="fontawesome">Font Awesome Icons</SelectItem>
+          </SelectContent>
+        </Select>
         <div className="relative">
           <input
             type="text"
