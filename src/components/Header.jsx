@@ -1,8 +1,9 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Library, Keyboard, Image, Terminal, BookMarked } from 'lucide-react';
+import { Settings as SettingsIcon, Save, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Keyboard, ChevronDown } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const Header = ({
   currentCodeName,
@@ -23,7 +24,10 @@ const Header = ({
   toggleConsole,
   showConsole,
   toggleSnippetLibrary,
-  showSnippetLibrary
+  showSnippetLibrary,
+  setShowCssToolsPanel,
+  setShowHtmlToolsPanel,
+  setShowJsToolsPanel
 }) => {
   const getLayoutIcon = () => {
     switch (layout) {
@@ -84,14 +88,39 @@ const Header = ({
         <div className="flex items-center space-x-2">
           <TooltipProvider>
             {renderButton(<Save className="w-5 h-5" />, saveCurrentCode, "Save current code (Ctrl + S)")}
-            {renderButton(<BookOpen className="w-5 h-5" />, () => setShowSavedCodes(true), "Saved Codes (Ctrl + O)")}
-            {renderButton(<Type className="w-5 h-5" />, () => setShowFontPanel(true), "Font Library (Ctrl + F)")}
-            {renderButton(<Library className="w-5 h-5" />, () => setShowIconPanel(true), "Icon Library (Ctrl + I)")}
-            {renderButton(<Image className="w-5 h-5" />, () => setShowPexelsPanel(true), "Pexels Images (Ctrl + U)")}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="text-white hover:bg-gray-700">
+                  Library <ChevronDown className="ml-1 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-gray-700 text-white">
+                <DropdownMenuItem onSelect={() => setShowSavedCodes(true)}>Saved Codes</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowFontPanel(true)}>Font Library</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowIconPanel(true)}>Icon Library</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowPexelsPanel(true)}>Pexels Images</DropdownMenuItem>
+                <DropdownMenuItem onSelect={toggleSnippetLibrary}>
+                  {showSnippetLibrary ? 'Hide' : 'Show'} Snippet Library
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="text-white hover:bg-gray-700">
+                  Tools <ChevronDown className="ml-1 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-gray-700 text-white">
+                <DropdownMenuItem onSelect={toggleConsole}>
+                  {showConsole ? 'Hide' : 'Show'} Console
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowHtmlToolsPanel(true)}>HTML Tools</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowCssToolsPanel(true)}>CSS Tools</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowJsToolsPanel(true)}>JS Tools</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             {renderButton(getLayoutIcon(), toggleLayout, "Toggle Layout (Ctrl + L)")}
             {renderButton(<Keyboard className="w-5 h-5" />, () => setShowKeyboardShortcuts(true), "Keyboard Shortcuts (Ctrl + /)")}
-            {renderButton(<Terminal className="w-5 h-5" />, toggleConsole, `${showConsole ? 'Hide' : 'Show'} Console (Ctrl + J)`)}
-            {renderButton(<BookMarked className="w-5 h-5" />, toggleSnippetLibrary, `${showSnippetLibrary ? 'Hide' : 'Show'} Snippet Library (Ctrl + B)`)}
             {renderButton(<SettingsIcon className="w-5 h-5" />, () => setShowSettings(true), "Settings (Ctrl + ,)")}
           </TooltipProvider>
         </div>
