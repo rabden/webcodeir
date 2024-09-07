@@ -10,7 +10,6 @@ const PEXELS_API_KEY = 'SlQp2QTvSTt9CB9Fa6AMAZaNo3kC7IYvENxUJTWaSJzrs1kls0B5z3fX
 const PexelsImagePanel = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [images, setImages] = useState([]);
-  const [visibleImages, setVisibleImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
@@ -55,10 +54,8 @@ const PexelsImagePanel = ({ onClose }) => {
       const data = await response.json();
       if (newPage === 1 || refresh) {
         setImages(data.photos);
-        setVisibleImages(data.photos.slice(0, 10));
       } else {
         setImages(prevImages => [...prevImages, ...data.photos]);
-        setVisibleImages(prevImages => [...prevImages, ...data.photos.slice(0, 10)]);
       }
       setHasMore(data.photos.length === 30);
       setPage(newPage);
@@ -75,7 +72,6 @@ const PexelsImagePanel = ({ onClose }) => {
 
   const handleSearch = () => {
     setImages([]);
-    setVisibleImages([]);
     setPage(1);
     setIsSearching(true);
     fetchImages(searchTerm);
@@ -91,9 +87,8 @@ const PexelsImagePanel = ({ onClose }) => {
 
   const refreshImages = () => {
     setImages([]);
-    setVisibleImages([]);
     setPage(1);
-    fetchImages('', 1, true);
+    fetchImages(searchTerm || '', 1, true);
   };
 
   const copyToClipboard = (text) => {
@@ -103,18 +98,6 @@ const PexelsImagePanel = ({ onClose }) => {
       description: "Copied to clipboard",
     });
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (visibleImages.length < images.length) {
-        setVisibleImages(prevVisible => [
-          ...prevVisible,
-          ...images.slice(prevVisible.length, prevVisible.length + 10)
-        ]);
-      }
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [visibleImages, images]);
 
   return (
     <div className={`fixed inset-y-4 right-4 ${isMobile ? 'left-4' : 'w-96'} bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg`}>
@@ -144,11 +127,11 @@ const PexelsImagePanel = ({ onClose }) => {
       <div className="flex-grow overflow-y-auto p-4 space-y-4">
         {error && <p className="text-red-500">{error}</p>}
         <div className={`grid ${isMobile ? 'grid-cols-2 gap-2' : 'grid-cols-1 gap-4'}`}>
-          {visibleImages.map((image, index) => (
+          {images.map((image, index) => (
             <div 
               key={image.id} 
               className="relative group" 
-              ref={index === visibleImages.length - 1 ? lastImageElementRef : null}
+              ref={index === images.length - 1 ? lastImageElementRef : null}
             >
               <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-lg">
                 <img 
