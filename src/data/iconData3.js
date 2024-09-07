@@ -8,7 +8,7 @@ import {
   ChevronsUp, ChevronsDown, ChevronsLeft, ChevronsRight, CornerUpLeft, CornerUpRight, CornerDownLeft, CornerDownRight,
 
   // Weather and nature
-  Cloud, Sun, Moon, Star, Wind, Rainbow, Umbrella, Snowflake, Droplet, Thermometer,
+  Cloud, Sun, Moon, Wind, Rainbow, Umbrella, Snowflake, Droplet, Thermometer,
 
   // Technology and devices
   Smartphone, Tablet, Laptop, Desktop, Tv, Radio, Headphones, Speaker, Battery, Wifi,
@@ -38,11 +38,16 @@ import {
   Bold, Italic, Underline, Type, List, AlignLeft, AlignCenter, AlignRight, AlignJustify,
 
   // Miscellaneous
-  Home, User, Users, Activity, Bell, Eye, EyeOff, Coffee, Umbrella, Zap,
+  Home, User, Users, Activity, Bell, Eye, EyeOff, Coffee, Zap,
 
-  // Additional icons (add more as needed, grouped by category)
-  // ...
-
+  // Additional icons
+  Airplay, AtSign, Award, Bluetooth, Box, Briefcase, Cast, Clipboard, Codepen,
+  Codesandbox, Columns, Cpu, Dribbble, Droplet, ExternalLink, Facebook, Figma,
+  FileText, Framer, Gitlab, Grid, Instagram, Layers, Layout, Linkedin, Loader,
+  LogOut, MapPin, Maximize2, Meh, Monitor, Move, Pocket, Power, Printer,
+  RefreshCw, Repeat, Rss, Server, Shield, Sidebar, Sliders, Smartphone, Smile,
+  Speaker, Target, Terminal, ThumbsDown, ThumbsUp, ToggleLeft, ToggleRight,
+  Trello, TrendingDown, TrendingUp, Twitter, Voicemail, XCircle, XOctagon, Youtube
 } from 'lucide-react';
 
 export const extraIcons = {
@@ -55,7 +60,7 @@ export const extraIcons = {
   ChevronsUp, ChevronsDown, ChevronsLeft, ChevronsRight, CornerUpLeft, CornerUpRight, CornerDownLeft, CornerDownRight,
 
   // Weather and nature
-  Cloud, Sun, Moon, Star, Wind, Rainbow, Umbrella, Snowflake, Droplet, Thermometer,
+  Cloud, Sun, Moon, Wind, Rainbow, Umbrella, Snowflake, Droplet, Thermometer,
 
   // Technology and devices
   Smartphone, Tablet, Laptop, Desktop, Tv, Radio, Headphones, Speaker, Battery, Wifi,
@@ -85,9 +90,14 @@ export const extraIcons = {
   Bold, Italic, Underline, Type, List, AlignLeft, AlignCenter, AlignRight, AlignJustify,
 
   // Miscellaneous
-  Home, User, Users, Activity, Bell, Eye, EyeOff, Coffee, Umbrella, Zap,
+  Home, User, Users, Activity, Bell, Eye, EyeOff, Coffee, Zap,
 
-  // Additional icons (add more as needed, grouped by category)
-  // ...
-
+  // Additional icons
+  Airplay, AtSign, Award, Bluetooth, Box, Briefcase, Cast, Clipboard, Codepen,
+  Codesandbox, Columns, Cpu, Dribbble, Droplet, ExternalLink, Facebook, Figma,
+  FileText, Framer, Gitlab, Grid, Instagram, Layers, Layout, Linkedin, Loader,
+  LogOut, MapPin, Maximize2, Meh, Monitor, Move, Pocket, Power, Printer,
+  RefreshCw, Repeat, Rss, Server, Shield, Sidebar, Sliders, Smartphone, Smile,
+  Speaker, Target, Terminal, ThumbsDown, ThumbsUp, ToggleLeft, ToggleRight,
+  Trello, TrendingDown, TrendingUp, Twitter, Voicemail, XCircle, XOctagon, Youtube
 };
