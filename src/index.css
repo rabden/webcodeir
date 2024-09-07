@@ -75,32 +75,25 @@
   }
 }
 
-/* Custom scrollbar styles */
-::-webkit-scrollbar {
+/* Custom scrollbar styles for code editor */
+.cm-scroller::-webkit-scrollbar {
+  width: 2px !important;
+  height: 2px !important;
+}
+
+.cm-scroller::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.cm-scroller::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.5) !important;
+  border-radius: 1px !important;
+}
+
+/* Custom scrollbar styles for preview panel */
+.custom-scrollbar::-webkit-scrollbar {
   width: 6px;
   height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: rgba(155, 155, 155, 0.5);
-  border-radius: 3px;
-  border: transparent;
-}
-
-/* For Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
-}
-
-/* Custom scrollbar for preview panel */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -109,10 +102,24 @@
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: var(--muted);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: var(--muted) var(--background);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
+}
+
+/* Mobile preview button */
+.mobile-preview-button {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 50;
 }

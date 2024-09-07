@@ -53,7 +53,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       EditorView.theme({
         "&": { height: "100%", overflow: "auto" },
         ".cm-scroller": { overflow: "auto" },
-        ".cm-content": { whiteSpace: "pre !important", paddingBottom: "50vh" },
+        ".cm-content": { 
+          whiteSpace: isMobile ? "pre !important" : "pre-wrap !important",
+          wordBreak: isMobile ? "normal" : "break-word",
+          paddingBottom: "50vh"
+        },
         "&::-webkit-scrollbar": { width: "2px", height: "2px" },
         "&::-webkit-scrollbar-track": { background: "transparent" },
         "&::-webkit-scrollbar-thumb": { background: "rgba(255, 255, 255, 0.1)", borderRadius: "1px" },
