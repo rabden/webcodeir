@@ -42,11 +42,11 @@ import {
 
   // Additional icons
   Airplay, AtSign, Award, Bluetooth, Box, Briefcase, Cast, Clipboard, Codepen,
-  Codesandbox, Columns, Cpu, Dribbble, Droplet, ExternalLink, Facebook, Figma,
+  Codesandbox, Columns, Cpu, Dribbble, ExternalLink, Facebook, Figma,
   FileText, Framer, Gitlab, Grid, Instagram, Layers, Layout, Linkedin, Loader,
   LogOut, MapPin, Maximize2, Meh, Monitor, Move, Pocket, Power, Printer,
-  RefreshCw, Repeat, Rss, Server, Shield, Sidebar, Sliders, Smartphone, Smile,
-  Speaker, Target, Terminal, ThumbsDown, ThumbsUp, ToggleLeft, ToggleRight,
+  RefreshCw, Repeat, Rss, Server, Shield, Sidebar, Sliders, Smile,
+  Target, Terminal, ThumbsDown, ThumbsUp, ToggleLeft, ToggleRight,
   Trello, TrendingDown, TrendingUp, Twitter, Voicemail, XCircle, XOctagon, Youtube
 } from 'lucide-react';
 
@@ -94,10 +94,10 @@ export const extraIcons = {
 
   // Additional icons
   Airplay, AtSign, Award, Bluetooth, Box, Briefcase, Cast, Clipboard, Codepen,
-  Codesandbox, Columns, Cpu, Dribbble, Droplet, ExternalLink, Facebook, Figma,
+  Codesandbox, Columns, Cpu, Dribbble, ExternalLink, Facebook, Figma,
   FileText, Framer, Gitlab, Grid, Instagram, Layers, Layout, Linkedin, Loader,
   LogOut, MapPin, Maximize2, Meh, Monitor, Move, Pocket, Power, Printer,
-  RefreshCw, Repeat, Rss, Server, Shield, Sidebar, Sliders, Smartphone, Smile,
-  Speaker, Target, Terminal, ThumbsDown, ThumbsUp, ToggleLeft, ToggleRight,
+  RefreshCw, Repeat, Rss, Server, Shield, Sidebar, Sliders, Smile,
+  Target, Terminal, ThumbsDown, ThumbsUp, ToggleLeft, ToggleRight,
   Trello, TrendingDown, TrendingUp, Twitter, Voicemail, XCircle, XOctagon, Youtube
 };
