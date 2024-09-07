@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Search, ExternalLink, Copy, MoreVertical } from 'lucide-react';
+import { X, Search, ExternalLink, Copy, MoreVertical, RefreshCw } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -37,7 +37,7 @@ const PexelsImagePanel = ({ onClose }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const fetchImages = async (query = '', newPage = 1) => {
+  const fetchImages = async (query = '', newPage = 1, refresh = false) => {
     setLoading(true);
     setError(null);
     try {
@@ -53,7 +53,7 @@ const PexelsImagePanel = ({ onClose }) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      if (newPage === 1) {
+      if (newPage === 1 || refresh) {
         setImages(data.photos);
         setVisibleImages(data.photos.slice(0, 10));
       } else {
@@ -89,6 +89,13 @@ const PexelsImagePanel = ({ onClose }) => {
     }
   };
 
+  const refreshImages = () => {
+    setImages([]);
+    setVisibleImages([]);
+    setPage(1);
+    fetchImages('', 1, true);
+  };
+
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     toast({
@@ -113,9 +120,14 @@ const PexelsImagePanel = ({ onClose }) => {
     <div className={`fixed inset-y-4 right-4 ${isMobile ? 'left-4' : 'w-96'} bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg`}>
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-xl font-bold text-white">Pexels Images</h2>
-        <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
-          <X className="w-5 h-5 text-white" />
-        </button>
+        <div className="flex items-center space-x-2">
+          <Button onClick={refreshImages} variant="ghost" size="icon" className="text-white hover:bg-gray-700">
+            <RefreshCw className="w-5 h-5" />
+          </Button>
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
+            <X className="w-5 h-5 text-white" />
+          </button>
+        </div>
       </div>
       <div className="p-4 flex space-x-2">
         <Input
