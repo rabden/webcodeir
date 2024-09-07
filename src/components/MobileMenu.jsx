@@ -1,8 +1,8 @@
 import React from 'react';
-import { X, Save, BookOpen, Settings as SettingsIcon, Type, Library, Palette, Code, Wrench, Keyboard, Image } from 'lucide-react';
+import { X, Save, BookOpen, Settings as SettingsIcon, Type, Library, Palette, Code, Wrench, Keyboard, Image, Terminal } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
-const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, setShowKeyboardShortcuts, setShowPexelsPanel, saveCurrentCode }) => {
+const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, setShowKeyboardShortcuts, setShowPexelsPanel, saveCurrentCode, toggleConsole, showConsole }) => {
   return (
     <div className={`fixed inset-y-0 left-0 w-64 bg-gray-900 shadow-lg z-50 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out overflow-y-auto`}>
       <div className="sticky top-0 bg-gray-900 p-4 flex justify-between items-center border-b border-gray-800">
@@ -21,6 +21,7 @@ const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, set
         <MenuButton icon={<Code className="w-4 h-4" />} label="HTML Tools" onClick={() => { setShowHtmlToolsPanel(true); setIsOpen(false); }} />
         <MenuButton icon={<Wrench className="w-4 h-4" />} label="JS Tools" onClick={() => { setShowJsToolsPanel(true); setIsOpen(false); }} />
         <MenuButton icon={<Keyboard className="w-4 h-4" />} label="Keyboard Shortcuts" onClick={() => { setShowKeyboardShortcuts(true); setIsOpen(false); }} />
+        <MenuButton icon={<Terminal className="w-4 h-4" />} label={`${showConsole ? 'Hide' : 'Show'} Console`} onClick={() => { toggleConsole(); setIsOpen(false); }} />
         <MenuButton icon={<SettingsIcon className="w-4 h-4" />} label="Settings" onClick={() => { setShowSettings(true); setIsOpen(false); }} />
       </nav>
     </div>

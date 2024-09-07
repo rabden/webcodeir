@@ -12,6 +12,7 @@ import ToolsPanel from './ToolsPanel';
 import MobilePreviewButton from './MobilePreviewButton';
 import KeyboardShortcutsPanel from './KeyboardShortcutsPanel';
 import PexelsImagePanel from './PexelsImagePanel';
+import ConsolePanel from './ConsolePanel';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
@@ -19,6 +20,7 @@ const CodeEditor = () => {
   const [state, setState] = useCodeEditorState();
   const { saveToLocalStorage, loadFromLocalStorage } = useLocalStorage(setState);
   const [activeTab, setActiveTab] = useState('html');
+  const [showConsole, setShowConsole] = useState(false);
 
   useEffect(() => {
     loadFromLocalStorage();
@@ -49,6 +51,7 @@ const CodeEditor = () => {
           case 'm': e.preventDefault(); if (state.isMobile) setState(s => ({ ...s, isMenuOpen: !s.isMenuOpen })); break;
           case '/': e.preventDefault(); setState(s => ({ ...s, showKeyboardShortcuts: !s.showKeyboardShortcuts })); break;
           case 'u': e.preventDefault(); setState(s => ({ ...s, showPexelsPanel: !s.showPexelsPanel })); break;
+          case 'j': e.preventDefault(); setShowConsole(s => !s); break;
         }
       }
     };
@@ -120,6 +123,7 @@ const CodeEditor = () => {
       </div>
     );
     const previewPanel = <PreviewPanel preview={state.preview} />;
+    const consolePanel = showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.isMobile} />;
 
     if (state.isMobile) {
       return (
@@ -130,6 +134,7 @@ const CodeEditor = () => {
               {previewPanel}
             </div>
           )}
+          {consolePanel}
         </div>
       );
     } else {
@@ -142,7 +147,10 @@ const CodeEditor = () => {
             <div className={`${state.settings.layout === 'stacked' ? 'h-0.5 w-full' : 'w-0.5 h-full'} bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200`}></div>
           </PanelResizeHandle>
           <Panel minSize={0} defaultSize={50}>
-            {state.settings.layout === 'horizontal' ? editorPanel : previewPanel}
+            <div className="h-full flex flex-col">
+              {state.settings.layout === 'horizontal' ? editorPanel : previewPanel}
+              {consolePanel}
+            </div>
           </Panel>
         </PanelGroup>
       );
@@ -167,6 +175,8 @@ const CodeEditor = () => {
         setShowPexelsPanel={() => setState(s => ({ ...s, showPexelsPanel: true }))}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        toggleConsole={() => setShowConsole(s => !s)}
+        showConsole={showConsole}
       />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
@@ -193,6 +203,8 @@ const CodeEditor = () => {
         setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true, isMenuOpen: false }))}
         setShowPexelsPanel={() => setState(s => ({ ...s, showPexelsPanel: true, isMenuOpen: false }))}
         saveCurrentCode={() => { saveCurrentCode(); setState(s => ({ ...s, isMenuOpen: false })); }}
+        toggleConsole={() => { setShowConsole(s => !s); setState(s => ({ ...s, isMenuOpen: false })); }}
+        showConsole={showConsole}
       />
     </div>
   );

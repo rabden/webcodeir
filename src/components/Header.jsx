@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Library, Keyboard, Image } from 'lucide-react';
+import { Settings as SettingsIcon, Save, BookOpen, Type, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Library, Keyboard, Image, Terminal } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,7 +19,9 @@ const Header = ({
   setShowKeyboardShortcuts,
   setShowPexelsPanel,
   activeTab,
-  setActiveTab
+  setActiveTab,
+  toggleConsole,
+  showConsole
 }) => {
   const getLayoutIcon = () => {
     switch (layout) {
@@ -33,6 +35,24 @@ const Header = ({
         return <LayoutPanelLeft className="w-5 h-5" />;
     }
   };
+
+  const renderButton = (icon, onClick, tooltip) => (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClick}
+          className="text-white hover:bg-gray-700"
+        >
+          {icon}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{tooltip}</p>
+      </TooltipContent>
+    </Tooltip>
+  );
 
   return (
     <header className="bg-gray-800 p-2 flex justify-between items-center">
@@ -61,133 +81,15 @@ const Header = ({
       {!isMobile && (
         <div className="flex items-center space-x-2">
           <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={saveCurrentCode}
-                  className="text-white hover:bg-gray-700"
-                >
-                  <Save className="w-5 h-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Save current code (Ctrl + S)</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowSavedCodes(true)}
-                  className="text-white hover:bg-gray-700"
-                >
-                  <BookOpen className="w-5 h-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Saved Codes (Ctrl + O)</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowFontPanel(true)}
-                  className="text-white hover:bg-gray-700"
-                >
-                  <Type className="w-5 h-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Font Library (Ctrl + F)</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowIconPanel(true)}
-                  className="text-white hover:bg-gray-700"
-                >
-                  <Library className="w-5 h-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Icon Library (Ctrl + I)</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowPexelsPanel(true)}
-                  className="text-white hover:bg-gray-700"
-                >
-                  <Image className="w-5 h-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Pexels Images (Ctrl + U)</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleLayout}
-                  className="text-white hover:bg-gray-700"
-                >
-                  {getLayoutIcon()}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Toggle Layout (Ctrl + L)</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowKeyboardShortcuts(true)}
-                  className="text-white hover:bg-gray-700"
-                >
-                  <Keyboard className="w-5 h-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Keyboard Shortcuts (Ctrl + /)</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowSettings(true)}
-                  className="text-white hover:bg-gray-700"
-                >
-                  <SettingsIcon className="w-5 h-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Settings (Ctrl + ,)</p>
-              </TooltipContent>
-            </Tooltip>
+            {renderButton(<Save className="w-5 h-5" />, saveCurrentCode, "Save current code (Ctrl + S)")}
+            {renderButton(<BookOpen className="w-5 h-5" />, () => setShowSavedCodes(true), "Saved Codes (Ctrl + O)")}
+            {renderButton(<Type className="w-5 h-5" />, () => setShowFontPanel(true), "Font Library (Ctrl + F)")}
+            {renderButton(<Library className="w-5 h-5" />, () => setShowIconPanel(true), "Icon Library (Ctrl + I)")}
+            {renderButton(<Image className="w-5 h-5" />, () => setShowPexelsPanel(true), "Pexels Images (Ctrl + U)")}
+            {renderButton(getLayoutIcon(), toggleLayout, "Toggle Layout (Ctrl + L)")}
+            {renderButton(<Keyboard className="w-5 h-5" />, () => setShowKeyboardShortcuts(true), "Keyboard Shortcuts (Ctrl + /)")}
+            {renderButton(<Terminal className="w-5 h-5" />, toggleConsole, `${showConsole ? 'Hide' : 'Show'} Console (Ctrl + J)`)}
+            {renderButton(<SettingsIcon className="w-5 h-5" />, () => setShowSettings(true), "Settings (Ctrl + ,)")}
           </TooltipProvider>
         </div>
       )}
