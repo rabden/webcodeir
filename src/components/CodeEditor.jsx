@@ -175,7 +175,7 @@ const CodeEditor = () => {
       {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
       {showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.iMobile} />}
       {showSnippetLibrary && <CodeSnippetLibrary onClose={() => setShowSnippetLibrary(false)} isMobile={state.iMobile} />}
-      {showAIImageGenerator && <AIImageGenerator onClose={() => setShowAIImageGenerator(false)} isMobile={state.iMobile} />}
+      {showAIImageGenerator && <AIImageGenerator onClose={() => setShowAIImageGenerator(false)} />}
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
