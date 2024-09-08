@@ -1,8 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -46,28 +44,10 @@ const AIImageGenerator = () => {
   };
 
   const getModelData = useCallback((model) => {
-    const commonData = {
+    return {
       inputs: document.getElementById(`${model.toLowerCase()}-prompt`).value,
       seed: Math.floor(Math.random() * MAX_SEED),
     };
-    if (model === 'StableDiffusion') {
-      return {
-        ...commonData,
-        negative_prompt: document.getElementById('sd-negative-prompt').value,
-        width: parseInt(document.getElementById('sd-width').value),
-        height: parseInt(document.getElementById('sd-height').value),
-        guidance_scale: parseFloat(document.getElementById('sd-guidance-scale').value),
-        num_inference_steps: parseInt(document.getElementById('sd-inference-steps').value),
-      };
-    } else if (model === 'FLUX') {
-      return {
-        ...commonData,
-        width: parseInt(document.getElementById('flux-width').value),
-        height: parseInt(document.getElementById('flux-height').value),
-        num_inference_steps: parseInt(document.getElementById('flux-inference-steps').value),
-      };
-    }
-    return commonData; // For Hent model
   }, []);
 
   const downloadImage = (imageUrl, fileName) => {
@@ -82,37 +62,6 @@ const AIImageGenerator = () => {
   const renderInputs = (model) => (
     <>
       <Input id={`${model.toLowerCase()}-prompt`} placeholder="Enter prompt" className="mb-4" />
-      {model !== 'Hent' && (
-        <>
-          {model === 'StableDiffusion' && (
-            <Input id="sd-negative-prompt" placeholder="Enter negative prompt" className="mb-4" />
-          )}
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <Label>Width: <span id={`${model.toLowerCase()}-width-value`}>1024</span></Label>
-              <Slider id={`${model.toLowerCase()}-width`} min={256} max={model === 'FLUX' ? 2048 : 1024} step={8} defaultValue={[1024]} 
-                onValueChange={(value) => document.getElementById(`${model.toLowerCase()}-width-value`).textContent = value} />
-            </div>
-            <div>
-              <Label>Height: <span id={`${model.toLowerCase()}-height-value`}>1024</span></Label>
-              <Slider id={`${model.toLowerCase()}-height`} min={256} max={model === 'FLUX' ? 2048 : 1024} step={8} defaultValue={[1024]} 
-                onValueChange={(value) => document.getElementById(`${model.toLowerCase()}-height-value`).textContent = value} />
-            </div>
-          </div>
-          {model === 'StableDiffusion' && (
-            <div className="mb-4">
-              <Label>Guidance scale: <span id="sd-guidance-scale-value">5</span></Label>
-              <Slider id="sd-guidance-scale" min={1} max={20} step={0.1} defaultValue={[5]} 
-                onValueChange={(value) => document.getElementById('sd-guidance-scale-value').textContent = value} />
-            </div>
-          )}
-          <div className="mb-4">
-            <Label>Inference steps: <span id={`${model.toLowerCase()}-inference-steps-value`}>{model === 'FLUX' ? 4 : 28}</span></Label>
-            <Slider id={`${model.toLowerCase()}-inference-steps`} min={1} max={model === 'FLUX' ? 50 : 100} step={1} defaultValue={[model === 'FLUX' ? 4 : 28]} 
-              onValueChange={(value) => document.getElementById(`${model.toLowerCase()}-inference-steps-value`).textContent = value} />
-          </div>
-        </>
-      )}
       <Button onClick={() => generateImage(model)} disabled={loading[model]}>
         {loading[model] ? 'Generating...' : 'Generate Image'}
       </Button>
