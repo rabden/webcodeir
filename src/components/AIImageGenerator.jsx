@@ -3,7 +3,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Wand2 } from 'lucide-react';
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Wand2, MoreVertical, Download, Link, Image } from 'lucide-react';
+import { useToast } from "@/components/ui/use-toast";
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -12,6 +15,7 @@ const AIImageGenerator = () => {
   const [results, setResults] = useState({ StableDiffusion: [], FLUX: [], Hent: [] });
   const [loading, setLoading] = useState({ StableDiffusion: false, FLUX: false, Hent: false });
   const [prompts, setPrompts] = useState({ StableDiffusion: '', FLUX: '', Hent: '' });
+  const { toast } = useToast();
 
   const generateImage = async (model) => {
     setLoading(prev => ({ ...prev, [model]: true }));
@@ -62,6 +66,14 @@ const AIImageGenerator = () => {
     document.body.removeChild(a);
   };
 
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: "Copied to clipboard",
+    });
+  };
+
   const renderInputs = (model) => (
     <div className="flex items-center space-x-2 mb-4">
       <Input
@@ -82,20 +94,46 @@ const AIImageGenerator = () => {
 
   const renderResult = (model) => {
     return results[model].map((result, index) => (
-      <div key={index} className="mb-4">
+      <Card key={index} className="mb-4">
         {result.error ? (
-          <p className="text-red-500">{result.error}</p>
+          <CardContent className="p-4">
+            <p className="text-red-500">{result.error}</p>
+          </CardContent>
         ) : (
           <>
-            <img src={result.imageUrl} alt="Generated image" className="max-w-full h-auto mb-2" />
-            <p>Used seed: {result.seed}</p>
-            <p>Prompt: {result.prompt}</p>
-            <Button onClick={() => downloadImage(result.imageUrl, `${model.toLowerCase()}_image_${index}.png`)} className="mt-2">
-              Download Image
-            </Button>
+            <CardContent className="p-0">
+              <img src={result.imageUrl} alt="Generated image" className="w-full h-auto rounded-t-lg" />
+            </CardContent>
+            <CardFooter className="flex justify-between items-center p-4">
+              <div>
+                <p className="text-sm text-gray-500">Seed: {result.seed}</p>
+                <p className="text-sm text-gray-500">Prompt: {result.prompt}</p>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => downloadImage(result.imageUrl, `${model.toLowerCase()}_image_${index}.png`)}>
+                    <Download className="mr-2 h-4 w-4" />
+                    <span>Download</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => copyToClipboard(result.imageUrl)}>
+                    <Link className="mr-2 h-4 w-4" />
+                    <span>Copy Link</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => copyToClipboard(`<img src="${result.imageUrl}" alt="Generated image" />`)}>
+                    <Image className="mr-2 h-4 w-4" />
+                    <span>Copy Image Tag</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </CardFooter>
           </>
         )}
-      </div>
+      </Card>
     ));
   };
 
