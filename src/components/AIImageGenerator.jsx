@@ -32,54 +32,59 @@ const AIImageGenerator = () => {
       height: 1024,
       num_inference_steps: 4
     },
-    isFluxSettingsOpen: false
+    isFluxSettingsOpen: false,
+    imageCount: 1
   });
   const { toast } = useToast();
 
   const generateImage = async (model) => {
     setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true } }));
-    let data = { inputs: state.prompts[model] };
-    if (model === 'FLUX') {
-      data.parameters = {
-        seed: state.fluxParams.randomize_seed ? Math.floor(Math.random() * MAX_SEED) : state.fluxParams.seed,
-        width: state.fluxParams.width,
-        height: state.fluxParams.height,
-        num_inference_steps: state.fluxParams.num_inference_steps
-      };
+    const results = [];
+    for (let i = 0; i < state.imageCount; i++) {
+      let data = { inputs: state.prompts[model] };
+      if (model === 'FLUX') {
+        data.parameters = {
+          seed: state.fluxParams.randomize_seed ? Math.floor(Math.random() * MAX_SEED) : state.fluxParams.seed,
+          width: state.fluxParams.width,
+          height: state.fluxParams.height,
+          num_inference_steps: state.fluxParams.num_inference_steps
+        };
+      }
+      
+      results.push({ loading: true, seed: data.parameters?.seed, prompt: state.prompts[model] });
     }
-    
+
     setState(prev => ({
       ...prev,
-      results: {
-        ...prev.results,
-        [model]: [{ loading: true, seed: data.parameters?.seed, prompt: state.prompts[model] }, ...prev.results[model]]
-      }
+      results: { ...prev.results, [model]: [...results, ...prev.results[model]] }
     }));
 
-    try {
-      const response = await queryModel(model, data);
-      const imageUrl = URL.createObjectURL(response[0]);
-      setState(prev => ({ 
-        ...prev, 
-        results: { 
-          ...prev.results, 
-          [model]: prev.results[model].map((item, index) => 
-            index === 0 ? { imageUrl, seed: response[1], prompt: state.prompts[model] } : item
-          )
-        },
-        fluxParams: model === 'FLUX' ? { ...prev.fluxParams, seed: response[1] } : prev.fluxParams
-      }));
-    } catch (error) {
-      console.error('Error:', error);
-      setState(prev => ({ 
-        ...prev, 
-        results: { 
-          ...prev.results, 
-          [model]: prev.results[model].map((item, index) => 
-            index === 0 ? { error: 'Error generating image. Please try again.', seed: data.parameters?.seed, prompt: state.prompts[model] } : item
-          )
-        }
-      }));
+    for (let i = 0; i < state.imageCount; i++) {
+      try {
+        const response = await queryModel(model, { inputs: state.prompts[model], parameters: results[i].parameters });
+        const imageUrl = URL.createObjectURL(response[0]);
+        setState(prev => ({ 
+          ...prev, 
+          results: { 
+            ...prev.results, 
+            [model]: prev.results[model].map((item, index) => 
+              index === i ? { imageUrl, seed: response[1], prompt: state.prompts[model] } : item
+            )
+          },
+          fluxParams: model === 'FLUX' ? { ...prev.fluxParams, seed: response[1] } : prev.fluxParams
+        }));
+      } catch (error) {
+        console.error('Error:', error);
+        setState(prev => ({ 
+          ...prev, 
+          results: { 
+            ...prev.results, 
+            [model]: prev.results[model].map((item, index) => 
+              index === i ? { error: 'Error generating image. Please try again.', seed: results[i].parameters?.seed, prompt: state.prompts[model] } : item
+            )
+          }
+        }));
+      }
     }
     setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: false } }));
   };
@@ -100,15 +105,6 @@ const AIImageGenerator = () => {
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     toast({ title: "Copied!", description: "Copied to clipboard" });
-  };
-
-  const downloadImage = (imageUrl, fileName) => {
-    const a = document.createElement('a');
-    a.href = imageUrl;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
   };
 
   const renderInputs = (model) => (
@@ -226,6 +222,16 @@ const AIImageGenerator = () => {
     <ScrollArea className="h-full">
       <div className="p-4 space-y-4">
         <h2 className="text-2xl font-bold">AI Image Generators</h2>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-white">Number of Images to Generate</label>
+          <Input
+            type="number"
+            value={state.imageCount}
+            onChange={(e) => setState(prev => ({ ...prev, imageCount: Math.max(1, parseInt(e.target.value)) }))}
+            min="1"
+            className="w-full"
+          />
+        </div>
         <Tabs defaultValue="FLUX">
           <TabsList>
             <TabsTrigger value="FLUX">FLUX</TabsTrigger>
