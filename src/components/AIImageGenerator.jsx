@@ -15,9 +15,9 @@ const MAX_SEED = 4294967295;
 const API_KEY = "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";
 
 const AIImageGenerator = () => {
-  const [results, setResults] = useState({ StableDiffusion: [], FLUX: [] });
-  const [loading, setLoading] = useState({ StableDiffusion: false, FLUX: false });
-  const [prompts, setPrompts] = useState({ StableDiffusion: '', FLUX: '' });
+  const [results, setResults] = useState({ SD3: [], FLUX: [] });
+  const [loading, setLoading] = useState({ SD3: false, FLUX: false });
+  const [prompts, setPrompts] = useState({ SD3: '', FLUX: '' });
   const [fluxParams, setFluxParams] = useState({
     seed: 0,
     randomize_seed: true,
@@ -30,19 +30,19 @@ const AIImageGenerator = () => {
 
   const generateImage = async (model) => {
     setLoading(prev => ({ ...prev, [model]: true }));
-    let data = {
-      inputs: prompts[model],
-      parameters: {
+    let data = { inputs: prompts[model] };
+    if (model === 'FLUX') {
+      data.parameters = {
         seed: fluxParams.randomize_seed ? Math.floor(Math.random() * MAX_SEED) : fluxParams.seed,
         width: fluxParams.width,
         height: fluxParams.height,
         num_inference_steps: fluxParams.num_inference_steps
-      }
-    };
+      };
+    }
     
     setResults(prev => ({
       ...prev,
-      [model]: [{ loading: true, seed: data.parameters.seed, prompt: prompts[model] }, ...prev[model]]
+      [model]: [{ loading: true, seed: data.parameters?.seed, prompt: prompts[model] }, ...prev[model]]
     }));
 
     try {
@@ -54,13 +54,13 @@ const AIImageGenerator = () => {
           index === 0 ? { imageUrl, seed: response[1], prompt: prompts[model] } : item
         )
       }));
-      setFluxParams(prev => ({ ...prev, seed: response[1] }));
+      if (model === 'FLUX') setFluxParams(prev => ({ ...prev, seed: response[1] }));
     } catch (error) {
       console.error('Error:', error);
       setResults(prev => ({ 
         ...prev, 
         [model]: prev[model].map((item, index) => 
-          index === 0 ? { error: 'Error generating image. Please try again.', seed: data.parameters.seed, prompt: prompts[model] } : item
+          index === 0 ? { error: 'Error generating image. Please try again.', seed: data.parameters?.seed, prompt: prompts[model] } : item
         )
       }));
     }
@@ -69,7 +69,7 @@ const AIImageGenerator = () => {
 
   const queryModel = async (model, data) => {
     const modelEndpoints = {
-      StableDiffusion: "stabilityai/stable-diffusion-3-medium-diffusers",
+      SD3: "stabilityai/stable-diffusion-3-medium-diffusers",
       FLUX: "black-forest-labs/FLUX.1-schnell"
     };
     const response = await fetch(
@@ -81,7 +81,7 @@ const AIImageGenerator = () => {
       }
     );
     const result = await response.blob();
-    return [result, data.parameters.seed];
+    return [result, data.parameters?.seed];
   };
 
   const copyToClipboard = (text) => {
@@ -213,12 +213,12 @@ const AIImageGenerator = () => {
     <ScrollArea className="h-full">
       <div className="p-4 space-y-4">
         <h2 className="text-2xl font-bold">AI Image Generators</h2>
-        <Tabs defaultValue="StableDiffusion">
+        <Tabs defaultValue="SD3">
           <TabsList>
-            <TabsTrigger value="StableDiffusion">Stable Diffusion 3</TabsTrigger>
+            <TabsTrigger value="SD3">SD3</TabsTrigger>
             <TabsTrigger value="FLUX">FLUX</TabsTrigger>
           </TabsList>
-          {['StableDiffusion', 'FLUX'].map(model => (
+          {['SD3', 'FLUX'].map(model => (
             <TabsContent key={model} value={model}>
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold">{model} Image Generator</h3>
