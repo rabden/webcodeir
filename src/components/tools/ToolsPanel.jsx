@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, MoreVertical } from 'lucide-react';
+import { X, MoreVertical, Minimize2 } from 'lucide-react';
 import FlexboxGenerator from './FlexboxGenerator';
 import GridGenerator from './GridGenerator';
 import AnimationCreator from './AnimationCreator';
@@ -13,6 +13,7 @@ import EventListenerHelper from './EventListenerHelper';
 import FetchApiHelper from './FetchApiHelper';
 import LocalStorageHelper from './LocalStorageHelper';
 import AIImageGenerator from './AIImageGenerator';
+import MinimizedPanelIcon from './MinimizedPanelIcon';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -29,6 +30,8 @@ const ToolsPanel = ({ onClose, type }) => {
     loading: { StableDiffusion: false, FLUX: false, Hent: false },
     prompts: { StableDiffusion: '', FLUX: '', Hent: '' }
   });
+
+  const [isMinimized, setIsMinimized] = useState(false);
 
   const cssTabs = [
     { id: 'flexbox', label: 'Flexbox', component: FlexboxGenerator },
@@ -59,6 +62,18 @@ const ToolsPanel = ({ onClose, type }) => {
 
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || (() => null);
 
+  const handleMinimize = () => {
+    setIsMinimized(true);
+  };
+
+  const handleMaximize = () => {
+    setIsMinimized(false);
+  };
+
+  if (isMinimized) {
+    return <MinimizedPanelIcon onMaximize={handleMaximize} type={type} />;
+  }
+
   return (
     <div className="fixed inset-0 bg-gray-800 z-50 flex flex-col md:inset-y-4 md:right-4 md:left-auto md:w-96 md:rounded-lg overflow-hidden">
       <div className="p-4 border-b border-gray-700 flex justify-between items-center">
@@ -82,6 +97,9 @@ const ToolsPanel = ({ onClose, type }) => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button variant="ghost" size="icon" onClick={handleMinimize}>
+            <Minimize2 className="h-4 w-4" />
+          </Button>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
           </Button>
