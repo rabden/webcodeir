@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Wand2, MoreVertical, Download, Link, Image } from 'lucide-react';
+import { Wand2, MoreVertical, Download, Link, Image, Loader2 } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 
 const MAX_SEED = 4294967295;
@@ -23,18 +23,29 @@ const AIImageGenerator = () => {
       inputs: prompts[model],
       seed: Math.floor(Math.random() * MAX_SEED),
     };
+    
+    // Add a placeholder result immediately
+    setResults(prev => ({
+      ...prev,
+      [model]: [{ loading: true, seed: data.seed, prompt: prompts[model] }, ...prev[model]]
+    }));
+
     try {
       const response = await queryModel(model, data);
       const imageUrl = URL.createObjectURL(response);
       setResults(prev => ({ 
         ...prev, 
-        [model]: [{ imageUrl, seed: data.seed, prompt: prompts[model] }, ...prev[model]]
+        [model]: prev[model].map((item, index) => 
+          index === 0 ? { imageUrl, seed: data.seed, prompt: prompts[model] } : item
+        )
       }));
     } catch (error) {
       console.error('Error:', error);
       setResults(prev => ({ 
         ...prev, 
-        [model]: [{ error: 'Error generating image. Please try again.' }, ...prev[model]]
+        [model]: prev[model].map((item, index) => 
+          index === 0 ? { error: 'Error generating image. Please try again.', seed: data.seed, prompt: prompts[model] } : item
+        )
       }));
     }
     setLoading(prev => ({ ...prev, [model]: false }));
@@ -57,6 +68,14 @@ const AIImageGenerator = () => {
     return await response.blob();
   };
 
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: "Copied to clipboard",
+    });
+  };
+
   const downloadImage = (imageUrl, fileName) => {
     const a = document.createElement('a');
     a.href = imageUrl;
@@ -64,14 +83,6 @@ const AIImageGenerator = () => {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-  };
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Copied!",
-      description: "Copied to clipboard",
-    });
   };
 
   const renderInputs = (model) => (
@@ -95,27 +106,33 @@ const AIImageGenerator = () => {
   const renderResult = (model) => {
     return results[model].map((result, index) => (
       <Card key={index} className="mb-4">
-        {result.error ? (
-          <CardContent className="p-4">
-            <p className="text-red-500">{result.error}</p>
-          </CardContent>
-        ) : (
-          <>
-            <CardContent className="p-0">
-              <img src={result.imageUrl} alt="Generated image" className="w-full h-auto rounded-t-lg" />
-            </CardContent>
-            <CardFooter className="flex justify-between items-center p-4">
-              <div>
-                <p className="text-sm text-gray-500">Seed: {result.seed}</p>
-                <p className="text-sm text-gray-500">Prompt: {result.prompt}</p>
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
+        <CardContent className="p-0">
+          {result.loading ? (
+            <div className="w-full h-64 flex items-center justify-center bg-gray-200">
+              <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
+            </div>
+          ) : result.error ? (
+            <div className="w-full h-64 flex items-center justify-center bg-gray-200">
+              <p className="text-red-500">{result.error}</p>
+            </div>
+          ) : (
+            <img src={result.imageUrl} alt="Generated image" className="w-full h-auto rounded-t-lg" />
+          )}
+        </CardContent>
+        <CardFooter className="flex justify-between items-center p-4">
+          <div>
+            <p className="text-sm text-gray-500">Seed: {result.seed}</p>
+            <p className="text-sm text-gray-500">Prompt: {result.prompt}</p>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {!result.loading && !result.error && (
+                <>
                   <DropdownMenuItem onClick={() => downloadImage(result.imageUrl, `${model.toLowerCase()}_image_${index}.png`)}>
                     <Download className="mr-2 h-4 w-4" />
                     <span>Download</span>
@@ -128,11 +145,11 @@ const AIImageGenerator = () => {
                     <Image className="mr-2 h-4 w-4" />
                     <span>Copy Image Tag</span>
                   </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </CardFooter>
-          </>
-        )}
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </CardFooter>
       </Card>
     ));
   };
