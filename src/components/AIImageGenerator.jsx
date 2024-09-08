@@ -32,12 +32,11 @@ const AIImageGenerator = () => {
 
     try {
       const response = await queryModel(model, data);
-      const imageBlob = await response.blob();
-      const imageUrl = URL.createObjectURL(imageBlob);
+      const imageUrl = URL.createObjectURL(response);
       setResults(prev => ({ 
         ...prev, 
         [model]: prev[model].map((item, index) => 
-          index === 0 ? { imageUrl, seed: data.seed, prompt: prompts[model], blob: imageBlob } : item
+          index === 0 ? { imageUrl, seed: data.seed, prompt: prompts[model] } : item
         )
       }));
     } catch (error) {
@@ -66,7 +65,7 @@ const AIImageGenerator = () => {
         body: JSON.stringify(data),
       }
     );
-    return response;
+    return await response.blob();
   };
 
   const copyToClipboard = (text) => {
@@ -77,15 +76,13 @@ const AIImageGenerator = () => {
     });
   };
 
-  const downloadImage = (blob, fileName) => {
-    const url = URL.createObjectURL(blob);
+  const downloadImage = (imageUrl, fileName) => {
     const a = document.createElement('a');
-    a.href = url;
+    a.href = imageUrl;
     a.download = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   const renderInputs = (model) => (
@@ -136,7 +133,7 @@ const AIImageGenerator = () => {
             <DropdownMenuContent>
               {!result.loading && !result.error && (
                 <>
-                  <DropdownMenuItem onClick={() => downloadImage(result.blob, `${model.toLowerCase()}_image_${index}.png`)}>
+                  <DropdownMenuItem onClick={() => downloadImage(result.imageUrl, `${model.toLowerCase()}_image_${index}.png`)}>
                     <Download className="mr-2 h-4 w-4" />
                     <span>Download</span>
                   </DropdownMenuItem>

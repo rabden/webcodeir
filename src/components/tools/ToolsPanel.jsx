@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, MoreVertical, Minimize2 } from 'lucide-react';
+import { X, MoreVertical } from 'lucide-react';
 import FlexboxGenerator from './FlexboxGenerator';
 import GridGenerator from './GridGenerator';
 import AnimationCreator from './AnimationCreator';
@@ -12,8 +12,6 @@ import JsSnippetGenerator from './JsSnippetGenerator';
 import EventListenerHelper from './EventListenerHelper';
 import FetchApiHelper from './FetchApiHelper';
 import LocalStorageHelper from './LocalStorageHelper';
-import AIImageGenerator from './AIImageGenerator';
-import MinimizedPanelIcon from './MinimizedPanelIcon';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -21,24 +19,8 @@ const ToolsPanel = ({ onClose, type }) => {
   const [activeTab, setActiveTab] = useState(
     type === 'css' ? 'flexbox' : 
     type === 'html' ? 'htmlStructure' : 
-    type === 'js' ? 'jsSnippet' :
-    'aiImageGenerator'
+    'jsSnippet'
   );
-
-  const [aiImageGeneratorState, setAIImageGeneratorState] = useState({
-    results: { StableDiffusion: [], FLUX: [], Hent: [] },
-    loading: { StableDiffusion: false, FLUX: false, Hent: false },
-    prompts: { StableDiffusion: '', FLUX: '', Hent: '' },
-    fluxParams: {
-      seed: 0,
-      randomize_seed: true,
-      width: 1024,
-      height: 1024,
-      num_inference_steps: 4
-    }
-  });
-
-  const [isMinimized, setIsMinimized] = useState(false);
 
   const cssTabs = [
     { id: 'flexbox', label: 'Flexbox', component: FlexboxGenerator },
@@ -61,25 +43,9 @@ const ToolsPanel = ({ onClose, type }) => {
     { id: 'localStorage', label: 'Local Storage', component: LocalStorageHelper },
   ];
 
-  const aiTabs = [
-    { id: 'aiImageGenerator', label: 'AI Image Generator', component: AIImageGenerator },
-  ];
-
-  const tabs = type === 'css' ? cssTabs : type === 'html' ? htmlTabs : type === 'js' ? jsTabs : aiTabs;
+  const tabs = type === 'css' ? cssTabs : type === 'html' ? htmlTabs : jsTabs;
 
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || (() => null);
-
-  const handleMinimize = () => {
-    setIsMinimized(true);
-  };
-
-  const handleMaximize = () => {
-    setIsMinimized(false);
-  };
-
-  if (isMinimized) {
-    return <MinimizedPanelIcon onMaximize={handleMaximize} type={type} />;
-  }
 
   return (
     <div className="fixed inset-0 bg-gray-800 z-50 flex flex-col md:inset-y-4 md:right-4 md:left-auto md:w-96 md:rounded-lg overflow-hidden">
@@ -104,23 +70,13 @@ const ToolsPanel = ({ onClose, type }) => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant="ghost" size="icon" onClick={handleMinimize}>
-            <Minimize2 className="h-4 w-4" />
-          </Button>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
           </Button>
         </div>
       </div>
-      <div className="flex-grow overflow-y-auto">
-        {activeTab === 'aiImageGenerator' ? (
-          <AIImageGenerator
-            state={aiImageGeneratorState}
-            setState={setAIImageGeneratorState}
-          />
-        ) : (
-          <ActiveComponent />
-        )}
+      <div className="flex-grow overflow-y-auto p-4">
+        <ActiveComponent />
       </div>
     </div>
   );
