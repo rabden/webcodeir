@@ -99,6 +99,23 @@ const AIImageGenerator = () => {
     document.body.removeChild(a);
   };
 
+  const renderSlider = (name, value, onChange, min, max, step) => (
+    <div className="space-y-2">
+      <div className="flex justify-between">
+        <label className="text-sm font-medium text-white">{name}</label>
+        <span className="text-sm text-gray-400">{value}</span>
+      </div>
+      <Slider
+        value={[value]}
+        onValueChange={(newValue) => onChange(newValue[0])}
+        min={min}
+        max={max}
+        step={step}
+        className="bg-gray-800"
+      />
+    </div>
+  );
+
   const renderInputs = (model) => (
     <div className="space-y-4">
       <Input
@@ -107,7 +124,22 @@ const AIImageGenerator = () => {
         placeholder="Enter prompt"
         className="h-12"
       />
-      {model === 'FLUX' && renderFluxControls()}
+      {model === 'FLUX' && (
+        <>
+          {renderSlider("Seed", fluxParams.seed, (value) => setFluxParams(prev => ({ ...prev, seed: value })), 0, MAX_SEED, 1)}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="randomize-seed"
+              checked={fluxParams.randomize_seed}
+              onCheckedChange={(checked) => setFluxParams(prev => ({ ...prev, randomize_seed: checked }))}
+            />
+            <label htmlFor="randomize-seed" className="text-sm text-gray-400">Randomize seed</label>
+          </div>
+          {renderSlider("Width", fluxParams.width, (value) => setFluxParams(prev => ({ ...prev, width: value })), 256, 2048, 8)}
+          {renderSlider("Height", fluxParams.height, (value) => setFluxParams(prev => ({ ...prev, height: value })), 256, 2048, 8)}
+          {renderSlider("Inference Steps", fluxParams.num_inference_steps, (value) => setFluxParams(prev => ({ ...prev, num_inference_steps: value })), 1, 50, 1)}
+        </>
+      )}
       <Button
         onClick={() => generateImage(model)}
         disabled={loading[model]}
@@ -116,51 +148,6 @@ const AIImageGenerator = () => {
         {loading[model] ? <Loader2 className="h-6 w-6 animate-spin" /> : <Wand2 className="h-6 w-6 mr-2" />}
         Generate
       </Button>
-    </div>
-  );
-
-  const renderFluxControls = () => (
-    <div className="space-y-4">
-      <div className="flex items-center space-x-2">
-        <Slider
-          value={[fluxParams.seed]}
-          onValueChange={(value) => setFluxParams(prev => ({ ...prev, seed: value[0] }))}
-          max={MAX_SEED}
-          step={1}
-          disabled={fluxParams.randomize_seed}
-        />
-        <span className="text-sm text-gray-400 w-16 text-right">{fluxParams.seed}</span>
-      </div>
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="randomize-seed"
-          checked={fluxParams.randomize_seed}
-          onCheckedChange={(checked) => setFluxParams(prev => ({ ...prev, randomize_seed: checked }))}
-        />
-        <label htmlFor="randomize-seed" className="text-sm text-gray-400">Randomize seed</label>
-      </div>
-      {['width', 'height'].map(param => (
-        <div key={param} className="flex items-center space-x-2">
-          <Slider
-            value={[fluxParams[param]]}
-            onValueChange={(value) => setFluxParams(prev => ({ ...prev, [param]: value[0] }))}
-            min={256}
-            max={2048}
-            step={8}
-          />
-          <span className="text-sm text-gray-400 w-16 text-right">{fluxParams[param]}px</span>
-        </div>
-      ))}
-      <div className="flex items-center space-x-2">
-        <Slider
-          value={[fluxParams.num_inference_steps]}
-          onValueChange={(value) => setFluxParams(prev => ({ ...prev, num_inference_steps: value[0] }))}
-          min={1}
-          max={50}
-          step={1}
-        />
-        <span className="text-sm text-gray-400 w-16 text-right">{fluxParams.num_inference_steps}</span>
-      </div>
     </div>
   );
 
