@@ -9,7 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 const AIImageGenerator = () => {
   const [stableDiffusionParams, setStableDiffusionParams] = useState({
-    prompt: '',
+    inputs: '',
     negative_prompt: '',
     seed: 0,
     randomize_seed: true,
@@ -20,7 +20,7 @@ const AIImageGenerator = () => {
   });
 
   const [fluxParams, setFluxParams] = useState({
-    prompt: '',
+    inputs: '',
     seed: 0,
     randomize_seed: true,
     width: 1024,
@@ -109,6 +109,50 @@ const AIImageGenerator = () => {
     document.body.removeChild(a);
   };
 
+  const renderInputs = (params, updateParam, model) => (
+    <>
+      <div className="space-y-4">
+        <div>
+          <Label htmlFor={`${model}-prompt`}>Prompt:</Label>
+          <Input id={`${model}-prompt`} value={params.inputs} onChange={(e) => updateParam('inputs', e.target.value)} />
+        </div>
+        {model === 'StableDiffusion' && (
+          <div>
+            <Label htmlFor="sd-negative-prompt">Negative prompt:</Label>
+            <Input id="sd-negative-prompt" value={params.negative_prompt} onChange={(e) => updateParam('negative_prompt', e.target.value)} />
+          </div>
+        )}
+        <div>
+          <Label htmlFor={`${model}-seed`}>Seed:</Label>
+          <Input type="number" id={`${model}-seed`} value={params.seed} onChange={(e) => updateParam('seed', parseInt(e.target.value))} min={0} max={4294967295} />
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox id={`${model}-randomize-seed`} checked={params.randomize_seed} onCheckedChange={(checked) => updateParam('randomize_seed', checked)} />
+          <Label htmlFor={`${model}-randomize-seed`}>Randomize seed</Label>
+        </div>
+        <div>
+          <Label htmlFor={`${model}-width`}>Width: {params.width}</Label>
+          <Slider id={`${model}-width`} min={256} max={1024} step={8} value={[params.width]} onValueChange={([value]) => updateParam('width', value)} />
+        </div>
+        <div>
+          <Label htmlFor={`${model}-height`}>Height: {params.height}</Label>
+          <Slider id={`${model}-height`} min={256} max={1024} step={8} value={[params.height]} onValueChange={([value]) => updateParam('height', value)} />
+        </div>
+        {model === 'StableDiffusion' && (
+          <div>
+            <Label htmlFor="sd-guidance-scale">Guidance scale: {params.guidance_scale}</Label>
+            <Slider id="sd-guidance-scale" min={1} max={20} step={0.1} value={[params.guidance_scale]} onValueChange={([value]) => updateParam('guidance_scale', value)} />
+          </div>
+        )}
+        <div>
+          <Label htmlFor={`${model}-inference-steps`}>Number of inference steps: {params.num_inference_steps}</Label>
+          <Slider id={`${model}-inference-steps`} min={1} max={model === 'StableDiffusion' ? 100 : 50} step={1} value={[params.num_inference_steps]} onValueChange={([value]) => updateParam('num_inference_steps', value)} />
+        </div>
+      </div>
+      <Button onClick={() => generateImage(model)} className="mt-4">Generate Image</Button>
+    </>
+  );
+
   return (
     <ScrollArea className="h-full">
       <div className="p-4 space-y-4">
@@ -119,96 +163,36 @@ const AIImageGenerator = () => {
             <TabsTrigger value="FLUX">FLUX</TabsTrigger>
           </TabsList>
           <TabsContent value="StableDiffusion">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="sd-prompt">Prompt:</Label>
-                <Input id="sd-prompt" value={stableDiffusionParams.prompt} onChange={(e) => updateStableDiffusionParam('prompt', e.target.value)} />
+            {renderInputs(stableDiffusionParams, updateStableDiffusionParam, 'StableDiffusion')}
+            {stableDiffusionResult && (
+              <div className="mt-4">
+                {typeof stableDiffusionResult === 'string' ? (
+                  <p>{stableDiffusionResult}</p>
+                ) : (
+                  <>
+                    <img src={stableDiffusionResult.imageUrl} alt="Generated image" className="max-w-full h-auto" />
+                    <p>Used seed: {stableDiffusionResult.seed}</p>
+                    <Button onClick={() => downloadImage(stableDiffusionResult.imageUrl, 'stable_diffusion_image.png')} className="mt-2">Download Image</Button>
+                  </>
+                )}
               </div>
-              <div>
-                <Label htmlFor="sd-negative-prompt">Negative prompt:</Label>
-                <Input id="sd-negative-prompt" value={stableDiffusionParams.negative_prompt} onChange={(e) => updateStableDiffusionParam('negative_prompt', e.target.value)} />
-              </div>
-              <div>
-                <Label htmlFor="sd-seed">Seed:</Label>
-                <Input type="number" id="sd-seed" value={stableDiffusionParams.seed} onChange={(e) => updateStableDiffusionParam('seed', parseInt(e.target.value))} min={0} max={4294967295} />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox id="sd-randomize-seed" checked={stableDiffusionParams.randomize_seed} onCheckedChange={(checked) => updateStableDiffusionParam('randomize_seed', checked)} />
-                <Label htmlFor="sd-randomize-seed">Randomize seed</Label>
-              </div>
-              <div>
-                <Label htmlFor="sd-width">Width: {stableDiffusionParams.width}</Label>
-                <Slider id="sd-width" min={256} max={1024} step={8} value={[stableDiffusionParams.width]} onValueChange={([value]) => updateStableDiffusionParam('width', value)} />
-              </div>
-              <div>
-                <Label htmlFor="sd-height">Height: {stableDiffusionParams.height}</Label>
-                <Slider id="sd-height" min={256} max={1024} step={8} value={[stableDiffusionParams.height]} onValueChange={([value]) => updateStableDiffusionParam('height', value)} />
-              </div>
-              <div>
-                <Label htmlFor="sd-guidance-scale">Guidance scale: {stableDiffusionParams.guidance_scale}</Label>
-                <Slider id="sd-guidance-scale" min={1} max={20} step={0.1} value={[stableDiffusionParams.guidance_scale]} onValueChange={([value]) => updateStableDiffusionParam('guidance_scale', value)} />
-              </div>
-              <div>
-                <Label htmlFor="sd-inference-steps">Number of inference steps: {stableDiffusionParams.num_inference_steps}</Label>
-                <Slider id="sd-inference-steps" min={1} max={100} step={1} value={[stableDiffusionParams.num_inference_steps]} onValueChange={([value]) => updateStableDiffusionParam('num_inference_steps', value)} />
-              </div>
-              <Button onClick={() => generateImage('StableDiffusion')}>Generate Image</Button>
-              {stableDiffusionResult && (
-                <div>
-                  {typeof stableDiffusionResult === 'string' ? (
-                    <p>{stableDiffusionResult}</p>
-                  ) : (
-                    <>
-                      <img src={stableDiffusionResult.imageUrl} alt="Generated image" className="max-w-full h-auto" />
-                      <p>Used seed: {stableDiffusionResult.seed}</p>
-                      <Button onClick={() => downloadImage(stableDiffusionResult.imageUrl, 'stable_diffusion_image.png')}>Download Image</Button>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
+            )}
           </TabsContent>
           <TabsContent value="FLUX">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="flux-prompt">Prompt:</Label>
-                <Input id="flux-prompt" value={fluxParams.prompt} onChange={(e) => updateFluxParam('prompt', e.target.value)} />
+            {renderInputs(fluxParams, updateFluxParam, 'FLUX')}
+            {fluxResult && (
+              <div className="mt-4">
+                {typeof fluxResult === 'string' ? (
+                  <p>{fluxResult}</p>
+                ) : (
+                  <>
+                    <img src={fluxResult.imageUrl} alt="Generated image" className="max-w-full h-auto" />
+                    <p>Used seed: {fluxResult.seed}</p>
+                    <Button onClick={() => downloadImage(fluxResult.imageUrl, 'flux_image.png')} className="mt-2">Download Image</Button>
+                  </>
+                )}
               </div>
-              <div>
-                <Label htmlFor="flux-seed">Seed:</Label>
-                <Input type="number" id="flux-seed" value={fluxParams.seed} onChange={(e) => updateFluxParam('seed', parseInt(e.target.value))} min={0} max={4294967295} />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox id="flux-randomize-seed" checked={fluxParams.randomize_seed} onCheckedChange={(checked) => updateFluxParam('randomize_seed', checked)} />
-                <Label htmlFor="flux-randomize-seed">Randomize seed</Label>
-              </div>
-              <div>
-                <Label htmlFor="flux-width">Width: {fluxParams.width}</Label>
-                <Slider id="flux-width" min={256} max={1024} step={8} value={[fluxParams.width]} onValueChange={([value]) => updateFluxParam('width', value)} />
-              </div>
-              <div>
-                <Label htmlFor="flux-height">Height: {fluxParams.height}</Label>
-                <Slider id="flux-height" min={256} max={1024} step={8} value={[fluxParams.height]} onValueChange={([value]) => updateFluxParam('height', value)} />
-              </div>
-              <div>
-                <Label htmlFor="flux-inference-steps">Number of inference steps: {fluxParams.num_inference_steps}</Label>
-                <Slider id="flux-inference-steps" min={1} max={50} step={1} value={[fluxParams.num_inference_steps]} onValueChange={([value]) => updateFluxParam('num_inference_steps', value)} />
-              </div>
-              <Button onClick={() => generateImage('FLUX')}>Generate Image</Button>
-              {fluxResult && (
-                <div>
-                  {typeof fluxResult === 'string' ? (
-                    <p>{fluxResult}</p>
-                  ) : (
-                    <>
-                      <img src={fluxResult.imageUrl} alt="Generated image" className="max-w-full h-auto" />
-                      <p>Used seed: {fluxResult.seed}</p>
-                      <Button onClick={() => downloadImage(fluxResult.imageUrl, 'flux_image.png')}>Download Image</Button>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>
