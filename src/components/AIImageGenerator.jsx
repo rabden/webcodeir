@@ -65,7 +65,15 @@ const AIImageGenerator = () => {
       {
         headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          inputs: data.inputs,
+          negative_prompt: data.negative_prompt,
+          seed: data.seed,
+          width: data.width,
+          height: data.height,
+          guidance_scale: data.guidance_scale,
+          num_inference_steps: data.num_inference_steps,
+        }),
       }
     );
     return await response.blob();
@@ -77,7 +85,13 @@ const AIImageGenerator = () => {
       {
         headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          inputs: data.inputs,
+          seed: data.seed,
+          width: data.width,
+          height: data.height,
+          num_inference_steps: data.num_inference_steps,
+        }),
       }
     );
     return await response.blob();
