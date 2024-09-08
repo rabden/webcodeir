@@ -14,10 +14,16 @@ import { useToast } from "@/components/ui/use-toast";
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
 
+const modelEndpoints = {
+  SD3: "stabilityai/stable-diffusion-3-medium-diffusers",
+  FLUX: "black-forest-labs/FLUX.1-schnell",
+  HENTAI: "stablediffusionapi/explicit-freedom-nsfw-wai"
+};
+
 const AIImageGenerator = () => {
-  const [results, setResults] = useState({ SD3: [], FLUX: [] });
-  const [loading, setLoading] = useState({ SD3: false, FLUX: false });
-  const [prompts, setPrompts] = useState({ SD3: '', FLUX: '' });
+  const [results, setResults] = useState({ SD3: [], FLUX: [], HENTAI: [] });
+  const [loading, setLoading] = useState({ SD3: false, FLUX: false, HENTAI: false });
+  const [prompts, setPrompts] = useState({ SD3: '', FLUX: '', HENTAI: '' });
   const [fluxParams, setFluxParams] = useState({
     seed: 0,
     randomize_seed: true,
@@ -68,10 +74,6 @@ const AIImageGenerator = () => {
   };
 
   const queryModel = async (model, data) => {
-    const modelEndpoints = {
-      SD3: "stabilityai/stable-diffusion-3-medium-diffusers",
-      FLUX: "black-forest-labs/FLUX.1-schnell"
-    };
     const response = await fetch(
       `https://api-inference.huggingface.co/models/${modelEndpoints[model]}`,
       {
@@ -217,8 +219,9 @@ const AIImageGenerator = () => {
           <TabsList>
             <TabsTrigger value="SD3">SD3</TabsTrigger>
             <TabsTrigger value="FLUX">FLUX</TabsTrigger>
+            <TabsTrigger value="HENTAI">hent.ai</TabsTrigger>
           </TabsList>
-          {['SD3', 'FLUX'].map(model => (
+          {['SD3', 'FLUX', 'HENTAI'].map(model => (
             <TabsContent key={model} value={model}>
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold">{model} Image Generator</h3>
