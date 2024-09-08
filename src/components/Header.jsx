@@ -28,7 +28,6 @@ const Header = ({
   setShowCssToolsPanel,
   setShowHtmlToolsPanel,
   setShowJsToolsPanel,
-  setShowAIImageGenerator,
 }) => {
   const getLayoutIcon = () => {
     switch (layout) {
@@ -140,10 +139,6 @@ const Header = ({
                 <DropdownMenuItem onSelect={() => setShowJsToolsPanel(true)}>
                   <Code className="w-4 h-4 mr-2" />
                   <span>JS Tools</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowAIImageGenerator(true)}>
-                  <Image className="w-4 h-4 mr-2" />
-                  <span>AI Image Generator</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

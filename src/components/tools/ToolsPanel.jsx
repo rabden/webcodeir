@@ -12,7 +12,6 @@ import JsSnippetGenerator from './JsSnippetGenerator';
 import EventListenerHelper from './EventListenerHelper';
 import FetchApiHelper from './FetchApiHelper';
 import LocalStorageHelper from './LocalStorageHelper';
-import AIImageGenerator from './AIImageGenerator';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -20,8 +19,7 @@ const ToolsPanel = ({ onClose, type }) => {
   const [activeTab, setActiveTab] = useState(
     type === 'css' ? 'flexbox' : 
     type === 'html' ? 'htmlStructure' : 
-    type === 'js' ? 'jsSnippet' :
-    'aiImage'
+    'jsSnippet'
   );
 
   const cssTabs = [
@@ -45,11 +43,7 @@ const ToolsPanel = ({ onClose, type }) => {
     { id: 'localStorage', label: 'Local Storage', component: LocalStorageHelper },
   ];
 
-  const aiTabs = [
-    { id: 'aiImage', label: 'AI Image Generator', component: AIImageGenerator },
-  ];
-
-  const tabs = type === 'css' ? cssTabs : type === 'html' ? htmlTabs : type === 'js' ? jsTabs : aiTabs;
+  const tabs = type === 'css' ? cssTabs : type === 'html' ? htmlTabs : jsTabs;
 
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || (() => null);
 

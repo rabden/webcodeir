@@ -14,7 +14,6 @@ import KeyboardShortcutsPanel from './KeyboardShortcutsPanel';
 import PexelsImagePanel from './PexelsImagePanel';
 import ConsolePanel from './ConsolePanel';
 import CodeSnippetLibrary from './CodeSnippetLibrary';
-import AIImageGenerator from './AIImageGenerator';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
@@ -24,7 +23,6 @@ const CodeEditor = () => {
   const [activeTab, setActiveTab] = useState('html');
   const [showConsole, setShowConsole] = useState(false);
   const [showSnippetLibrary, setShowSnippetLibrary] = useState(false);
-  const [showAIImageGenerator, setShowAIImageGenerator] = useState(false);
 
   useEffect(() => {
     loadFromLocalStorage();
@@ -159,7 +157,6 @@ const CodeEditor = () => {
         setShowCssToolsPanel={() => setState(s => ({ ...s, showCssToolsPanel: true }))}
         setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true }))}
         setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true }))}
-        setShowAIImageGenerator={() => setShowAIImageGenerator(true)}
       />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
@@ -173,9 +170,8 @@ const CodeEditor = () => {
       {state.showJsToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showJsToolsPanel: false }))} type="js" />}
       {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
       {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
-      {showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.iMobile} />}
+      {showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.isMobile} />}
       {showSnippetLibrary && <CodeSnippetLibrary onClose={() => setShowSnippetLibrary(false)} isMobile={state.iMobile} />}
-      {showAIImageGenerator && <AIImageGenerator onClose={() => setShowAIImageGenerator(false)} />}
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
@@ -193,7 +189,6 @@ const CodeEditor = () => {
         showConsole={showConsole}
         toggleSnippetLibrary={() => { setShowSnippetLibrary(s => !s); setState(s => ({ ...s, isMenuOpen: false })); }}
         showSnippetLibrary={showSnippetLibrary}
-        setShowAIImageGenerator={() => { setShowAIImageGenerator(true); setState(s => ({ ...s, isMenuOpen: false })); }}
       />
     </div>
   );
