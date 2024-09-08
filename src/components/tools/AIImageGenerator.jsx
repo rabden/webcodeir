@@ -11,6 +11,7 @@ import { generateImage, copyToClipboard, downloadImage } from './aiImageHelpers'
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import FluxControls from './FluxControls';
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -24,89 +25,7 @@ const AIImageGenerator = ({ state, setState }) => {
 
   const renderInputs = (model) => {
     if (model === 'FLUX') {
-      return (
-        <div className="space-y-4">
-          <Input
-            value={state.prompts[model]}
-            onChange={(e) => setState(prevState => ({
-              ...prevState,
-              prompts: { ...prevState.prompts, [model]: e.target.value }
-            }))}
-            placeholder="Enter prompt"
-            className="flex-grow h-12"
-          />
-          <div className="space-y-2">
-            <Label htmlFor="seed">Seed: {state.fluxParams.seed}</Label>
-            <Slider
-              id="seed"
-              value={[state.fluxParams.seed]}
-              onValueChange={(value) => setState(prevState => ({
-                ...prevState,
-                fluxParams: { ...prevState.fluxParams, seed: value[0] }
-              }))}
-              max={MAX_SEED}
-              step={1}
-              className="flex-grow"
-            />
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="randomize-seed"
-              checked={state.fluxParams.randomize_seed}
-              onCheckedChange={(checked) => setState(prevState => ({
-                ...prevState,
-                fluxParams: { ...prevState.fluxParams, randomize_seed: checked }
-              }))}
-            />
-            <Label htmlFor="randomize-seed">Randomize seed</Label>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="width">Width: {state.fluxParams.width}</Label>
-            <Slider
-              id="width"
-              value={[state.fluxParams.width]}
-              onValueChange={(value) => setState(prevState => ({
-                ...prevState,
-                fluxParams: { ...prevState.fluxParams, width: value[0] }
-              }))}
-              min={256}
-              max={1024}
-              step={64}
-              className="flex-grow"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="height">Height: {state.fluxParams.height}</Label>
-            <Slider
-              id="height"
-              value={[state.fluxParams.height]}
-              onValueChange={(value) => setState(prevState => ({
-                ...prevState,
-                fluxParams: { ...prevState.fluxParams, height: value[0] }
-              }))}
-              min={256}
-              max={1024}
-              step={64}
-              className="flex-grow"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="inference-steps">Inference steps: {state.fluxParams.num_inference_steps}</Label>
-            <Slider
-              id="inference-steps"
-              value={[state.fluxParams.num_inference_steps]}
-              onValueChange={(value) => setState(prevState => ({
-                ...prevState,
-                fluxParams: { ...prevState.fluxParams, num_inference_steps: value[0] }
-              }))}
-              min={1}
-              max={50}
-              step={1}
-              className="flex-grow"
-            />
-          </div>
-        </div>
-      );
+      return <FluxControls state={state} setState={setState} />;
     } else {
       return (
         <Input
