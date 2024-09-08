@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -31,8 +31,18 @@ const AIImageGenerator = () => {
     num_inference_steps: 4,
   });
 
+  const [hentParams, setHentParams] = useState({
+    inputs: '',
+    seed: 0,
+    randomize_seed: true,
+    width: 1024,
+    height: 1024,
+    num_inference_steps: 28,
+  });
+
   const [stableDiffusionResult, setStableDiffusionResult] = useState(null);
   const [fluxResult, setFluxResult] = useState(null);
+  const [hentResult, setHentResult] = useState(null);
 
   const updateParam = (setter, key, value) => {
     setter(prev => ({ ...prev, [key]: value }));
@@ -41,7 +51,9 @@ const AIImageGenerator = () => {
   const generateImage = async (model) => {
     const { data, queryFunction, setResult } = model === 'StableDiffusion'
       ? { data: stableDiffusionParams, queryFunction: queryStableDiffusion, setResult: setStableDiffusionResult }
-      : { data: fluxParams, queryFunction: queryFLUX, setResult: setFluxResult };
+      : model === 'FLUX'
+      ? { data: fluxParams, queryFunction: queryFLUX, setResult: setFluxResult }
+      : { data: hentParams, queryFunction: queryHent, setResult: setHentResult };
 
     if (data.randomize_seed) {
       data.seed = Math.floor(Math.random() * MAX_SEED);
@@ -97,6 +109,24 @@ const AIImageGenerator = () => {
     return await response.blob();
   };
 
+  const queryHent = async (data) => {
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/stablediffusionapi/explicit-freedom-nsfw-wai",
+      {
+        headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({
+          inputs: data.inputs,
+          seed: data.seed,
+          width: data.width,
+          height: data.height,
+          num_inference_steps: data.num_inference_steps,
+        }),
+      }
+    );
+    return await response.blob();
+  };
+
   const downloadImage = (imageUrl, fileName) => {
     const a = document.createElement('a');
     a.href = imageUrl;
@@ -115,12 +145,12 @@ const AIImageGenerator = () => {
         )}
         <InputField label="Seed:" id={`${model}-seed`} type="number" value={params.seed} onChange={(e) => updateParam('seed', parseInt(e.target.value))} min={0} max={MAX_SEED} />
         <CheckboxField id={`${model}-randomize-seed`} label="Randomize seed" checked={params.randomize_seed} onCheckedChange={(checked) => updateParam('randomize_seed', checked)} />
-        <SliderField label="Width:" id={`${model}-width`} value={params.width} onChange={(value) => updateParam('width', value)} min={256} max={model === 'StableDiffusion' ? 1024 : 2048} step={8} />
-        <SliderField label="Height:" id={`${model}-height`} value={params.height} onChange={(value) => updateParam('height', value)} min={256} max={model === 'StableDiffusion' ? 1024 : 2048} step={8} />
+        <SliderField label="Width:" id={`${model}-width`} value={params.width} onChange={(value) => updateParam('width', value)} min={256} max={model === 'FLUX' ? 2048 : 1024} step={8} />
+        <SliderField label="Height:" id={`${model}-height`} value={params.height} onChange={(value) => updateParam('height', value)} min={256} max={model === 'FLUX' ? 2048 : 1024} step={8} />
         {model === 'StableDiffusion' && (
           <SliderField label="Guidance scale:" id="sd-guidance-scale" value={params.guidance_scale} onChange={(value) => updateParam('guidance_scale', value)} min={1} max={20} step={0.1} />
         )}
-        <SliderField label="Number of inference steps:" id={`${model}-inference-steps`} value={params.num_inference_steps} onChange={(value) => updateParam('num_inference_steps', value)} min={1} max={model === 'StableDiffusion' ? 100 : 50} step={1} />
+        <SliderField label="Number of inference steps:" id={`${model}-inference-steps`} value={params.num_inference_steps} onChange={(value) => updateParam('num_inference_steps', value)} min={1} max={model === 'FLUX' ? 50 : 100} step={1} />
       </div>
       <Button onClick={() => generateImage(model)} className="mt-4">Generate Image</Button>
     </>
@@ -134,6 +164,7 @@ const AIImageGenerator = () => {
           <TabsList>
             <TabsTrigger value="StableDiffusion">Stable Diffusion 3</TabsTrigger>
             <TabsTrigger value="FLUX">FLUX</TabsTrigger>
+            <TabsTrigger value="Hent">Hent</TabsTrigger>
           </TabsList>
           <TabsContent value="StableDiffusion">
             {renderInputs(stableDiffusionParams, (key, value) => updateParam(setStableDiffusionParams, key, value), 'StableDiffusion')}
@@ -142,6 +173,10 @@ const AIImageGenerator = () => {
           <TabsContent value="FLUX">
             {renderInputs(fluxParams, (key, value) => updateParam(setFluxParams, key, value), 'FLUX')}
             <ResultDisplay result={fluxResult} downloadImage={downloadImage} fileName="flux_image.png" />
+          </TabsContent>
+          <TabsContent value="Hent">
+            {renderInputs(hentParams, (key, value) => updateParam(setHentParams, key, value), 'Hent')}
+            <ResultDisplay result={hentResult} downloadImage={downloadImage} fileName="hent_image.png" />
           </TabsContent>
         </Tabs>
       </div>
