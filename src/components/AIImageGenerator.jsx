@@ -41,17 +41,17 @@ const AIImageGenerator = () => {
     setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true } }));
     const results = [];
     for (let i = 0; i < state.imageCount; i++) {
-      let data = { inputs: state.prompts[model] };
-      if (model === 'FLUX') {
-        data.parameters = {
-          seed: state.fluxParams.randomize_seed ? Math.floor(Math.random() * MAX_SEED) : state.fluxParams.seed,
+      const seed = state.fluxParams.randomize_seed ? Math.floor(Math.random() * MAX_SEED) : state.fluxParams.seed + i;
+      let data = { 
+        inputs: state.prompts[model],
+        parameters: {
+          seed,
           width: state.fluxParams.width,
           height: state.fluxParams.height,
           num_inference_steps: state.fluxParams.num_inference_steps
-        };
-      }
-      
-      results.push({ loading: true, seed: data.parameters?.seed, prompt: state.prompts[model] });
+        }
+      };
+      results.push({ loading: true, seed, prompt: state.prompts[model] });
     }
 
     setState(prev => ({
@@ -61,17 +61,16 @@ const AIImageGenerator = () => {
 
     for (let i = 0; i < state.imageCount; i++) {
       try {
-        const response = await queryModel(model, { inputs: state.prompts[model], parameters: results[i].parameters });
-        const imageUrl = URL.createObjectURL(response[0]);
+        const response = await queryModel(model, results[i]);
+        const imageUrl = URL.createObjectURL(response);
         setState(prev => ({ 
           ...prev, 
           results: { 
             ...prev.results, 
             [model]: prev.results[model].map((item, index) => 
-              index === i ? { imageUrl, seed: response[1], prompt: state.prompts[model] } : item
+              index === i ? { imageUrl, seed: results[i].seed, prompt: state.prompts[model] } : item
             )
-          },
-          fluxParams: model === 'FLUX' ? { ...prev.fluxParams, seed: response[1] } : prev.fluxParams
+          }
         }));
       } catch (error) {
         console.error('Error:', error);
@@ -80,7 +79,7 @@ const AIImageGenerator = () => {
           results: { 
             ...prev.results, 
             [model]: prev.results[model].map((item, index) => 
-              index === i ? { error: 'Error generating image. Please try again.', seed: results[i].parameters?.seed, prompt: state.prompts[model] } : item
+              index === i ? { error: 'Error generating image. Please try again.', seed: results[i].seed, prompt: state.prompts[model] } : item
             )
           }
         }));
@@ -98,8 +97,7 @@ const AIImageGenerator = () => {
         body: JSON.stringify(data),
       }
     );
-    const result = await response.blob();
-    return [result, data.parameters?.seed];
+    return await response.blob();
   };
 
   const copyToClipboard = (text) => {
