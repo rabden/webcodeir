@@ -8,7 +8,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Wand2, MoreVertical, Download, Link, Image, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Progress } from "@/components/ui/progress";
+import { Wand2, MoreVertical, Download, Link, Image, ChevronDown, ChevronUp } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 
 const MAX_SEED = 4294967295;
@@ -32,12 +33,13 @@ const AIImageGenerator = () => {
       height: 1024,
       num_inference_steps: 4
     },
-    isFluxSettingsOpen: false
+    isFluxSettingsOpen: false,
+    progress: { FLUX: 0, SD3: 0, HENTAI: 0 }
   });
   const { toast } = useToast();
 
   const generateImage = async (model) => {
-    setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true } }));
+    setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true }, progress: { ...prev.progress, [model]: 0 } }));
     let data = { inputs: state.prompts[model] };
     if (model === 'FLUX') {
       data.parameters = {
@@ -67,7 +69,8 @@ const AIImageGenerator = () => {
             index === 0 ? { imageUrl, seed: response[1], prompt: state.prompts[model] } : item
           )
         },
-        fluxParams: model === 'FLUX' ? { ...prev.fluxParams, seed: response[1] } : prev.fluxParams
+        fluxParams: model === 'FLUX' ? { ...prev.fluxParams, seed: response[1] } : prev.fluxParams,
+        progress: { ...prev.progress, [model]: 100 }
       }));
     } catch (error) {
       console.error('Error:', error);
@@ -78,7 +81,8 @@ const AIImageGenerator = () => {
           [model]: prev.results[model].map((item, index) => 
             index === 0 ? { error: 'Error generating image. Please try again.', seed: data.parameters?.seed, prompt: state.prompts[model] } : item
           )
-        }
+        },
+        progress: { ...prev.progress, [model]: 0 }
       }));
     }
     setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: false } }));
@@ -124,7 +128,7 @@ const AIImageGenerator = () => {
         disabled={state.loading[model]}
         size="icon"
       >
-        {state.loading[model] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+        <Wand2 className="h-4 w-4" />
       </Button>
     </div>
   );
@@ -177,7 +181,7 @@ const AIImageGenerator = () => {
         <CardContent className="p-0">
           {result.loading ? (
             <div className="w-full h-64 flex items-center justify-center bg-gray-200">
-              <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
+              <Progress value={state.progress[model]} className="w-1/2" />
             </div>
           ) : result.error ? (
             <div className="w-full h-64 flex items-center justify-center bg-gray-200">
@@ -220,7 +224,7 @@ const AIImageGenerator = () => {
         </CardFooter>
       </Card>
     ));
-  }, [state.results]);
+  }, [state.results, state.progress]);
 
   return (
     <ScrollArea className="h-full">
