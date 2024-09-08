@@ -112,21 +112,19 @@ const AIImageGenerator = () => {
   };
 
   const renderInputs = (model) => (
-    <div className="space-y-4">
+    <div className="flex space-x-2 mb-4">
       <Input
         value={state.prompts[model]}
         onChange={(e) => setState(prev => ({ ...prev, prompts: { ...prev.prompts, [model]: e.target.value } }))}
         placeholder="Enter prompt"
-        className="h-12"
+        className="flex-grow"
       />
-      {model === 'FLUX' && renderFluxSettings()}
       <Button
         onClick={() => generateImage(model)}
         disabled={state.loading[model]}
-        className="w-full h-12"
+        size="icon"
       >
-        {state.loading[model] ? <Loader2 className="h-6 w-6 animate-spin" /> : <Wand2 className="h-6 w-6 mr-2" />}
-        Generate
+        {state.loading[model] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
       </Button>
     </div>
   );
@@ -134,12 +132,12 @@ const AIImageGenerator = () => {
   const renderFluxSettings = () => (
     <Collapsible open={state.isFluxSettingsOpen} onOpenChange={(open) => setState(prev => ({ ...prev, isFluxSettingsOpen: open }))}>
       <CollapsibleTrigger asChild>
-        <Button variant="outline" className="w-full justify-between">
+        <Button variant="outline" className="w-full justify-between mb-2">
           FLUX Settings
           {state.isFluxSettingsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </Button>
       </CollapsibleTrigger>
-      <CollapsibleContent className="space-y-4 mt-4">
+      <CollapsibleContent className="space-y-4">
         {renderSlider("Seed", state.fluxParams.seed, (value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, seed: value } })), 0, MAX_SEED, 1)}
         <div className="flex items-center space-x-2">
           <Checkbox
@@ -239,6 +237,7 @@ const AIImageGenerator = () => {
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold">{model} Image Generator</h3>
                 {renderInputs(model)}
+                {model === 'FLUX' && renderFluxSettings()}
                 <div className="mt-4">
                   {renderResult(model)}
                 </div>
