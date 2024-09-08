@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -11,121 +11,64 @@ const MAX_SEED = 4294967295;
 const API_KEY = "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";
 
 const AIImageGenerator = () => {
-  const [stableDiffusionParams, setStableDiffusionParams] = useState({
-    inputs: '',
-    negative_prompt: '',
-    seed: 0,
-    randomize_seed: true,
-    width: 1024,
-    height: 1024,
-    guidance_scale: 5,
-    num_inference_steps: 28,
-  });
-
-  const [fluxParams, setFluxParams] = useState({
-    inputs: '',
-    seed: 0,
-    randomize_seed: true,
-    width: 1024,
-    height: 1024,
-    num_inference_steps: 4,
-  });
-
-  const [hentParams, setHentParams] = useState({
-    inputs: '',
-    seed: 0,
-    randomize_seed: true,
-    width: 1024,
-    height: 1024,
-    num_inference_steps: 28,
-  });
-
-  const [stableDiffusionResult, setStableDiffusionResult] = useState(null);
-  const [fluxResult, setFluxResult] = useState(null);
-  const [hentResult, setHentResult] = useState(null);
-
-  const updateParam = (setter, key, value) => {
-    setter(prev => ({ ...prev, [key]: value }));
-  };
+  const [results, setResults] = useState({ StableDiffusion: null, FLUX: null, Hent: null });
+  const [loading, setLoading] = useState({ StableDiffusion: false, FLUX: false, Hent: false });
 
   const generateImage = async (model) => {
-    const { data, queryFunction, setResult } = model === 'StableDiffusion'
-      ? { data: stableDiffusionParams, queryFunction: queryStableDiffusion, setResult: setStableDiffusionResult }
-      : model === 'FLUX'
-      ? { data: fluxParams, queryFunction: queryFLUX, setResult: setFluxResult }
-      : { data: hentParams, queryFunction: queryHent, setResult: setHentResult };
-
-    if (data.randomize_seed) {
-      data.seed = Math.floor(Math.random() * MAX_SEED);
-    }
-
-    setResult('Generating image...');
-
+    setLoading(prev => ({ ...prev, [model]: true }));
+    const data = getModelData(model);
     try {
-      const response = await queryFunction(data);
+      const response = await queryModel(model, data);
       const imageUrl = URL.createObjectURL(response);
-      setResult({ imageUrl, seed: data.seed });
+      setResults(prev => ({ ...prev, [model]: { imageUrl, seed: data.seed } }));
     } catch (error) {
-      setResult('Error generating image. Please try again.');
       console.error('Error:', error);
+      setResults(prev => ({ ...prev, [model]: 'Error generating image. Please try again.' }));
     }
+    setLoading(prev => ({ ...prev, [model]: false }));
   };
 
-  const queryStableDiffusion = async (data) => {
+  const queryModel = async (model, data) => {
+    const modelEndpoints = {
+      StableDiffusion: "stabilityai/stable-diffusion-3-medium-diffusers",
+      FLUX: "black-forest-labs/FLUX.1-schnell",
+      Hent: "stablediffusionapi/explicit-freedom-nsfw-wai"
+    };
     const response = await fetch(
-      "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3-medium-diffusers",
+      `https://api-inference.huggingface.co/models/${modelEndpoints[model]}`,
       {
         headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({
-          inputs: data.inputs,
-          negative_prompt: data.negative_prompt,
-          seed: data.seed,
-          width: data.width,
-          height: data.height,
-          guidance_scale: data.guidance_scale,
-          num_inference_steps: data.num_inference_steps,
-        }),
+        body: JSON.stringify(data),
       }
     );
     return await response.blob();
   };
 
-  const queryFLUX = async (data) => {
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
-      {
-        headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-        method: "POST",
-        body: JSON.stringify({
-          inputs: data.inputs,
-          seed: data.seed,
-          width: data.width,
-          height: data.height,
-          num_inference_steps: data.num_inference_steps,
-        }),
-      }
-    );
-    return await response.blob();
-  };
-
-  const queryHent = async (data) => {
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/stablediffusionapi/explicit-freedom-nsfw-wai",
-      {
-        headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-        method: "POST",
-        body: JSON.stringify({
-          inputs: data.inputs,
-          seed: data.seed,
-          width: data.width,
-          height: data.height,
-          num_inference_steps: data.num_inference_steps,
-        }),
-      }
-    );
-    return await response.blob();
-  };
+  const getModelData = useCallback((model) => {
+    const commonData = {
+      inputs: document.getElementById(`${model.toLowerCase()}-prompt`).value,
+      seed: Math.floor(Math.random() * MAX_SEED),
+    };
+    if (model === 'StableDiffusion') {
+      return {
+        ...commonData,
+        negative_prompt: document.getElementById('sd-negative-prompt').value,
+        width: parseInt(document.getElementById('sd-width').value),
+        height: parseInt(document.getElementById('sd-height').value),
+        guidance_scale: parseFloat(document.getElementById('sd-guidance-scale').value),
+        num_inference_steps: parseInt(document.getElementById('sd-inference-steps').value),
+      };
+    } else if (model === 'FLUX') {
+      return {
+        ...commonData,
+        width: parseInt(document.getElementById('flux-width').value),
+        height: parseInt(document.getElementById('flux-height').value),
+        num_inference_steps: parseInt(document.getElementById('flux-inference-steps').value),
+      };
+    }
+    return commonData; // For Hent model
+  }, []);
 
   const downloadImage = (imageUrl, fileName) => {
     const a = document.createElement('a');
@@ -136,25 +79,60 @@ const AIImageGenerator = () => {
     document.body.removeChild(a);
   };
 
-  const renderInputs = (params, updateParam, model) => (
+  const renderInputs = (model) => (
     <>
-      <div className="space-y-4">
-        <InputField label="Prompt:" id={`${model}-prompt`} value={params.inputs} onChange={(e) => updateParam('inputs', e.target.value)} />
-        {model === 'StableDiffusion' && (
-          <InputField label="Negative prompt:" id="sd-negative-prompt" value={params.negative_prompt} onChange={(e) => updateParam('negative_prompt', e.target.value)} />
-        )}
-        <InputField label="Seed:" id={`${model}-seed`} type="number" value={params.seed} onChange={(e) => updateParam('seed', parseInt(e.target.value))} min={0} max={MAX_SEED} />
-        <CheckboxField id={`${model}-randomize-seed`} label="Randomize seed" checked={params.randomize_seed} onCheckedChange={(checked) => updateParam('randomize_seed', checked)} />
-        <SliderField label="Width:" id={`${model}-width`} value={params.width} onChange={(value) => updateParam('width', value)} min={256} max={model === 'FLUX' ? 2048 : 1024} step={8} />
-        <SliderField label="Height:" id={`${model}-height`} value={params.height} onChange={(value) => updateParam('height', value)} min={256} max={model === 'FLUX' ? 2048 : 1024} step={8} />
-        {model === 'StableDiffusion' && (
-          <SliderField label="Guidance scale:" id="sd-guidance-scale" value={params.guidance_scale} onChange={(value) => updateParam('guidance_scale', value)} min={1} max={20} step={0.1} />
-        )}
-        <SliderField label="Number of inference steps:" id={`${model}-inference-steps`} value={params.num_inference_steps} onChange={(value) => updateParam('num_inference_steps', value)} min={1} max={model === 'FLUX' ? 50 : 100} step={1} />
-      </div>
-      <Button onClick={() => generateImage(model)} className="mt-4">Generate Image</Button>
+      <Input id={`${model.toLowerCase()}-prompt`} placeholder="Enter prompt" className="mb-4" />
+      {model !== 'Hent' && (
+        <>
+          {model === 'StableDiffusion' && (
+            <Input id="sd-negative-prompt" placeholder="Enter negative prompt" className="mb-4" />
+          )}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <Label>Width: <span id={`${model.toLowerCase()}-width-value`}>1024</span></Label>
+              <Slider id={`${model.toLowerCase()}-width`} min={256} max={model === 'FLUX' ? 2048 : 1024} step={8} defaultValue={[1024]} 
+                onValueChange={(value) => document.getElementById(`${model.toLowerCase()}-width-value`).textContent = value} />
+            </div>
+            <div>
+              <Label>Height: <span id={`${model.toLowerCase()}-height-value`}>1024</span></Label>
+              <Slider id={`${model.toLowerCase()}-height`} min={256} max={model === 'FLUX' ? 2048 : 1024} step={8} defaultValue={[1024]} 
+                onValueChange={(value) => document.getElementById(`${model.toLowerCase()}-height-value`).textContent = value} />
+            </div>
+          </div>
+          {model === 'StableDiffusion' && (
+            <div className="mb-4">
+              <Label>Guidance scale: <span id="sd-guidance-scale-value">5</span></Label>
+              <Slider id="sd-guidance-scale" min={1} max={20} step={0.1} defaultValue={[5]} 
+                onValueChange={(value) => document.getElementById('sd-guidance-scale-value').textContent = value} />
+            </div>
+          )}
+          <div className="mb-4">
+            <Label>Inference steps: <span id={`${model.toLowerCase()}-inference-steps-value`}>{model === 'FLUX' ? 4 : 28}</span></Label>
+            <Slider id={`${model.toLowerCase()}-inference-steps`} min={1} max={model === 'FLUX' ? 50 : 100} step={1} defaultValue={[model === 'FLUX' ? 4 : 28]} 
+              onValueChange={(value) => document.getElementById(`${model.toLowerCase()}-inference-steps-value`).textContent = value} />
+          </div>
+        </>
+      )}
+      <Button onClick={() => generateImage(model)} disabled={loading[model]}>
+        {loading[model] ? 'Generating...' : 'Generate Image'}
+      </Button>
     </>
   );
+
+  const renderResult = (model) => {
+    const result = results[model];
+    if (typeof result === 'string') return <p>{result}</p>;
+    if (!result) return null;
+    return (
+      <>
+        <img src={result.imageUrl} alt="Generated image" className="max-w-full h-auto mb-2" />
+        <p>Used seed: {result.seed}</p>
+        <Button onClick={() => downloadImage(result.imageUrl, `${model.toLowerCase()}_image.png`)} className="mt-2">
+          Download Image
+        </Button>
+      </>
+    );
+  };
 
   return (
     <ScrollArea className="h-full">
@@ -166,59 +144,21 @@ const AIImageGenerator = () => {
             <TabsTrigger value="FLUX">FLUX</TabsTrigger>
             <TabsTrigger value="Hent">Hent</TabsTrigger>
           </TabsList>
-          <TabsContent value="StableDiffusion">
-            {renderInputs(stableDiffusionParams, (key, value) => updateParam(setStableDiffusionParams, key, value), 'StableDiffusion')}
-            <ResultDisplay result={stableDiffusionResult} downloadImage={downloadImage} fileName="stable_diffusion_image.png" />
-          </TabsContent>
-          <TabsContent value="FLUX">
-            {renderInputs(fluxParams, (key, value) => updateParam(setFluxParams, key, value), 'FLUX')}
-            <ResultDisplay result={fluxResult} downloadImage={downloadImage} fileName="flux_image.png" />
-          </TabsContent>
-          <TabsContent value="Hent">
-            {renderInputs(hentParams, (key, value) => updateParam(setHentParams, key, value), 'Hent')}
-            <ResultDisplay result={hentResult} downloadImage={downloadImage} fileName="hent_image.png" />
-          </TabsContent>
+          {['StableDiffusion', 'FLUX', 'Hent'].map(model => (
+            <TabsContent key={model} value={model}>
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold">{model} Image Generator</h3>
+                {renderInputs(model)}
+                <div className="mt-4">
+                  {renderResult(model)}
+                </div>
+              </div>
+            </TabsContent>
+          ))}
         </Tabs>
       </div>
     </ScrollArea>
   );
 };
-
-const InputField = ({ label, id, ...props }) => (
-  <div>
-    <Label htmlFor={id}>{label}</Label>
-    <Input id={id} {...props} />
-  </div>
-);
-
-const CheckboxField = ({ id, label, ...props }) => (
-  <div className="flex items-center space-x-2">
-    <Checkbox id={id} {...props} />
-    <Label htmlFor={id}>{label}</Label>
-  </div>
-);
-
-const SliderField = ({ label, id, value, onChange, ...props }) => (
-  <div>
-    <Label htmlFor={id}>{label} {value}</Label>
-    <Slider id={id} value={[value]} onValueChange={([value]) => onChange(value)} {...props} />
-  </div>
-);
-
-const ResultDisplay = ({ result, downloadImage, fileName }) => (
-  result && (
-    <div className="mt-4">
-      {typeof result === 'string' ? (
-        <p>{result}</p>
-      ) : (
-        <>
-          <img src={result.imageUrl} alt="Generated image" className="max-w-full h-auto" />
-          <p>Used seed: {result.seed}</p>
-          <Button onClick={() => downloadImage(result.imageUrl, fileName)} className="mt-2">Download Image</Button>
-        </>
-      )}
-    </div>
-  )
-);
 
 export default AIImageGenerator;
