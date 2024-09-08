@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Wand2, MoreVertical, Download, Link, Image, Loader2 } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
+import { generateImage, copyToClipboard, downloadImage } from './aiImageHelpers';
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -14,91 +15,9 @@ const API_KEY = "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";
 const AIImageGenerator = ({ state, setState }) => {
   const { toast } = useToast();
 
-  const generateImage = async (model) => {
-    setState(prevState => ({
-      ...prevState,
-      loading: { ...prevState.loading, [model]: true }
-    }));
-    const data = {
-      inputs: state.prompts[model],
-      seed: Math.floor(Math.random() * MAX_SEED),
-    };
-    
-    // Add a placeholder result immediately
-    setState(prevState => ({
-      ...prevState,
-      results: {
-        ...prevState.results,
-        [model]: [{ loading: true, seed: data.seed, prompt: state.prompts[model] }, ...prevState.results[model]]
-      }
-    }));
-
-    try {
-      const response = await queryModel(model, data);
-      const imageBlob = await response.blob();
-      const imageUrl = URL.createObjectURL(imageBlob);
-      setState(prevState => ({ 
-        ...prevState,
-        results: {
-          ...prevState.results,
-          [model]: prevState.results[model].map((item, index) => 
-            index === 0 ? { imageUrl, seed: data.seed, prompt: state.prompts[model], blob: imageBlob } : item
-          )
-        }
-      }));
-    } catch (error) {
-      console.error('Error:', error);
-      setState(prevState => ({ 
-        ...prevState,
-        results: {
-          ...prevState.results,
-          [model]: prevState.results[model].map((item, index) => 
-            index === 0 ? { error: 'Error generating image. Please try again.', seed: data.seed, prompt: state.prompts[model] } : item
-          )
-        }
-      }));
-    }
-    setState(prevState => ({
-      ...prevState,
-      loading: { ...prevState.loading, [model]: false }
-    }));
-  };
-
-  const queryModel = async (model, data) => {
-    const modelEndpoints = {
-      StableDiffusion: "stabilityai/stable-diffusion-3-medium-diffusers",
-      FLUX: "black-forest-labs/FLUX.1-schnell",
-      Hent: "stablediffusionapi/explicit-freedom-nsfw-wai"
-    };
-    const response = await fetch(
-      `https://api-inference.huggingface.co/models/${modelEndpoints[model]}`,
-      {
-        headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-        method: "POST",
-        body: JSON.stringify(data),
-      }
-    );
-    return response;
-  };
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Copied!",
-      description: "Copied to clipboard",
-    });
-  };
-
-  const downloadImage = (blob, fileName) => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
+  const handleGenerateImage = useCallback((model) => {
+    generateImage(model, state, setState, API_KEY, MAX_SEED);
+  }, [state, setState]);
 
   const renderInputs = (model) => (
     <div className="flex items-center space-x-2 mb-4">
@@ -112,7 +31,7 @@ const AIImageGenerator = ({ state, setState }) => {
         className="flex-grow h-12"
       />
       <Button
-        onClick={() => generateImage(model)}
+        onClick={() => handleGenerateImage(model)}
         disabled={state.loading[model]}
         className="h-12 w-12 p-0"
       >
@@ -155,11 +74,11 @@ const AIImageGenerator = ({ state, setState }) => {
                     <Download className="mr-2 h-4 w-4" />
                     <span>Download</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => copyToClipboard(result.imageUrl)}>
+                  <DropdownMenuItem onClick={() => copyToClipboard(result.imageUrl, toast)}>
                     <Link className="mr-2 h-4 w-4" />
                     <span>Copy Link</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => copyToClipboard(`<img src="${result.imageUrl}" alt="Generated image" />`)}>
+                  <DropdownMenuItem onClick={() => copyToClipboard(`<img src="${result.imageUrl}" alt="Generated image" />`, toast)}>
                     <Image className="mr-2 h-4 w-4" />
                     <span>Copy Image Tag</span>
                   </DropdownMenuItem>
