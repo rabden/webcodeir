@@ -3,7 +3,7 @@ import { X, Save, BookOpen, Settings as SettingsIcon, ChevronDown, ChevronUp, Li
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, setShowKeyboardShortcuts, setShowPexelsPanel, saveCurrentCode, toggleConsole, showConsole, toggleSnippetLibrary, showSnippetLibrary }) => {
+const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, setShowKeyboardShortcuts, setShowPexelsPanel, saveCurrentCode, toggleConsole, showConsole, toggleSnippetLibrary, showSnippetLibrary, setShowAIImageGeneratorPanel }) => {
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
 
@@ -52,6 +52,7 @@ const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, set
             <MenuButton label="HTML Tools" onClick={() => { setShowHtmlToolsPanel(true); setIsOpen(false); }} />
             <MenuButton label="CSS Tools" onClick={() => { setShowCssToolsPanel(true); setIsOpen(false); }} />
             <MenuButton label="JS Tools" onClick={() => { setShowJsToolsPanel(true); setIsOpen(false); }} />
+            <MenuButton label="AI Image Generator" onClick={() => { setShowAIImageGeneratorPanel(true); setIsOpen(false); }} />
           </CollapsibleContent>
         </Collapsible>
 

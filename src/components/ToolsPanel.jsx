@@ -12,6 +12,7 @@ import JsSnippetGenerator from './tools/JsSnippetGenerator';
 import EventListenerHelper from './tools/EventListenerHelper';
 import FetchApiHelper from './tools/FetchApiHelper';
 import LocalStorageHelper from './tools/LocalStorageHelper';
+import AIImageGenerator from './AIImageGenerator';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -19,7 +20,8 @@ const ToolsPanel = ({ onClose, type }) => {
   const [activeTab, setActiveTab] = useState(
     type === 'css' ? 'flexbox' : 
     type === 'html' ? 'htmlStructure' : 
-    'jsSnippet'
+    type === 'js' ? 'jsSnippet' :
+    'aiImageGenerator'
   );
 
   const cssTabs = [
@@ -43,7 +45,11 @@ const ToolsPanel = ({ onClose, type }) => {
     { id: 'localStorage', label: 'Local Storage', component: LocalStorageHelper },
   ];
 
-  const tabs = type === 'css' ? cssTabs : type === 'html' ? htmlTabs : jsTabs;
+  const aiTabs = [
+    { id: 'aiImageGenerator', label: 'AI Image Generator', component: AIImageGenerator },
+  ];
+
+  const tabs = type === 'css' ? cssTabs : type === 'html' ? htmlTabs : type === 'js' ? jsTabs : aiTabs;
 
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || (() => null);
 
@@ -75,7 +81,7 @@ const ToolsPanel = ({ onClose, type }) => {
           </Button>
         </div>
       </div>
-      <div className="flex-grow overflow-y-auto p-4">
+      <div className="flex-grow overflow-y-auto">
         <ActiveComponent />
       </div>
     </div>
