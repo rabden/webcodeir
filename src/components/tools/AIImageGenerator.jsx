@@ -8,9 +8,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Wand2, MoreVertical, Download, Link, Image, Loader2 } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 import { generateImage, copyToClipboard, downloadImage } from './aiImageHelpers';
-import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import FluxControls from './FluxControls';
 
 const MAX_SEED = 4294967295;
