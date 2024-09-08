@@ -8,6 +8,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Wand2, MoreVertical, Download, Link, Image, Loader2 } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 import { generateImage, copyToClipboard, downloadImage } from './aiImageHelpers';
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -19,26 +21,101 @@ const AIImageGenerator = ({ state, setState }) => {
     generateImage(model, state, setState, API_KEY, MAX_SEED);
   }, [state, setState]);
 
-  const renderInputs = (model) => (
-    <div className="flex items-center space-x-2 mb-4">
-      <Input
-        value={state.prompts[model]}
-        onChange={(e) => setState(prevState => ({
-          ...prevState,
-          prompts: { ...prevState.prompts, [model]: e.target.value }
-        }))}
-        placeholder="Enter prompt"
-        className="flex-grow h-12"
-      />
-      <Button
-        onClick={() => handleGenerateImage(model)}
-        disabled={state.loading[model]}
-        className="h-12 w-12 p-0"
-      >
-        <Wand2 className="h-6 w-6" />
-      </Button>
-    </div>
-  );
+  const renderInputs = (model) => {
+    if (model === 'FLUX') {
+      return (
+        <div className="space-y-4">
+          <Input
+            value={state.prompts[model]}
+            onChange={(e) => setState(prevState => ({
+              ...prevState,
+              prompts: { ...prevState.prompts, [model]: e.target.value }
+            }))}
+            placeholder="Enter prompt"
+            className="flex-grow h-12"
+          />
+          <div className="flex items-center space-x-2">
+            <Slider
+              value={[state.fluxParams.seed]}
+              onValueChange={(value) => setState(prevState => ({
+                ...prevState,
+                fluxParams: { ...prevState.fluxParams, seed: value[0] }
+              }))}
+              max={MAX_SEED}
+              step={1}
+              className="flex-grow"
+            />
+            <span className="text-sm text-gray-400">Seed: {state.fluxParams.seed}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              checked={state.fluxParams.randomize_seed}
+              onCheckedChange={(checked) => setState(prevState => ({
+                ...prevState,
+                fluxParams: { ...prevState.fluxParams, randomize_seed: checked }
+              }))}
+              id="randomize-seed"
+            />
+            <label htmlFor="randomize-seed" className="text-sm text-gray-400">Randomize seed</label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Slider
+              value={[state.fluxParams.width]}
+              onValueChange={(value) => setState(prevState => ({
+                ...prevState,
+                fluxParams: { ...prevState.fluxParams, width: value[0] }
+              }))}
+              min={256}
+              max={1024}
+              step={64}
+              className="flex-grow"
+            />
+            <span className="text-sm text-gray-400">Width: {state.fluxParams.width}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Slider
+              value={[state.fluxParams.height]}
+              onValueChange={(value) => setState(prevState => ({
+                ...prevState,
+                fluxParams: { ...prevState.fluxParams, height: value[0] }
+              }))}
+              min={256}
+              max={1024}
+              step={64}
+              className="flex-grow"
+            />
+            <span className="text-sm text-gray-400">Height: {state.fluxParams.height}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Slider
+              value={[state.fluxParams.num_inference_steps]}
+              onValueChange={(value) => setState(prevState => ({
+                ...prevState,
+                fluxParams: { ...prevState.fluxParams, num_inference_steps: value[0] }
+              }))}
+              min={1}
+              max={50}
+              step={1}
+              className="flex-grow"
+            />
+            <span className="text-sm text-gray-400">Inference steps: {state.fluxParams.num_inference_steps}</span>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <Input
+          value={state.prompts[model]}
+          onChange={(e) => setState(prevState => ({
+            ...prevState,
+            prompts: { ...prevState.prompts, [model]: e.target.value }
+          }))}
+          placeholder="Enter prompt"
+          className="flex-grow h-12"
+        />
+      );
+    }
+  };
 
   const renderResult = (model) => {
     return state.results[model].map((result, index) => (
@@ -106,6 +183,20 @@ const AIImageGenerator = ({ state, setState }) => {
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold">{model} Image Generator</h3>
                 {renderInputs(model)}
+                <Button
+                  onClick={() => handleGenerateImage(model)}
+                  disabled={state.loading[model]}
+                  className="w-full h-12"
+                >
+                  {state.loading[model] ? (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  ) : (
+                    <>
+                      <Wand2 className="w-6 h-6 mr-2" />
+                      Generate Image
+                    </>
+                  )}
+                </Button>
                 <div className="mt-4">
                   {renderResult(model)}
                 </div>

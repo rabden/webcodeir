@@ -28,7 +28,14 @@ const ToolsPanel = ({ onClose, type }) => {
   const [aiImageGeneratorState, setAIImageGeneratorState] = useState({
     results: { StableDiffusion: [], FLUX: [], Hent: [] },
     loading: { StableDiffusion: false, FLUX: false, Hent: false },
-    prompts: { StableDiffusion: '', FLUX: '', Hent: '' }
+    prompts: { StableDiffusion: '', FLUX: '', Hent: '' },
+    fluxParams: {
+      seed: 0,
+      randomize_seed: true,
+      width: 1024,
+      height: 1024,
+      num_inference_steps: 4
+    }
   });
 
   const [isMinimized, setIsMinimized] = useState(false);
