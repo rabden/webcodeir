@@ -2,8 +2,8 @@ import React, { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Wand2 } from 'lucide-react';
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -11,6 +11,7 @@ const API_KEY = "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";
 const AIImageGenerator = () => {
   const [results, setResults] = useState({ StableDiffusion: null, FLUX: null, Hent: null });
   const [loading, setLoading] = useState({ StableDiffusion: false, FLUX: false, Hent: false });
+  const [prompts, setPrompts] = useState({ StableDiffusion: '', FLUX: '', Hent: '' });
 
   const generateImage = async (model) => {
     setLoading(prev => ({ ...prev, [model]: true }));
@@ -45,10 +46,10 @@ const AIImageGenerator = () => {
 
   const getModelData = useCallback((model) => {
     return {
-      inputs: document.getElementById(`${model.toLowerCase()}-prompt`).value,
+      inputs: prompts[model],
       seed: Math.floor(Math.random() * MAX_SEED),
     };
-  }, []);
+  }, [prompts]);
 
   const downloadImage = (imageUrl, fileName) => {
     const a = document.createElement('a');
@@ -60,12 +61,21 @@ const AIImageGenerator = () => {
   };
 
   const renderInputs = (model) => (
-    <>
-      <Input id={`${model.toLowerCase()}-prompt`} placeholder="Enter prompt" className="mb-4" />
-      <Button onClick={() => generateImage(model)} disabled={loading[model]}>
-        {loading[model] ? 'Generating...' : 'Generate Image'}
+    <div className="flex items-center space-x-2 mb-4">
+      <Input
+        value={prompts[model]}
+        onChange={(e) => setPrompts(prev => ({ ...prev, [model]: e.target.value }))}
+        placeholder="Enter prompt"
+        className="flex-grow h-12"
+      />
+      <Button
+        onClick={() => generateImage(model)}
+        disabled={loading[model]}
+        className="h-12 w-12 p-0"
+      >
+        <Wand2 className="h-6 w-6" />
       </Button>
-    </>
+    </div>
   );
 
   const renderResult = (model) => {
