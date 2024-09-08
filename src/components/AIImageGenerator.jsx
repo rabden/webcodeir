@@ -14,9 +14,9 @@ const MAX_SEED = 4294967295;
 const API_KEY = "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";
 
 const AIImageGenerator = () => {
-  const [results, setResults] = useState({ StableDiffusion: [], FLUX: [], Hent: [] });
-  const [loading, setLoading] = useState({ StableDiffusion: false, FLUX: false, Hent: false });
-  const [prompts, setPrompts] = useState({ StableDiffusion: '', FLUX: '', Hent: '' });
+  const [results, setResults] = useState({ StableDiffusion: [], FLUX: [] });
+  const [loading, setLoading] = useState({ StableDiffusion: false, FLUX: false });
+  const [prompts, setPrompts] = useState({ StableDiffusion: '', FLUX: '' });
   const [fluxParams, setFluxParams] = useState({
     seed: 0,
     randomize_seed: true,
@@ -30,21 +30,17 @@ const AIImageGenerator = () => {
     setLoading(prev => ({ ...prev, [model]: true }));
     let data = {
       inputs: prompts[model],
-      seed: Math.floor(Math.random() * MAX_SEED),
+      parameters: {
+        seed: fluxParams.randomize_seed ? Math.floor(Math.random() * MAX_SEED) : fluxParams.seed,
+        width: fluxParams.width,
+        height: fluxParams.height,
+        num_inference_steps: fluxParams.num_inference_steps
+      }
     };
     
-    if (model === 'FLUX') {
-      data = {
-        ...data,
-        ...fluxParams,
-        seed: fluxParams.randomize_seed ? Math.floor(Math.random() * MAX_SEED) : fluxParams.seed,
-      };
-    }
-    
-    // Add a placeholder result immediately
     setResults(prev => ({
       ...prev,
-      [model]: [{ loading: true, seed: data.seed, prompt: prompts[model] }, ...prev[model]]
+      [model]: [{ loading: true, seed: data.parameters.seed, prompt: prompts[model] }, ...prev[model]]
     }));
 
     try {
@@ -56,15 +52,13 @@ const AIImageGenerator = () => {
           index === 0 ? { imageUrl, seed: response[1], prompt: prompts[model] } : item
         )
       }));
-      if (model === 'FLUX') {
-        setFluxParams(prev => ({ ...prev, seed: response[1] }));
-      }
+      setFluxParams(prev => ({ ...prev, seed: response[1] }));
     } catch (error) {
       console.error('Error:', error);
       setResults(prev => ({ 
         ...prev, 
         [model]: prev[model].map((item, index) => 
-          index === 0 ? { error: 'Error generating image. Please try again.', seed: data.seed, prompt: prompts[model] } : item
+          index === 0 ? { error: 'Error generating image. Please try again.', seed: data.parameters.seed, prompt: prompts[model] } : item
         )
       }));
     }
@@ -74,8 +68,7 @@ const AIImageGenerator = () => {
   const queryModel = async (model, data) => {
     const modelEndpoints = {
       StableDiffusion: "stabilityai/stable-diffusion-3-medium-diffusers",
-      FLUX: "black-forest-labs/FLUX.1-schnell",
-      Hent: "stablediffusionapi/explicit-freedom-nsfw-wai"
+      FLUX: "black-forest-labs/FLUX.1-schnell"
     };
     const response = await fetch(
       `https://api-inference.huggingface.co/models/${modelEndpoints[model]}`,
@@ -86,7 +79,7 @@ const AIImageGenerator = () => {
       }
     );
     const result = await response.blob();
-    return [result, data.seed];
+    return [result, data.parameters.seed];
   };
 
   const copyToClipboard = (text) => {
@@ -107,32 +100,34 @@ const AIImageGenerator = () => {
   };
 
   const renderInputs = (model) => (
-    <div className="flex items-center space-x-2 mb-4">
+    <div className="space-y-4">
       <Input
         value={prompts[model]}
         onChange={(e) => setPrompts(prev => ({ ...prev, [model]: e.target.value }))}
         placeholder="Enter prompt"
-        className="flex-grow h-12"
+        className="h-12"
       />
+      {model === 'FLUX' && renderFluxControls()}
       <Button
         onClick={() => generateImage(model)}
         disabled={loading[model]}
-        className="h-12 w-12 p-0"
+        className="w-full h-12"
       >
-        <Wand2 className="h-6 w-6" />
+        {loading[model] ? <Loader2 className="h-6 w-6 animate-spin" /> : <Wand2 className="h-6 w-6 mr-2" />}
+        Generate
       </Button>
     </div>
   );
 
   const renderFluxControls = () => (
-    <div className="space-y-4 mb-4">
+    <div className="space-y-4">
       <div className="flex items-center space-x-2">
         <Slider
           value={[fluxParams.seed]}
           onValueChange={(value) => setFluxParams(prev => ({ ...prev, seed: value[0] }))}
           max={MAX_SEED}
           step={1}
-          className="flex-grow"
+          disabled={fluxParams.randomize_seed}
         />
         <span className="text-sm text-gray-400 w-16 text-right">{fluxParams.seed}</span>
       </div>
@@ -144,28 +139,18 @@ const AIImageGenerator = () => {
         />
         <label htmlFor="randomize-seed" className="text-sm text-gray-400">Randomize seed</label>
       </div>
-      <div className="flex items-center space-x-2">
-        <Slider
-          value={[fluxParams.width]}
-          onValueChange={(value) => setFluxParams(prev => ({ ...prev, width: value[0] }))}
-          min={512}
-          max={2048}
-          step={64}
-          className="flex-grow"
-        />
-        <span className="text-sm text-gray-400 w-16 text-right">{fluxParams.width}px</span>
-      </div>
-      <div className="flex items-center space-x-2">
-        <Slider
-          value={[fluxParams.height]}
-          onValueChange={(value) => setFluxParams(prev => ({ ...prev, height: value[0] }))}
-          min={512}
-          max={2048}
-          step={64}
-          className="flex-grow"
-        />
-        <span className="text-sm text-gray-400 w-16 text-right">{fluxParams.height}px</span>
-      </div>
+      {['width', 'height'].map(param => (
+        <div key={param} className="flex items-center space-x-2">
+          <Slider
+            value={[fluxParams[param]]}
+            onValueChange={(value) => setFluxParams(prev => ({ ...prev, [param]: value[0] }))}
+            min={256}
+            max={2048}
+            step={8}
+          />
+          <span className="text-sm text-gray-400 w-16 text-right">{fluxParams[param]}px</span>
+        </div>
+      ))}
       <div className="flex items-center space-x-2">
         <Slider
           value={[fluxParams.num_inference_steps]}
@@ -173,14 +158,13 @@ const AIImageGenerator = () => {
           min={1}
           max={50}
           step={1}
-          className="flex-grow"
         />
         <span className="text-sm text-gray-400 w-16 text-right">{fluxParams.num_inference_steps}</span>
       </div>
     </div>
   );
 
-  const renderResult = (model) => {
+  const renderResult = useCallback((model) => {
     return results[model].map((result, index) => (
       <Card key={index} className="mb-4">
         <CardContent className="p-0">
@@ -229,7 +213,7 @@ const AIImageGenerator = () => {
         </CardFooter>
       </Card>
     ));
-  };
+  }, [results]);
 
   return (
     <ScrollArea className="h-full">
@@ -239,14 +223,12 @@ const AIImageGenerator = () => {
           <TabsList>
             <TabsTrigger value="StableDiffusion">Stable Diffusion 3</TabsTrigger>
             <TabsTrigger value="FLUX">FLUX</TabsTrigger>
-            <TabsTrigger value="Hent">Hent</TabsTrigger>
           </TabsList>
-          {['StableDiffusion', 'FLUX', 'Hent'].map(model => (
+          {['StableDiffusion', 'FLUX'].map(model => (
             <TabsContent key={model} value={model}>
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold">{model} Image Generator</h3>
                 {renderInputs(model)}
-                {model === 'FLUX' && renderFluxControls()}
                 <div className="mt-4">
                   {renderResult(model)}
                 </div>
