@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,11 +8,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Wand2, MoreVertical, Download, Link, Image, ChevronDown, ChevronUp } from 'lucide-react';
+import { Wand2, MoreVertical, Download, Link, Image, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 
 const MAX_SEED = 4294967295;
-const DEFAULT_API_KEY = "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";
+const API_KEY = "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";
 
 const modelEndpoints = {
   FLUX: "black-forest-labs/FLUX.1-schnell",
@@ -32,30 +32,9 @@ const AIImageGenerator = () => {
       height: 1024,
       num_inference_steps: 4
     },
-    isFluxSettingsOpen: false,
-    useCustomApi: false,
-    customApiKey: ''
+    isFluxSettingsOpen: false
   });
   const { toast } = useToast();
-
-  useEffect(() => {
-    const savedState = localStorage.getItem('aiImageGeneratorState');
-    if (savedState) {
-      const parsedState = JSON.parse(savedState);
-      setState(prevState => ({
-        ...prevState,
-        useCustomApi: parsedState.useCustomApi,
-        customApiKey: parsedState.customApiKey
-      }));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('aiImageGeneratorState', JSON.stringify({
-      useCustomApi: state.useCustomApi,
-      customApiKey: state.customApiKey
-    }));
-  }, [state.useCustomApi, state.customApiKey]);
 
   const generateImage = async (model) => {
     setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true } }));
@@ -106,11 +85,10 @@ const AIImageGenerator = () => {
   };
 
   const queryModel = async (model, data) => {
-    const apiKey = state.useCustomApi ? state.customApiKey : DEFAULT_API_KEY;
     const response = await fetch(
       `https://api-inference.huggingface.co/models/${modelEndpoints[model]}`,
       {
-        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
         method: "POST",
         body: JSON.stringify(data),
       }
@@ -146,7 +124,7 @@ const AIImageGenerator = () => {
         disabled={state.loading[model]}
         size="icon"
       >
-        {state.loading[model] ? <span className="loading loading-spinner"></span> : <Wand2 className="h-4 w-4" />}
+        {state.loading[model] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
       </Button>
     </div>
   );
@@ -199,7 +177,7 @@ const AIImageGenerator = () => {
         <CardContent className="p-0">
           {result.loading ? (
             <div className="w-full h-64 flex items-center justify-center bg-gray-200">
-              <span className="loading loading-spinner"></span>
+              <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
             </div>
           ) : result.error ? (
             <div className="w-full h-64 flex items-center justify-center bg-gray-200">
@@ -248,22 +226,6 @@ const AIImageGenerator = () => {
     <ScrollArea className="h-full">
       <div className="p-4 space-y-4">
         <h2 className="text-2xl font-bold">AI Image Generators</h2>
-        <div className="flex items-center space-x-2 mb-4">
-          <Checkbox
-            id="use-custom-api"
-            checked={state.useCustomApi}
-            onCheckedChange={(checked) => setState(prev => ({ ...prev, useCustomApi: checked }))}
-          />
-          <label htmlFor="use-custom-api" className="text-sm text-gray-400">Use Custom API Key</label>
-        </div>
-        {state.useCustomApi && (
-          <Input
-            value={state.customApiKey}
-            onChange={(e) => setState(prev => ({ ...prev, customApiKey: e.target.value }))}
-            placeholder="Enter your custom API key"
-            className="mb-4"
-          />
-        )}
         <Tabs defaultValue="FLUX">
           <TabsList>
             <TabsTrigger value="FLUX">FLUX</TabsTrigger>
