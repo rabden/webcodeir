@@ -9,20 +9,29 @@ const MAX_SEED = 4294967295;
 const API_KEY = "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";
 
 const AIImageGenerator = () => {
-  const [results, setResults] = useState({ StableDiffusion: null, FLUX: null, Hent: null });
+  const [results, setResults] = useState({ StableDiffusion: [], FLUX: [], Hent: [] });
   const [loading, setLoading] = useState({ StableDiffusion: false, FLUX: false, Hent: false });
   const [prompts, setPrompts] = useState({ StableDiffusion: '', FLUX: '', Hent: '' });
 
   const generateImage = async (model) => {
     setLoading(prev => ({ ...prev, [model]: true }));
-    const data = getModelData(model);
+    const data = {
+      inputs: prompts[model],
+      seed: Math.floor(Math.random() * MAX_SEED),
+    };
     try {
       const response = await queryModel(model, data);
       const imageUrl = URL.createObjectURL(response);
-      setResults(prev => ({ ...prev, [model]: { imageUrl, seed: data.seed } }));
+      setResults(prev => ({ 
+        ...prev, 
+        [model]: [{ imageUrl, seed: data.seed, prompt: prompts[model] }, ...prev[model]]
+      }));
     } catch (error) {
       console.error('Error:', error);
-      setResults(prev => ({ ...prev, [model]: 'Error generating image. Please try again.' }));
+      setResults(prev => ({ 
+        ...prev, 
+        [model]: [{ error: 'Error generating image. Please try again.' }, ...prev[model]]
+      }));
     }
     setLoading(prev => ({ ...prev, [model]: false }));
   };
@@ -43,13 +52,6 @@ const AIImageGenerator = () => {
     );
     return await response.blob();
   };
-
-  const getModelData = useCallback((model) => {
-    return {
-      inputs: prompts[model],
-      seed: Math.floor(Math.random() * MAX_SEED),
-    };
-  }, [prompts]);
 
   const downloadImage = (imageUrl, fileName) => {
     const a = document.createElement('a');
@@ -79,18 +81,22 @@ const AIImageGenerator = () => {
   );
 
   const renderResult = (model) => {
-    const result = results[model];
-    if (typeof result === 'string') return <p>{result}</p>;
-    if (!result) return null;
-    return (
-      <>
-        <img src={result.imageUrl} alt="Generated image" className="max-w-full h-auto mb-2" />
-        <p>Used seed: {result.seed}</p>
-        <Button onClick={() => downloadImage(result.imageUrl, `${model.toLowerCase()}_image.png`)} className="mt-2">
-          Download Image
-        </Button>
-      </>
-    );
+    return results[model].map((result, index) => (
+      <div key={index} className="mb-4">
+        {result.error ? (
+          <p className="text-red-500">{result.error}</p>
+        ) : (
+          <>
+            <img src={result.imageUrl} alt="Generated image" className="max-w-full h-auto mb-2" />
+            <p>Used seed: {result.seed}</p>
+            <p>Prompt: {result.prompt}</p>
+            <Button onClick={() => downloadImage(result.imageUrl, `${model.toLowerCase()}_image_${index}.png`)} className="mt-2">
+              Download Image
+            </Button>
+          </>
+        )}
+      </div>
+    ));
   };
 
   return (
