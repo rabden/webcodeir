@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Wand2, MoreVertical, Download, Link, Image, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Wand2, MoreVertical, Download, Link, Image, ChevronDown, ChevronUp } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 
 const MAX_SEED = 4294967295;
@@ -146,7 +146,7 @@ const AIImageGenerator = () => {
         disabled={state.loading[model]}
         size="icon"
       >
-        {state.loading[model] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+        {state.loading[model] ? <span className="loading loading-spinner"></span> : <Wand2 className="h-4 w-4" />}
       </Button>
     </div>
   );
@@ -199,7 +199,7 @@ const AIImageGenerator = () => {
         <CardContent className="p-0">
           {result.loading ? (
             <div className="w-full h-64 flex items-center justify-center bg-gray-200">
-              <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
+              <span className="loading loading-spinner"></span>
             </div>
           ) : result.error ? (
             <div className="w-full h-64 flex items-center justify-center bg-gray-200">
