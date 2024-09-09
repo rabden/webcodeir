@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Search, Check, MoreVertical, Copy } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
@@ -80,6 +80,15 @@ const CodeSnippetLibrary = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedStates, setCopiedStates] = useState({});
   const { toast } = useToast();
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const filteredSnippets = snippets[activeTab].filter(snippet =>
     snippet.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -98,7 +107,7 @@ const CodeSnippetLibrary = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-800 z-50 flex flex-col overflow-hidden">
+    <div className={`fixed ${isMobile ? 'inset-0' : 'inset-y-4 right-4 w-96'} bg-gray-800 z-50 flex flex-col overflow-hidden ${isMobile ? '' : 'rounded-lg'}`}>
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-xl font-bold text-white">Code Snippet Library</h2>
         <div className="flex items-center space-x-2">
