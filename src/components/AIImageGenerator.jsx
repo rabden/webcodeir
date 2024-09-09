@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Wand2, MoreVertical, Download, Link, Image, Loader2, Settings, X } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
-import * as monaco from 'monaco-editor';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -45,9 +45,23 @@ const AIImageGenerator = () => {
     isFluxSettingsOpen: false
   });
   const { toast } = useToast();
+  const editorRef = useRef(null);
 
   useEffect(() => {
-    // Set up Monaco Editor auto-completion
+    if (!editorRef.current) {
+      editorRef.current = monaco.editor.create(document.getElementById('monaco-editor-container'), {
+        value: '',
+        language: 'plaintext',
+        theme: 'vs-dark',
+        minimap: { enabled: false },
+        lineNumbers: 'off',
+        glyphMargin: false,
+        folding: false,
+        lineDecorationsWidth: 0,
+        lineNumbersMinChars: 0,
+      });
+    }
+
     monaco.languages.registerCompletionItemProvider('plaintext', {
       provideCompletionItems: (model, position) => {
         const word = model.getWordUntilPosition(position);
@@ -73,6 +87,12 @@ const AIImageGenerator = () => {
         return { suggestions: suggestions.map(s => ({ ...s, range })) };
       }
     });
+
+    return () => {
+      if (editorRef.current) {
+        editorRef.current.dispose();
+      }
+    };
   }, []);
 
   const generateImage = async (model) => {
@@ -144,12 +164,7 @@ const AIImageGenerator = () => {
 
   const renderInputs = (model) => (
     <div className="flex space-x-2 mb-4">
-      <Input
-        value={state.prompts[model]}
-        onChange={(e) => setState(prev => ({ ...prev, prompts: { ...prev.prompts, [model]: e.target.value } }))}
-        placeholder="Enter prompt"
-        className="flex-grow"
-      />
+      <div id="monaco-editor-container" style={{ width: '100%', height: '100px' }}></div>
       <Button
         onClick={() => generateImage(model)}
         disabled={state.loading[model]}
