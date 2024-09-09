@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, Copy, Code, Palette, Wrench, MoreVertical } from 'lucide-react';
+import { X, Search, Check, MoreVertical } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -35,7 +36,7 @@ const snippets = {
   ],
 };
 
-const CodeSnippetLibrary = ({ onClose, isMobile }) => {
+const CodeSnippetLibrary = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState('html');
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedStates, setCopiedStates] = useState({});
@@ -58,7 +59,7 @@ const CodeSnippetLibrary = ({ onClose, isMobile }) => {
   };
 
   return (
-    <div className="fixed inset-y-4 right-4 w-80 bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden">
+    <div className="fixed inset-0 bg-gray-800 z-50 flex flex-col overflow-hidden">
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-xl font-bold text-white">Code Snippet Library</h2>
         <div className="flex items-center space-x-2">
@@ -70,15 +71,12 @@ const CodeSnippetLibrary = ({ onClose, isMobile }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-gray-700 text-white border-gray-600">
               <DropdownMenuItem onSelect={() => setActiveTab('html')} className="hover:bg-gray-600">
-                <Code className="w-4 h-4 mr-2" />
                 HTML
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setActiveTab('css')} className="hover:bg-gray-600">
-                <Palette className="w-4 h-4 mr-2" />
                 CSS
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setActiveTab('js')} className="hover:bg-gray-600">
-                <Wrench className="w-4 h-4 mr-2" />
                 JavaScript
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -103,21 +101,27 @@ const CodeSnippetLibrary = ({ onClose, isMobile }) => {
             <div key={index} className="bg-gray-700 p-4 rounded-lg">
               <div className="flex justify-between items-center mb-2">
                 <h3 className="text-white font-semibold">{snippet.name}</h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => copyToClipboard(snippet.code, snippet.name)}
-                  className={copiedStates[snippet.name] ? "text-green-500" : ""}
-                >
-                  {copiedStates[snippet.name] ? (
-                    "Copied!"
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy
-                    </>
-                  )}
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(snippet.code, snippet.name)}
+                        className={copiedStates[snippet.name] ? "text-green-500" : ""}
+                      >
+                        {copiedStates[snippet.name] ? (
+                          <Check className="w-4 h-4" />
+                        ) : (
+                          <Search className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{copiedStates[snippet.name] ? "Copied!" : "Copy to clipboard"}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
               <pre className="bg-gray-800 p-2 rounded text-sm text-white overflow-x-auto whitespace-pre-wrap break-all">
                 <code>{snippet.code}</code>
