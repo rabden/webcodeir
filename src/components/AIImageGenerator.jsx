@@ -17,7 +17,7 @@ const API_KEY = "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";
 const modelEndpoints = {
   FLUX: "black-forest-labs/FLUX.1-schnell",
   SD3: "stabilityai/stable-diffusion-3-medium-diffusers",
-  HENTAI: "stablediffusionapi/explicit-freedom-nsfw-wai"
+  HENTAI: "stablediffusionapi/newrealityxl-global-nsfw"
 };
 
 const AIImageGenerator = () => {
