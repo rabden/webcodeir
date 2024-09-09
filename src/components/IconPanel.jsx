@@ -7,12 +7,21 @@ import { additionalIcons } from '../data/iconData2';
 import { extraIcons } from '../data/iconData3';
 import ReactDOMServer from 'react-dom/server';
 
-const IconPanel = ({ onClose, isMobile }) => {
+const IconPanel = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedIcon, setCopiedIcon] = useState(null);
   const [filteredIcons, setFilteredIcons] = useState([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const allIcons = { ...topIcons, ...additionalIcons, ...extraIcons };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const results = Object.keys(allIcons).filter(iconName => 
@@ -33,7 +42,7 @@ const IconPanel = ({ onClose, isMobile }) => {
   };
 
   return (
-    <div className={`fixed inset-y-0 right-0 bg-gray-800 shadow-lg z-50 flex flex-col ${isMobile ? 'w-full' : 'w-80'}`}>
+    <div className={`fixed ${isMobile ? 'inset-0' : 'inset-y-0 right-0 w-80'} bg-gray-800 shadow-lg z-50 flex flex-col`}>
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-xl font-bold text-white">Icon Library</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">

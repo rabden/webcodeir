@@ -42,7 +42,7 @@ const FontPanel = ({ onClose }) => {
   };
 
   return (
-    <div className={`fixed inset-y-4 right-4 ${isMobile ? 'left-4' : 'w-96'} bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden`}>
+    <div className={`fixed ${isMobile ? 'inset-0' : 'inset-y-4 right-4 w-96'} bg-gray-800 shadow-lg z-50 flex flex-col ${isMobile ? '' : 'rounded-lg'} overflow-hidden`}>
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-white`}>Font Library</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700">
