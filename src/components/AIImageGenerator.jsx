@@ -1,15 +1,13 @@
-import React, { useState, useCallback } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { X, Download, Trash, Settings, Plus, Minus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Wand2, MoreVertical, Download, Link, Image, Loader2, Settings, X } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 
 const MAX_SEED = 4294967295;
@@ -125,56 +123,65 @@ const AIImageGenerator = () => {
         disabled={state.loading[model]}
         size="icon"
       >
-        {state.loading[model] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+        {state.loading[model] ? <span className="loading loading-spinner"></span> : "Generate"}
       </Button>
     </div>
   );
 
   const renderFluxSettings = () => (
     <Collapsible open={state.isFluxSettingsOpen} onOpenChange={(open) => setState(prev => ({ ...prev, isFluxSettingsOpen: open }))}>
-      <CollapsibleTrigger asChild>
-        <Button variant="outline" size="icon" className="mb-2">
-          {state.isFluxSettingsOpen ? <X className="h-4 w-4" /> : <Settings className="h-4 w-4" />}
-        </Button>
-      </CollapsibleTrigger>
-      <CollapsibleContent className="space-y-4">
-        <div className="flex space-x-2">
-          <div className="flex-1">
-            <label className="text-sm font-medium text-white">Inference Steps</label>
+      <div className="flex items-center space-x-2 mb-2">
+        <CollapsibleTrigger asChild>
+          <Button variant="outline" size="icon" className="w-8 h-8">
+            {state.isFluxSettingsOpen ? <X className="h-4 w-4" /> : <Settings className="h-4 w-4" />}
+          </Button>
+        </CollapsibleTrigger>
+        <div className="flex-grow flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
+            <Button
+              onClick={() => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: Math.max(1, prev.fluxParams.num_inference_steps - 1) } }))}
+              className="w-8 h-8 p-0"
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
             <Input
               type="number"
               value={state.fluxParams.num_inference_steps}
               onChange={(e) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: parseInt(e.target.value) } }))}
               min={1}
               max={50}
-              className="bg-gray-800 text-white border-gray-700"
+              className="w-16 text-center"
             />
-          </div>
-          <div className="flex-1">
-            <label className="text-sm font-medium text-white">Aspect Ratio</label>
-            <Select 
-              value={state.fluxParams.aspectRatio} 
-              onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, aspectRatio: value } }))}
+            <Button
+              onClick={() => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: Math.min(50, prev.fluxParams.num_inference_steps + 1) } }))}
+              className="w-8 h-8 p-0"
             >
-              <SelectTrigger className="bg-gray-800 text-white border-gray-700">
-                <SelectValue placeholder="Select aspect ratio" />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 text-white border-gray-700">
-                {Object.keys(aspectRatios).map((ratio) => (
-                  <SelectItem key={ratio} value={ratio}>{ratio}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
+          <Select 
+            value={state.fluxParams.aspectRatio} 
+            onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, aspectRatio: value } }))}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select aspect ratio" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.keys(aspectRatios).map((ratio) => (
+                <SelectItem key={ratio} value={ratio}>{ratio}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
+      </div>
+      <CollapsibleContent className="space-y-2">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-white">Seed: {state.fluxParams.seed}</label>
+          <label className="text-sm font-medium">Seed: {state.fluxParams.seed}</label>
           <Slider
             value={[state.fluxParams.seed]}
             onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, seed: value[0] } }))}
             max={MAX_SEED}
             step={1}
-            className="bg-gray-800"
           />
         </div>
         <div className="flex items-center space-x-2">
@@ -183,7 +190,7 @@ const AIImageGenerator = () => {
             checked={state.fluxParams.randomize_seed}
             onCheckedChange={(checked) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, randomize_seed: checked } }))}
           />
-          <label htmlFor="randomize-seed" className="text-sm text-gray-400">Randomize seed</label>
+          <label htmlFor="randomize-seed" className="text-sm">Randomize seed</label>
         </div>
       </CollapsibleContent>
     </Collapsible>
@@ -191,35 +198,36 @@ const AIImageGenerator = () => {
 
   const renderResult = useCallback((model) => {
     return state.results[model].map((result, index) => (
-      <Card key={index} className="mb-4">
-        <CardContent className="p-0">
+      <div key={index} className="mb-4 bg-gray-800 rounded-lg overflow-hidden">
+        <div className="p-4">
           {result.loading ? (
-            <div className="w-full h-64 flex items-center justify-center bg-gray-200">
-              <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
+            <div className="w-full h-64 flex items-center justify-center bg-gray-700">
+              <span className="loading loading-spinner"></span>
             </div>
           ) : result.error ? (
-            <div className="w-full h-64 flex items-center justify-center bg-gray-200">
+            <div className="w-full h-64 flex items-center justify-center bg-gray-700">
               <p className="text-red-500">{result.error}</p>
             </div>
           ) : (
-            <img src={result.imageUrl} alt="Generated image" className="w-full h-auto rounded-t-lg" />
+            <img src={result.imageUrl} alt="Generated image" className="w-full h-auto rounded-lg" />
           )}
-        </CardContent>
-        <CardFooter className="flex justify-between items-center p-4">
+        </div>
+        <div className="p-4 flex justify-between items-center">
           <div>
-            <p className="text-sm text-gray-500">Seed: {result.seed}</p>
-            <p className="text-sm text-gray-500">Prompt: {result.prompt}</p>
+            <p className="text-sm text-gray-400">Seed: {result.seed}</p>
+            <p className="text-sm text-gray-400">Prompt: {result.prompt}</p>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent align="end">
               {!result.loading && !result.error && (
                 <>
-                  <DropdownMenuItem onClick={() => downloadImage(result.imageUrl, `${model.toLowerCase()}_image_${index}.png`)}>
+                  <DropdownMenuItem onClick={() => window.open(result.imageUrl, '_blank')}>
                     <Download className="mr-2 h-4 w-4" />
                     <span>Download</span>
                   </DropdownMenuItem>
@@ -235,8 +243,8 @@ const AIImageGenerator = () => {
               )}
             </DropdownMenuContent>
           </DropdownMenu>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     ));
   }, [state.results]);
 
@@ -244,24 +252,21 @@ const AIImageGenerator = () => {
     <ScrollArea className="h-full">
       <div className="p-4 space-y-4">
         <h2 className="text-2xl font-bold">AI Image Generators</h2>
-        <Tabs defaultValue="FLUX">
-          <TabsList>
-            <TabsTrigger value="FLUX">FLUX</TabsTrigger>
-            <TabsTrigger value="SD3">SD3</TabsTrigger>
-          </TabsList>
-          {['FLUX', 'SD3'].map(model => (
-            <TabsContent key={model} value={model}>
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold">{model} Image Generator</h3>
-                {renderInputs(model)}
-                {model === 'FLUX' && renderFluxSettings()}
-                <div className="mt-4">
-                  {renderResult(model)}
-                </div>
-              </div>
-            </TabsContent>
-          ))}
-        </Tabs>
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold">FLUX Image Generator</h3>
+          {renderInputs('FLUX')}
+          {renderFluxSettings()}
+          <div className="mt-4">
+            {renderResult('FLUX')}
+          </div>
+        </div>
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold">SD3 Image Generator</h3>
+          {renderInputs('SD3')}
+          <div className="mt-4">
+            {renderResult('SD3')}
+          </div>
+        </div>
       </div>
     </ScrollArea>
   );
