@@ -16,20 +16,21 @@ const API_KEY = "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";
 const modelEndpoints = {
   FLUX: "black-forest-labs/FLUX.1-schnell",
   SD3: "stabilityai/stable-diffusion-3-medium-diffusers",
-  HENTAI: "stablediffusionapi/newrealityxl-global-nsfw"
+  CUSTOM: "stablediffusionapi/newrealityxl-global-nsfw"
 };
 
 const AIImageGenerator = () => {
   const [state, setState] = useState({
-    results: { FLUX: [], SD3: [], HENTAI: [] },
-    loading: { FLUX: false, SD3: false, HENTAI: false },
-    prompts: { FLUX: '', SD3: '', HENTAI: '' },
-    fluxParams: {
+    results: { FLUX: [], SD3: [], CUSTOM: [] },
+    loading: { FLUX: false, SD3: false, CUSTOM: false },
+    prompts: { FLUX: '', SD3: '', CUSTOM: '' },
+    params: {
       seed: 0,
       randomize_seed: true,
-      width: 1024,
-      height: 1024,
-      num_inference_steps: 4
+      width: 512,
+      height: 512,
+      num_inference_steps: 20,
+      guidance_scale: 7.5,
     }
   });
   const { toast } = useToast();
@@ -37,12 +38,13 @@ const AIImageGenerator = () => {
   const generateImage = async (model) => {
     setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true } }));
     let data = { inputs: state.prompts[model] };
-    if (model === 'FLUX') {
+    if (model === 'FLUX' || model === 'CUSTOM') {
       data.parameters = {
-        seed: state.fluxParams.randomize_seed ? Math.floor(Math.random() * MAX_SEED) : state.fluxParams.seed,
-        width: state.fluxParams.width,
-        height: state.fluxParams.height,
-        num_inference_steps: state.fluxParams.num_inference_steps
+        seed: state.params.randomize_seed ? Math.floor(Math.random() * MAX_SEED) : state.params.seed,
+        width: state.params.width,
+        height: state.params.height,
+        num_inference_steps: state.params.num_inference_steps,
+        guidance_scale: state.params.guidance_scale,
       };
     }
     
@@ -65,7 +67,7 @@ const AIImageGenerator = () => {
             index === 0 ? { imageUrl, seed: response[1], prompt: state.prompts[model] } : item
           )
         },
-        fluxParams: model === 'FLUX' ? { ...prev.fluxParams, seed: response[1] } : prev.fluxParams
+        params: { ...prev.params, seed: response[1] }
       }));
     } catch (error) {
       console.error('Error:', error);
@@ -127,52 +129,62 @@ const AIImageGenerator = () => {
     </div>
   );
 
-  const renderFluxSettings = () => (
+  const renderSettings = () => (
     <div className="space-y-4 mb-4">
       <div className="flex items-center space-x-2">
         <Checkbox
           id="randomize_seed"
-          checked={state.fluxParams.randomize_seed}
-          onCheckedChange={(checked) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, randomize_seed: checked } }))}
+          checked={state.params.randomize_seed}
+          onCheckedChange={(checked) => setState(prev => ({ ...prev, params: { ...prev.params, randomize_seed: checked } }))}
         />
         <label htmlFor="randomize_seed">Randomize Seed</label>
       </div>
-      {!state.fluxParams.randomize_seed && (
+      {!state.params.randomize_seed && (
         <Input
           type="number"
-          value={state.fluxParams.seed}
-          onChange={(e) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, seed: parseInt(e.target.value) } }))}
+          value={state.params.seed}
+          onChange={(e) => setState(prev => ({ ...prev, params: { ...prev.params, seed: parseInt(e.target.value) } }))}
           placeholder="Seed"
         />
       )}
       <div>
-        <label>Width: {state.fluxParams.width}px</label>
+        <label>Width: {state.params.width}px</label>
         <Slider
-          value={[state.fluxParams.width]}
-          onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, width: value[0] } }))}
+          value={[state.params.width]}
+          onValueChange={(value) => setState(prev => ({ ...prev, params: { ...prev.params, width: value[0] } }))}
           min={256}
           max={1024}
           step={64}
         />
       </div>
       <div>
-        <label>Height: {state.fluxParams.height}px</label>
+        <label>Height: {state.params.height}px</label>
         <Slider
-          value={[state.fluxParams.height]}
-          onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, height: value[0] } }))}
+          value={[state.params.height]}
+          onValueChange={(value) => setState(prev => ({ ...prev, params: { ...prev.params, height: value[0] } }))}
           min={256}
           max={1024}
           step={64}
         />
       </div>
       <div>
-        <label>Inference Steps: {state.fluxParams.num_inference_steps}</label>
+        <label>Inference Steps: {state.params.num_inference_steps}</label>
         <Slider
-          value={[state.fluxParams.num_inference_steps]}
-          onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: value[0] } }))}
+          value={[state.params.num_inference_steps]}
+          onValueChange={(value) => setState(prev => ({ ...prev, params: { ...prev.params, num_inference_steps: value[0] } }))}
           min={1}
           max={50}
           step={1}
+        />
+      </div>
+      <div>
+        <label>Guidance Scale: {state.params.guidance_scale}</label>
+        <Slider
+          value={[state.params.guidance_scale]}
+          onValueChange={(value) => setState(prev => ({ ...prev, params: { ...prev.params, guidance_scale: value[0] } }))}
+          min={1}
+          max={20}
+          step={0.1}
         />
       </div>
     </div>
@@ -237,14 +249,14 @@ const AIImageGenerator = () => {
           <TabsList>
             <TabsTrigger value="FLUX">FLUX</TabsTrigger>
             <TabsTrigger value="SD3">SD3</TabsTrigger>
-            <TabsTrigger value="HENTAI">hent.ai</TabsTrigger>
+            <TabsTrigger value="CUSTOM">Custom</TabsTrigger>
           </TabsList>
-          {['FLUX', 'SD3', 'HENTAI'].map(model => (
+          {['FLUX', 'SD3', 'CUSTOM'].map(model => (
             <TabsContent key={model} value={model}>
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold">{model} Image Generator</h3>
                 {renderInputs(model)}
-                {model === 'FLUX' && renderFluxSettings()}
+                {(model === 'FLUX' || model === 'CUSTOM') && renderSettings()}
                 <div className="mt-4">
                   {renderResult(model)}
                 </div>
