@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { X, Download, Trash, Settings, Plus, Minus } from 'lucide-react';
+import { X, Download, Trash, Settings, Plus, Minus, MoreVertical, Check, Copy, ExternalLink, Image, Link } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -140,9 +140,9 @@ const AIImageGenerator = () => {
           <div className="flex items-center space-x-2">
             <Button
               onClick={() => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: Math.max(1, prev.fluxParams.num_inference_steps - 1) } }))}
-              className="w-8 h-8 p-0"
+              className="w-10 h-10 p-0"
             >
-              <Minus className="h-4 w-4" />
+              <Minus className="h-6 w-6" />
             </Button>
             <Input
               type="number"
@@ -154,17 +154,17 @@ const AIImageGenerator = () => {
             />
             <Button
               onClick={() => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: Math.min(50, prev.fluxParams.num_inference_steps + 1) } }))}
-              className="w-8 h-8 p-0"
+              className="w-10 h-10 p-0"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-6 w-6" />
             </Button>
           </div>
           <Select 
             value={state.fluxParams.aspectRatio} 
             onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, aspectRatio: value } }))}
           >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select aspect ratio" />
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Aspect ratio" />
             </SelectTrigger>
             <SelectContent>
               {Object.keys(aspectRatios).map((ratio) => (
