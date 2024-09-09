@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -107,20 +107,9 @@ const AIImageGenerator = () => {
     return [result, data.parameters?.seed];
   };
 
-  const copyToClipboard = (imageUrl, type) => {
-    let textToCopy = '';
-    switch (type) {
-      case 'url':
-        textToCopy = imageUrl;
-        break;
-      case 'imgTag':
-        textToCopy = `<img src="${imageUrl}" alt="Generated image" />`;
-        break;
-      default:
-        textToCopy = imageUrl;
-    }
-    navigator.clipboard.writeText(textToCopy);
-    toast({ title: "Copied!", description: `${type === 'url' ? 'Image URL' : 'Image tag'} copied to clipboard` });
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: "Copied!", description: "Copied to clipboard" });
   };
 
   const renderInputs = (model) => (
@@ -235,11 +224,11 @@ const AIImageGenerator = () => {
                     <Download className="mr-2 h-4 w-4" />
                     <span>Download</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => copyToClipboard(result.imageUrl, 'url')} className="hover:bg-gray-700">
+                  <DropdownMenuItem onClick={() => copyToClipboard(result.imageUrl)} className="hover:bg-gray-700">
                     <Link className="mr-2 h-4 w-4" />
-                    <span>Copy URL</span>
+                    <span>Copy Link</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => copyToClipboard(result.imageUrl, 'imgTag')} className="hover:bg-gray-700">
+                  <DropdownMenuItem onClick={() => copyToClipboard(`<img src="${result.imageUrl}" alt="Generated image" />`)} className="hover:bg-gray-700">
                     <Image className="mr-2 h-4 w-4" />
                     <span>Copy Image Tag</span>
                   </DropdownMenuItem>
