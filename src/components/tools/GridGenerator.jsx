@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const GridGenerator = () => {
   const [columns, setColumns] = useState(3);
@@ -9,6 +11,7 @@ const GridGenerator = () => {
   const [gap, setGap] = useState(10);
   const [templateColumns, setTemplateColumns] = useState('1fr 1fr 1fr');
   const [templateRows, setTemplateRows] = useState('1fr 1fr 1fr');
+  const [customSizes, setCustomSizes] = useState(false);
 
   const gridStyle = {
     display: 'grid',
@@ -51,12 +54,14 @@ const GridGenerator = () => {
       </div>
       <div className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-white">Columns: {columns}</label>
+          <Label className="text-sm font-medium text-white">Columns: {columns}</Label>
           <Slider
             value={[columns]}
             onValueChange={(value) => {
               setColumns(value[0]);
-              setTemplateColumns('1fr '.repeat(value[0]).trim());
+              if (!customSizes) {
+                setTemplateColumns('1fr '.repeat(value[0]).trim());
+              }
             }}
             min={1}
             max={12}
@@ -65,12 +70,14 @@ const GridGenerator = () => {
           />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium text-white">Rows: {rows}</label>
+          <Label className="text-sm font-medium text-white">Rows: {rows}</Label>
           <Slider
             value={[rows]}
             onValueChange={(value) => {
               setRows(value[0]);
-              setTemplateRows('1fr '.repeat(value[0]).trim());
+              if (!customSizes) {
+                setTemplateRows('1fr '.repeat(value[0]).trim());
+              }
             }}
             min={1}
             max={12}
@@ -79,7 +86,7 @@ const GridGenerator = () => {
           />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium text-white">Gap: {gap}px</label>
+          <Label className="text-sm font-medium text-white">Gap: {gap}px</Label>
           <Slider
             value={[gap]}
             onValueChange={(value) => setGap(value[0])}
@@ -88,24 +95,38 @@ const GridGenerator = () => {
             className="bg-gray-800"
           />
         </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-white">Grid Template Columns</label>
-          <Input
-            value={templateColumns}
-            onChange={(e) => setTemplateColumns(e.target.value)}
-            placeholder="e.g., 1fr 2fr 1fr"
-            className="bg-gray-800 text-white border-gray-700"
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="customSizes"
+            checked={customSizes}
+            onCheckedChange={setCustomSizes}
           />
+          <Label htmlFor="customSizes" className="text-sm font-medium text-white">
+            Custom Grid Sizes
+          </Label>
         </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-white">Grid Template Rows</label>
-          <Input
-            value={templateRows}
-            onChange={(e) => setTemplateRows(e.target.value)}
-            placeholder="e.g., auto 1fr 2fr"
-            className="bg-gray-800 text-white border-gray-700"
-          />
-        </div>
+        {customSizes && (
+          <>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-white">Grid Template Columns</Label>
+              <Input
+                value={templateColumns}
+                onChange={(e) => setTemplateColumns(e.target.value)}
+                placeholder="e.g., 1fr 2fr 1fr"
+                className="bg-gray-800 text-white border-gray-700"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-white">Grid Template Rows</Label>
+              <Input
+                value={templateRows}
+                onChange={(e) => setTemplateRows(e.target.value)}
+                placeholder="e.g., auto 1fr 2fr"
+                className="bg-gray-800 text-white border-gray-700"
+              />
+            </div>
+          </>
+        )}
       </div>
       <Button onClick={() => navigator.clipboard.writeText(cssCode)} className="bg-blue-600 text-white hover:bg-blue-700">
         Copy CSS

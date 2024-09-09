@@ -12,14 +12,18 @@ import JsSnippetGenerator from './JsSnippetGenerator';
 import EventListenerHelper from './EventListenerHelper';
 import FetchApiHelper from './FetchApiHelper';
 import LocalStorageHelper from './LocalStorageHelper';
+import AIImageGenerator from '../AIImageGenerator';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const ToolsPanel = ({ onClose, type }) => {
   const [activeTab, setActiveTab] = useState(
     type === 'css' ? 'flexbox' : 
     type === 'html' ? 'htmlStructure' : 
-    'jsSnippet'
+    type === 'js' ? 'jsSnippet' :
+    'aiImageGenerator'
   );
 
   const cssTabs = [
@@ -43,7 +47,11 @@ const ToolsPanel = ({ onClose, type }) => {
     { id: 'localStorage', label: 'Local Storage', component: LocalStorageHelper },
   ];
 
-  const tabs = type === 'css' ? cssTabs : type === 'html' ? htmlTabs : jsTabs;
+  const aiTabs = [
+    { id: 'aiImageGenerator', label: 'AI Image Generator', component: AIImageGenerator },
+  ];
+
+  const tabs = type === 'css' ? cssTabs : type === 'html' ? htmlTabs : type === 'js' ? jsTabs : aiTabs;
 
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || (() => null);
 
@@ -75,9 +83,22 @@ const ToolsPanel = ({ onClose, type }) => {
           </Button>
         </div>
       </div>
-      <div className="flex-grow overflow-y-auto p-4">
-        <ActiveComponent />
-      </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-grow flex flex-col">
+        <TabsList className="bg-gray-700 p-1 mx-4 mt-4 rounded-md">
+          {tabs.map((tab) => (
+            <TabsTrigger
+              key={tab.id}
+              value={tab.id}
+              className="flex-1 text-sm py-1 text-gray-300 data-[state=active]:bg-gray-600 data-[state=active]:text-white rounded"
+            >
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <ScrollArea className="flex-grow p-4">
+          <ActiveComponent />
+        </ScrollArea>
+      </Tabs>
     </div>
   );
 };
