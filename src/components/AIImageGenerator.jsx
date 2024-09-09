@@ -7,7 +7,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Wand2, MoreVertical, Download, Link, Image, Loader2 } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Wand2, MoreVertical, Download, Link, Image, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 
 const MAX_SEED = 4294967295;
@@ -16,35 +17,34 @@ const API_KEY = "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";
 const modelEndpoints = {
   FLUX: "black-forest-labs/FLUX.1-schnell",
   SD3: "stabilityai/stable-diffusion-3-medium-diffusers",
-  CUSTOM: "stablediffusionapi/newrealityxl-global-nsfw"
+  HENTAI: "stablediffusionapi/explicit-freedom-nsfw-wai"
 };
 
 const AIImageGenerator = () => {
   const [state, setState] = useState({
-    results: { FLUX: [], SD3: [], CUSTOM: [] },
-    loading: { FLUX: false, SD3: false, CUSTOM: false },
-    prompts: { FLUX: '', SD3: '', CUSTOM: '' },
-    params: {
+    results: { FLUX: [], SD3: [], HENTAI: [] },
+    loading: { FLUX: false, SD3: false, HENTAI: false },
+    prompts: { FLUX: '', SD3: '', HENTAI: '' },
+    fluxParams: {
       seed: 0,
       randomize_seed: true,
-      width: 512,
-      height: 512,
-      num_inference_steps: 20,
-      guidance_scale: 7.5,
-    }
+      width: 1024,
+      height: 1024,
+      num_inference_steps: 4
+    },
+    isFluxSettingsOpen: false
   });
   const { toast } = useToast();
 
   const generateImage = async (model) => {
     setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true } }));
     let data = { inputs: state.prompts[model] };
-    if (model === 'FLUX' || model === 'CUSTOM') {
+    if (model === 'FLUX') {
       data.parameters = {
-        seed: state.params.randomize_seed ? Math.floor(Math.random() * MAX_SEED) : state.params.seed,
-        width: state.params.width,
-        height: state.params.height,
-        num_inference_steps: state.params.num_inference_steps,
-        guidance_scale: state.params.guidance_scale,
+        seed: state.fluxParams.randomize_seed ? Math.floor(Math.random() * MAX_SEED) : state.fluxParams.seed,
+        width: state.fluxParams.width,
+        height: state.fluxParams.height,
+        num_inference_steps: state.fluxParams.num_inference_steps
       };
     }
     
@@ -67,7 +67,7 @@ const AIImageGenerator = () => {
             index === 0 ? { imageUrl, seed: response[1], prompt: state.prompts[model] } : item
           )
         },
-        params: { ...prev.params, seed: response[1] }
+        fluxParams: model === 'FLUX' ? { ...prev.fluxParams, seed: response[1] } : prev.fluxParams
       }));
     } catch (error) {
       console.error('Error:', error);
@@ -129,64 +129,45 @@ const AIImageGenerator = () => {
     </div>
   );
 
-  const renderSettings = () => (
-    <div className="space-y-4 mb-4">
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="randomize_seed"
-          checked={state.params.randomize_seed}
-          onCheckedChange={(checked) => setState(prev => ({ ...prev, params: { ...prev.params, randomize_seed: checked } }))}
-        />
-        <label htmlFor="randomize_seed">Randomize Seed</label>
+  const renderFluxSettings = () => (
+    <Collapsible open={state.isFluxSettingsOpen} onOpenChange={(open) => setState(prev => ({ ...prev, isFluxSettingsOpen: open }))}>
+      <CollapsibleTrigger asChild>
+        <Button variant="outline" className="w-full justify-between mb-2">
+          FLUX Settings
+          {state.isFluxSettingsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </Button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="space-y-4">
+        {renderSlider("Seed", state.fluxParams.seed, (value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, seed: value } })), 0, MAX_SEED, 1)}
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="randomize-seed"
+            checked={state.fluxParams.randomize_seed}
+            onCheckedChange={(checked) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, randomize_seed: checked } }))}
+          />
+          <label htmlFor="randomize-seed" className="text-sm text-gray-400">Randomize seed</label>
+        </div>
+        {renderSlider("Width", state.fluxParams.width, (value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, width: value } })), 256, 2048, 8)}
+        {renderSlider("Height", state.fluxParams.height, (value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, height: value } })), 256, 2048, 8)}
+        {renderSlider("Inference Steps", state.fluxParams.num_inference_steps, (value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: value } })), 1, 50, 1)}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+
+  const renderSlider = (name, value, onChange, min, max, step) => (
+    <div className="space-y-2">
+      <div className="flex justify-between">
+        <label className="text-sm font-medium text-white">{name}</label>
+        <span className="text-sm text-gray-400">{value}</span>
       </div>
-      {!state.params.randomize_seed && (
-        <Input
-          type="number"
-          value={state.params.seed}
-          onChange={(e) => setState(prev => ({ ...prev, params: { ...prev.params, seed: parseInt(e.target.value) } }))}
-          placeholder="Seed"
-        />
-      )}
-      <div>
-        <label>Width: {state.params.width}px</label>
-        <Slider
-          value={[state.params.width]}
-          onValueChange={(value) => setState(prev => ({ ...prev, params: { ...prev.params, width: value[0] } }))}
-          min={256}
-          max={1024}
-          step={64}
-        />
-      </div>
-      <div>
-        <label>Height: {state.params.height}px</label>
-        <Slider
-          value={[state.params.height]}
-          onValueChange={(value) => setState(prev => ({ ...prev, params: { ...prev.params, height: value[0] } }))}
-          min={256}
-          max={1024}
-          step={64}
-        />
-      </div>
-      <div>
-        <label>Inference Steps: {state.params.num_inference_steps}</label>
-        <Slider
-          value={[state.params.num_inference_steps]}
-          onValueChange={(value) => setState(prev => ({ ...prev, params: { ...prev.params, num_inference_steps: value[0] } }))}
-          min={1}
-          max={50}
-          step={1}
-        />
-      </div>
-      <div>
-        <label>Guidance Scale: {state.params.guidance_scale}</label>
-        <Slider
-          value={[state.params.guidance_scale]}
-          onValueChange={(value) => setState(prev => ({ ...prev, params: { ...prev.params, guidance_scale: value[0] } }))}
-          min={1}
-          max={20}
-          step={0.1}
-        />
-      </div>
+      <Slider
+        value={[value]}
+        onValueChange={(newValue) => onChange(newValue[0])}
+        min={min}
+        max={max}
+        step={step}
+        className="bg-gray-800"
+      />
     </div>
   );
 
@@ -249,14 +230,14 @@ const AIImageGenerator = () => {
           <TabsList>
             <TabsTrigger value="FLUX">FLUX</TabsTrigger>
             <TabsTrigger value="SD3">SD3</TabsTrigger>
-            <TabsTrigger value="CUSTOM">Custom</TabsTrigger>
+            <TabsTrigger value="HENTAI">hent.ai</TabsTrigger>
           </TabsList>
-          {['FLUX', 'SD3', 'CUSTOM'].map(model => (
+          {['FLUX', 'SD3', 'HENTAI'].map(model => (
             <TabsContent key={model} value={model}>
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold">{model} Image Generator</h3>
                 {renderInputs(model)}
-                {(model === 'FLUX' || model === 'CUSTOM') && renderSettings()}
+                {model === 'FLUX' && renderFluxSettings()}
                 <div className="mt-4">
                   {renderResult(model)}
                 </div>
