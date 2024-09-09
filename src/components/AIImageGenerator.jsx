@@ -7,8 +7,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Wand2, MoreVertical, Download, Link, Image, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Wand2, MoreVertical, Download, Link, Image, Loader2 } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 
 const MAX_SEED = 4294967295;
@@ -31,8 +30,7 @@ const AIImageGenerator = () => {
       width: 1024,
       height: 1024,
       num_inference_steps: 4
-    },
-    isFluxSettingsOpen: false
+    }
   });
   const { toast } = useToast();
 
@@ -129,48 +127,6 @@ const AIImageGenerator = () => {
     </div>
   );
 
-  const renderFluxSettings = () => (
-    <Collapsible open={state.isFluxSettingsOpen} onOpenChange={(open) => setState(prev => ({ ...prev, isFluxSettingsOpen: open }))}>
-      <CollapsibleTrigger asChild>
-        <Button variant="outline" className="w-full justify-between mb-2">
-          FLUX Settings
-          {state.isFluxSettingsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </Button>
-      </CollapsibleTrigger>
-      <CollapsibleContent className="space-y-4">
-        {renderSlider("Seed", state.fluxParams.seed, (value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, seed: value } })), 0, MAX_SEED, 1)}
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="randomize-seed"
-            checked={state.fluxParams.randomize_seed}
-            onCheckedChange={(checked) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, randomize_seed: checked } }))}
-          />
-          <label htmlFor="randomize-seed" className="text-sm text-gray-400">Randomize seed</label>
-        </div>
-        {renderSlider("Width", state.fluxParams.width, (value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, width: value } })), 256, 2048, 8)}
-        {renderSlider("Height", state.fluxParams.height, (value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, height: value } })), 256, 2048, 8)}
-        {renderSlider("Inference Steps", state.fluxParams.num_inference_steps, (value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: value } })), 1, 50, 1)}
-      </CollapsibleContent>
-    </Collapsible>
-  );
-
-  const renderSlider = (name, value, onChange, min, max, step) => (
-    <div className="space-y-2">
-      <div className="flex justify-between">
-        <label className="text-sm font-medium text-white">{name}</label>
-        <span className="text-sm text-gray-400">{value}</span>
-      </div>
-      <Slider
-        value={[value]}
-        onValueChange={(newValue) => onChange(newValue[0])}
-        min={min}
-        max={max}
-        step={step}
-        className="bg-gray-800"
-      />
-    </div>
-  );
-
   const renderResult = useCallback((model) => {
     return state.results[model].map((result, index) => (
       <Card key={index} className="mb-4">
@@ -237,7 +193,6 @@ const AIImageGenerator = () => {
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold">{model} Image Generator</h3>
                 {renderInputs(model)}
-                {model === 'FLUX' && renderFluxSettings()}
                 <div className="mt-4">
                   {renderResult(model)}
                 </div>
