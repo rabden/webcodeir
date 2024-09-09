@@ -127,6 +127,57 @@ const AIImageGenerator = () => {
     </div>
   );
 
+  const renderFluxSettings = () => (
+    <div className="space-y-4 mb-4">
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="randomize_seed"
+          checked={state.fluxParams.randomize_seed}
+          onCheckedChange={(checked) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, randomize_seed: checked } }))}
+        />
+        <label htmlFor="randomize_seed">Randomize Seed</label>
+      </div>
+      {!state.fluxParams.randomize_seed && (
+        <Input
+          type="number"
+          value={state.fluxParams.seed}
+          onChange={(e) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, seed: parseInt(e.target.value) } }))}
+          placeholder="Seed"
+        />
+      )}
+      <div>
+        <label>Width: {state.fluxParams.width}px</label>
+        <Slider
+          value={[state.fluxParams.width]}
+          onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, width: value[0] } }))}
+          min={256}
+          max={1024}
+          step={64}
+        />
+      </div>
+      <div>
+        <label>Height: {state.fluxParams.height}px</label>
+        <Slider
+          value={[state.fluxParams.height]}
+          onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, height: value[0] } }))}
+          min={256}
+          max={1024}
+          step={64}
+        />
+      </div>
+      <div>
+        <label>Inference Steps: {state.fluxParams.num_inference_steps}</label>
+        <Slider
+          value={[state.fluxParams.num_inference_steps]}
+          onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: value[0] } }))}
+          min={1}
+          max={50}
+          step={1}
+        />
+      </div>
+    </div>
+  );
+
   const renderResult = useCallback((model) => {
     return state.results[model].map((result, index) => (
       <Card key={index} className="mb-4">
@@ -193,6 +244,7 @@ const AIImageGenerator = () => {
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold">{model} Image Generator</h3>
                 {renderInputs(model)}
+                {model === 'FLUX' && renderFluxSettings()}
                 <div className="mt-4">
                   {renderResult(model)}
                 </div>
