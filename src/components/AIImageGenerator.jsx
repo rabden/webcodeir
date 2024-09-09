@@ -9,7 +9,7 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Wand2, MoreVertical, Download, Link, Image, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Wand2, MoreVertical, Download, Link, Image, Loader2, Settings, X } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 
 const MAX_SEED = 4294967295;
@@ -133,13 +133,50 @@ const AIImageGenerator = () => {
   const renderFluxSettings = () => (
     <Collapsible open={state.isFluxSettingsOpen} onOpenChange={(open) => setState(prev => ({ ...prev, isFluxSettingsOpen: open }))}>
       <CollapsibleTrigger asChild>
-        <Button variant="outline" className="w-full justify-between mb-2">
-          FLUX Settings
-          {state.isFluxSettingsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        <Button variant="outline" size="icon" className="mb-2">
+          {state.isFluxSettingsOpen ? <X className="h-4 w-4" /> : <Settings className="h-4 w-4" />}
         </Button>
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-4">
-        {renderSlider("Seed", state.fluxParams.seed, (value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, seed: value } })), 0, MAX_SEED, 1)}
+        <div className="flex space-x-2">
+          <div className="flex-1">
+            <label className="text-sm font-medium text-white">Inference Steps</label>
+            <Input
+              type="number"
+              value={state.fluxParams.num_inference_steps}
+              onChange={(e) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: parseInt(e.target.value) } }))}
+              min={1}
+              max={50}
+              className="bg-gray-800 text-white border-gray-700"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="text-sm font-medium text-white">Aspect Ratio</label>
+            <Select 
+              value={state.fluxParams.aspectRatio} 
+              onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, aspectRatio: value } }))}
+            >
+              <SelectTrigger className="bg-gray-800 text-white border-gray-700">
+                <SelectValue placeholder="Select aspect ratio" />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800 text-white border-gray-700">
+                {Object.keys(aspectRatios).map((ratio) => (
+                  <SelectItem key={ratio} value={ratio}>{ratio}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-white">Seed: {state.fluxParams.seed}</label>
+          <Slider
+            value={[state.fluxParams.seed]}
+            onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, seed: value[0] } }))}
+            max={MAX_SEED}
+            step={1}
+            className="bg-gray-800"
+          />
+        </div>
         <div className="flex items-center space-x-2">
           <Checkbox
             id="randomize-seed"
@@ -148,39 +185,8 @@ const AIImageGenerator = () => {
           />
           <label htmlFor="randomize-seed" className="text-sm text-gray-400">Randomize seed</label>
         </div>
-        <Select 
-          value={state.fluxParams.aspectRatio} 
-          onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, aspectRatio: value } }))}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select aspect ratio" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.keys(aspectRatios).map((ratio) => (
-              <SelectItem key={ratio} value={ratio}>{ratio}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {renderSlider("Inference Steps", state.fluxParams.num_inference_steps, (value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: value } })), 1, 50, 1)}
       </CollapsibleContent>
     </Collapsible>
-  );
-
-  const renderSlider = (name, value, onChange, min, max, step) => (
-    <div className="space-y-2">
-      <div className="flex justify-between">
-        <label className="text-sm font-medium text-white">{name}</label>
-        <span className="text-sm text-gray-400">{value}</span>
-      </div>
-      <Slider
-        value={[value]}
-        onValueChange={(newValue) => onChange(newValue[0])}
-        min={min}
-        max={max}
-        step={step}
-        className="bg-gray-800"
-      />
-    </div>
   );
 
   const renderResult = useCallback((model) => {
