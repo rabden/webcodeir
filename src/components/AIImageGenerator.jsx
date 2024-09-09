@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Wand2, MoreVertical, Download, Link, Image, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 
@@ -19,6 +20,16 @@ const modelEndpoints = {
   SD3: "stabilityai/stable-diffusion-3-medium-diffusers"
 };
 
+const aspectRatios = {
+  "1:1": { width: 2048, height: 2048 },
+  "16:9": { width: 2048, height: 1152 },
+  "9:16": { width: 1152, height: 2048 },
+  "4:3": { width: 2048, height: 1536 },
+  "3:4": { width: 1536, height: 2048 },
+  "2:3": { width: 1365, height: 2048 },
+  "3:2": { width: 2048, height: 1365 },
+};
+
 const AIImageGenerator = () => {
   const [state, setState] = useState({
     results: { FLUX: [], SD3: [] },
@@ -27,8 +38,7 @@ const AIImageGenerator = () => {
     fluxParams: {
       seed: 0,
       randomize_seed: true,
-      width: 1024,
-      height: 1024,
+      aspectRatio: "1:1",
       num_inference_steps: 4
     },
     isFluxSettingsOpen: false
@@ -39,10 +49,11 @@ const AIImageGenerator = () => {
     setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true } }));
     let data = { inputs: state.prompts[model] };
     if (model === 'FLUX') {
+      const { width, height } = aspectRatios[state.fluxParams.aspectRatio];
       data.parameters = {
         seed: state.fluxParams.randomize_seed ? Math.floor(Math.random() * MAX_SEED) : state.fluxParams.seed,
-        width: state.fluxParams.width,
-        height: state.fluxParams.height,
+        width,
+        height,
         num_inference_steps: state.fluxParams.num_inference_steps
       };
     }
@@ -137,8 +148,19 @@ const AIImageGenerator = () => {
           />
           <label htmlFor="randomize-seed" className="text-sm text-gray-400">Randomize seed</label>
         </div>
-        {renderSlider("Width", state.fluxParams.width, (value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, width: value } })), 256, 2048, 8)}
-        {renderSlider("Height", state.fluxParams.height, (value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, height: value } })), 256, 2048, 8)}
+        <Select 
+          value={state.fluxParams.aspectRatio} 
+          onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, aspectRatio: value } }))}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select aspect ratio" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.keys(aspectRatios).map((ratio) => (
+              <SelectItem key={ratio} value={ratio}>{ratio}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         {renderSlider("Inference Steps", state.fluxParams.num_inference_steps, (value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: value } })), 1, 50, 1)}
       </CollapsibleContent>
     </Collapsible>
