@@ -27,7 +27,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   };
 
   useEffect(() => {
-    const handleScroll = () => {
+    const handleResize = () => {
       if (editorRef.current) {
         const { scrollTop, scrollHeight, clientHeight } = editorRef.current;
         const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px threshold
@@ -36,12 +36,12 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     };
 
     if (editorRef.current) {
-      editorRef.current.addEventListener('scroll', handleScroll);
+      editorRef.current.addEventListener('scroll', handleResize);
     }
 
     return () => {
       if (editorRef.current) {
-        editorRef.current.removeEventListener('scroll', handleScroll);
+        editorRef.current.removeEventListener('scroll', handleResize);
       }
     };
   }, []);
@@ -54,8 +54,8 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         "&": { height: "100%", overflow: "auto" },
         ".cm-scroller": { overflow: "auto" },
         ".cm-content": { 
-          whiteSpace: isMobile || activeTab ? "pre !important" : "pre-wrap !important",
-          wordBreak: isMobile || activeTab ? "normal" : "break-word",
+          whiteSpace: isMobile ? "pre !important" : "pre-wrap !important",
+          wordBreak: isMobile ? "normal" : "break-word",
           paddingBottom: "50vh"
         },
         "&::-webkit-scrollbar": { width: "2px", height: "2px" },
