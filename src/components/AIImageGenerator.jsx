@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,15 +16,14 @@ const API_KEY = "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";
 
 const modelEndpoints = {
   FLUX: "black-forest-labs/FLUX.1-schnell",
-  SD3: "stabilityai/stable-diffusion-3-medium-diffusers",
-  HENTAI: "stablediffusionapi/explicit-freedom-nsfw-wai"
+  SD3: "stabilityai/stable-diffusion-3-medium-diffusers"
 };
 
 const AIImageGenerator = () => {
   const [state, setState] = useState({
-    results: { FLUX: [], SD3: [], HENTAI: [] },
-    loading: { FLUX: false, SD3: false, HENTAI: false },
-    prompts: { FLUX: '', SD3: '', HENTAI: '' },
+    results: { FLUX: [], SD3: [] },
+    loading: { FLUX: false, SD3: false },
+    prompts: { FLUX: '', SD3: '' },
     fluxParams: {
       seed: 0,
       randomize_seed: true,
@@ -100,15 +99,6 @@ const AIImageGenerator = () => {
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     toast({ title: "Copied!", description: "Copied to clipboard" });
-  };
-
-  const downloadImage = (imageUrl, fileName) => {
-    const a = document.createElement('a');
-    a.href = imageUrl;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
   };
 
   const renderInputs = (model) => (
@@ -230,9 +220,8 @@ const AIImageGenerator = () => {
           <TabsList>
             <TabsTrigger value="FLUX">FLUX</TabsTrigger>
             <TabsTrigger value="SD3">SD3</TabsTrigger>
-            <TabsTrigger value="HENTAI">hent.ai</TabsTrigger>
           </TabsList>
-          {['FLUX', 'SD3', 'HENTAI'].map(model => (
+          {['FLUX', 'SD3'].map(model => (
             <TabsContent key={model} value={model}>
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold">{model} Image Generator</h3>
