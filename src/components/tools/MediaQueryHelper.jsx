@@ -9,7 +9,7 @@ const MediaQueryHelper = () => {
   const [queries, setQueries] = useState([
     { type: 'min-width', value: 768, unit: 'px', active: true }
   ]);
-  const [orientation, setOrientation] = useState('');
+  const [orientation, setOrientation] = useState('none');
   const [customFeatures, setCustomFeatures] = useState('');
 
   const addQuery = () => {
@@ -35,8 +35,8 @@ const MediaQueryHelper = () => {
       .join(' and ');
     
     if (conditions) query += conditions;
-    if (orientation) query += (conditions ? ' and ' : '') + `(orientation: ${orientation})`;
-    if (customFeatures.trim()) query += (conditions || orientation ? ' and ' : '') + customFeatures.trim();
+    if (orientation !== 'none') query += (conditions ? ' and ' : '') + `(orientation: ${orientation})`;
+    if (customFeatures.trim()) query += (conditions || orientation !== 'none' ? ' and ' : '') + customFeatures.trim();
     
     return query + ' {\n  /* Your styles here */\n}';
   };
@@ -91,7 +91,7 @@ const MediaQueryHelper = () => {
             <SelectValue placeholder="Select Orientation" />
           </SelectTrigger>
           <SelectContent className="bg-gray-800 text-white border-gray-700">
-            <SelectItem value="">None</SelectItem>
+            <SelectItem value="none">None</SelectItem>
             <SelectItem value="portrait">Portrait</SelectItem>
             <SelectItem value="landscape">Landscape</SelectItem>
           </SelectContent>
