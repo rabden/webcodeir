@@ -3,7 +3,7 @@ import { X, Save, BookOpen, Settings as SettingsIcon, ChevronDown, ChevronUp, Li
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, setShowKeyboardShortcuts, setShowPexelsPanel, saveCurrentCode, toggleConsole, showConsole, toggleSnippetLibrary, showSnippetLibrary, setShowAIImageGeneratorPanel }) => {
+const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCodeToolsPanel, setShowKeyboardShortcuts, setShowPexelsPanel, saveCurrentCode, toggleConsole, showConsole, toggleSnippetLibrary, showSnippetLibrary, setShowAIImageGeneratorPanel }) => {
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
 
@@ -49,10 +49,10 @@ const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, set
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2 mt-2 ml-4">
             <MenuButton label={`${showConsole ? 'Hide' : 'Show'} Console`} onClick={() => { toggleConsole(); setIsOpen(false); }} />
-            <MenuButton label="HTML Tools" onClick={() => { setShowHtmlToolsPanel(true); setIsOpen(false); }} />
-            <MenuButton label="CSS Tools" onClick={() => { setShowCssToolsPanel(true); setIsOpen(false); }} />
-            <MenuButton label="JS Tools" onClick={() => { setShowJsToolsPanel(true); setIsOpen(false); }} />
-            <MenuButton label="AI Image Generator" onClick={() => { setShowAIImageGeneratorPanel(true); setIsOpen(false); }} />
+            <MenuButton label="HTML Tools" onClick={() => { setShowCodeToolsPanel('html'); setIsOpen(false); }} />
+            <MenuButton label="CSS Tools" onClick={() => { setShowCodeToolsPanel('css'); setIsOpen(false); }} />
+            <MenuButton label="JS Tools" onClick={() => { setShowCodeToolsPanel('js'); setIsOpen(false); }} />
+            <MenuButton label="AI Image Generator" onClick={() => { setShowAIImageGeneratorPanel(); setIsOpen(false); }} />
           </CollapsibleContent>
         </Collapsible>
 

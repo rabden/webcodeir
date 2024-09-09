@@ -8,12 +8,13 @@ import Settings from './Settings';
 import SavedCodes from './SavedCodes';
 import FontPanel from './FontPanel';
 import IconPanel from './IconPanel';
-import ToolsPanel from './ToolsPanel';
+import CodeToolsPanel from './CodeToolsPanel';
 import MobilePreviewButton from './MobilePreviewButton';
 import KeyboardShortcutsPanel from './KeyboardShortcutsPanel';
 import PexelsImagePanel from './PexelsImagePanel';
 import ConsolePanel from './ConsolePanel';
 import CodeSnippetLibrary from './CodeSnippetLibrary';
+import AIImageGenerator from './AIImageGenerator';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
@@ -23,6 +24,8 @@ const CodeEditor = () => {
   const [activeTab, setActiveTab] = useState('html');
   const [showConsole, setShowConsole] = useState(false);
   const [showSnippetLibrary, setShowSnippetLibrary] = useState(false);
+  const [showCodeToolsPanel, setShowCodeToolsPanel] = useState(false);
+  const [codeToolsInitialTab, setCodeToolsInitialTab] = useState('html');
 
   useEffect(() => {
     loadFromLocalStorage();
@@ -87,9 +90,6 @@ const CodeEditor = () => {
           setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
           setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
           settings={state.settings}
-          setShowCssToolsPanel={() => setState(s => ({ ...s, showCssToolsPanel: true }))}
-          setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true }))}
-          setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true }))}
           isMobile={state.isMobile}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
@@ -154,9 +154,8 @@ const CodeEditor = () => {
         showConsole={showConsole}
         toggleSnippetLibrary={() => setShowSnippetLibrary(s => !s)}
         showSnippetLibrary={showSnippetLibrary}
-        setShowCssToolsPanel={() => setState(s => ({ ...s, showCssToolsPanel: true }))}
-        setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true }))}
-        setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true }))}
+        setShowCodeToolsPanel={setShowCodeToolsPanel}
+        setCodeToolsInitialTab={setCodeToolsInitialTab}
         setShowAIImageGeneratorPanel={() => setState(s => ({ ...s, showAIImageGeneratorPanel: true }))}
       />
       <div className="flex-grow overflow-hidden">
@@ -166,10 +165,8 @@ const CodeEditor = () => {
       {state.showSavedCodes && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html, cssCode: code.css, jsCode: code.js, currentCodeName: code.name, showSavedCodes: false }))} isMobile={state.iMobile} />}
       {state.showFontPanel && <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.iMobile} />}
       {state.showIconPanel && <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} isMobile={state.iMobile} />}
-      {state.showCssToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showCssToolsPanel: false }))} type="css" />}
-      {state.showHtmlToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showHtmlToolsPanel: false }))} type="html" />}
-      {state.showJsToolsPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showJsToolsPanel: false }))} type="js" />}
-      {state.showAIImageGeneratorPanel && <ToolsPanel onClose={() => setState(s => ({ ...s, showAIImageGeneratorPanel: false }))} type="ai" />}
+      {showCodeToolsPanel && <CodeToolsPanel onClose={() => setShowCodeToolsPanel(false)} initialTab={codeToolsInitialTab} />}
+      {state.showAIImageGeneratorPanel && <AIImageGenerator onClose={() => setState(s => ({ ...s, showAIImageGeneratorPanel: false }))} />}
       {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
       {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
       {showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.isMobile} />}
@@ -181,9 +178,7 @@ const CodeEditor = () => {
         setShowSavedCodes={() => setState(s => ({ ...s, showSavedCodes: true, isMenuOpen: false }))}
         setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true, isMenuOpen: false }))}
         setShowIconPanel={() => setState(s => ({ ...s, showIconPanel: true, isMenuOpen: false }))}
-        setShowCssToolsPanel={() => setState(s => ({ ...s, showCssToolsPanel: true, isMenuOpen: false }))}
-        setShowHtmlToolsPanel={() => setState(s => ({ ...s, showHtmlToolsPanel: true, isMenuOpen: false }))}
-        setShowJsToolsPanel={() => setState(s => ({ ...s, showJsToolsPanel: true, isMenuOpen: false }))}
+        setShowCodeToolsPanel={(tab) => { setShowCodeToolsPanel(true); setCodeToolsInitialTab(tab); setState(s => ({ ...s, isMenuOpen: false })); }}
         setShowAIImageGeneratorPanel={() => setState(s => ({ ...s, showAIImageGeneratorPanel: true, isMenuOpen: false }))}
         setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true, isMenuOpen: false }))}
         setShowPexelsPanel={() => setState(s => ({ ...s, showPexelsPanel: true, isMenuOpen: false }))}

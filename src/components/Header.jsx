@@ -25,9 +25,8 @@ const Header = ({
   showConsole,
   toggleSnippetLibrary,
   showSnippetLibrary,
-  setShowCssToolsPanel,
-  setShowHtmlToolsPanel,
-  setShowJsToolsPanel,
+  setShowCodeToolsPanel,
+  setCodeToolsInitialTab,
   setShowAIImageGeneratorPanel,
 }) => {
   const getLayoutIcon = () => {
@@ -129,15 +128,15 @@ const Header = ({
                   <Terminal className="w-4 h-4 mr-2" />
                   <span>{showConsole ? 'Hide' : 'Show'} Console</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowHtmlToolsPanel(true)}>
+                <DropdownMenuItem onSelect={() => { setShowCodeToolsPanel(true); setCodeToolsInitialTab('html'); }}>
                   <Code className="w-4 h-4 mr-2" />
                   <span>HTML Tools</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowCssToolsPanel(true)}>
+                <DropdownMenuItem onSelect={() => { setShowCodeToolsPanel(true); setCodeToolsInitialTab('css'); }}>
                   <Palette className="w-4 h-4 mr-2" />
                   <span>CSS Tools</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowJsToolsPanel(true)}>
+                <DropdownMenuItem onSelect={() => { setShowCodeToolsPanel(true); setCodeToolsInitialTab('js'); }}>
                   <Code className="w-4 h-4 mr-2" />
                   <span>JS Tools</span>
                 </DropdownMenuItem>
