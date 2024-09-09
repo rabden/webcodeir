@@ -124,6 +124,7 @@ const AIImageGenerator = () => {
         onClick={() => generateImage(model)}
         disabled={state.loading[model]}
         size="icon"
+        className="bg-blue-600 hover:bg-blue-700"
       >
         {state.loading[model] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
       </Button>
@@ -133,21 +134,21 @@ const AIImageGenerator = () => {
   const renderFluxSettings = () => (
     <Collapsible open={state.isFluxSettingsOpen} onOpenChange={(open) => setState(prev => ({ ...prev, isFluxSettingsOpen: open }))}>
       <CollapsibleTrigger asChild>
-        <Button variant="outline" size="icon" className="mb-2">
+        <Button variant="outline" size="sm" className="mb-2">
           {state.isFluxSettingsOpen ? <X className="h-4 w-4" /> : <Settings className="h-4 w-4" />}
         </Button>
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-4">
         <div className="flex space-x-2">
           <div className="flex-1">
-            <label className="text-sm font-medium text-white">Inference Steps</label>
-            <Input
-              type="number"
-              value={state.fluxParams.num_inference_steps}
-              onChange={(e) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: parseInt(e.target.value) } }))}
+            <label className="text-sm font-medium text-white">Inference Steps: {state.fluxParams.num_inference_steps}</label>
+            <Slider
+              value={[state.fluxParams.num_inference_steps]}
+              onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: value[0] } }))}
               min={1}
               max={50}
-              className="bg-gray-800 text-white border-gray-700"
+              step={1}
+              className="bg-gray-800"
             />
           </div>
           <div className="flex-1">
@@ -191,24 +192,24 @@ const AIImageGenerator = () => {
 
   const renderResult = useCallback((model) => {
     return state.results[model].map((result, index) => (
-      <Card key={index} className="mb-4">
+      <Card key={index} className="mb-4 bg-gray-800 border-gray-700">
         <CardContent className="p-0">
           {result.loading ? (
-            <div className="w-full h-64 flex items-center justify-center bg-gray-200">
-              <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
+            <div className="w-full h-64 flex items-center justify-center bg-gray-700">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
             </div>
           ) : result.error ? (
-            <div className="w-full h-64 flex items-center justify-center bg-gray-200">
+            <div className="w-full h-64 flex items-center justify-center bg-gray-700">
               <p className="text-red-500">{result.error}</p>
             </div>
           ) : (
             <img src={result.imageUrl} alt="Generated image" className="w-full h-auto rounded-t-lg" />
           )}
         </CardContent>
-        <CardFooter className="flex justify-between items-center p-4">
+        <CardFooter className="flex justify-between items-center p-4 bg-gray-900">
           <div>
-            <p className="text-sm text-gray-500">Seed: {result.seed}</p>
-            <p className="text-sm text-gray-500">Prompt: {result.prompt}</p>
+            <p className="text-sm text-gray-400">Seed: {result.seed}</p>
+            <p className="text-sm text-gray-400">Prompt: {result.prompt}</p>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -216,18 +217,18 @@ const AIImageGenerator = () => {
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent className="bg-gray-800 text-white border-gray-700">
               {!result.loading && !result.error && (
                 <>
-                  <DropdownMenuItem onClick={() => downloadImage(result.imageUrl, `${model.toLowerCase()}_image_${index}.png`)}>
+                  <DropdownMenuItem onClick={() => window.open(result.imageUrl, '_blank')} className="hover:bg-gray-700">
                     <Download className="mr-2 h-4 w-4" />
                     <span>Download</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => copyToClipboard(result.imageUrl)}>
+                  <DropdownMenuItem onClick={() => copyToClipboard(result.imageUrl)} className="hover:bg-gray-700">
                     <Link className="mr-2 h-4 w-4" />
                     <span>Copy Link</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => copyToClipboard(`<img src="${result.imageUrl}" alt="Generated image" />`)}>
+                  <DropdownMenuItem onClick={() => copyToClipboard(`<img src="${result.imageUrl}" alt="Generated image" />`)} className="hover:bg-gray-700">
                     <Image className="mr-2 h-4 w-4" />
                     <span>Copy Image Tag</span>
                   </DropdownMenuItem>
@@ -243,16 +244,16 @@ const AIImageGenerator = () => {
   return (
     <ScrollArea className="h-full">
       <div className="p-4 space-y-4">
-        <h2 className="text-2xl font-bold">AI Image Generators</h2>
-        <Tabs defaultValue="FLUX">
-          <TabsList>
-            <TabsTrigger value="FLUX">FLUX</TabsTrigger>
-            <TabsTrigger value="SD3">SD3</TabsTrigger>
+        <h2 className="text-2xl font-bold text-white">AI Image Generators</h2>
+        <Tabs defaultValue="FLUX" className="bg-gray-900 p-4 rounded-lg">
+          <TabsList className="bg-gray-800 mb-4">
+            <TabsTrigger value="FLUX" className="data-[state=active]:bg-blue-600">FLUX</TabsTrigger>
+            <TabsTrigger value="SD3" className="data-[state=active]:bg-blue-600">SD3</TabsTrigger>
           </TabsList>
           {['FLUX', 'SD3'].map(model => (
             <TabsContent key={model} value={model}>
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold">{model} Image Generator</h3>
+                <h3 className="text-xl font-semibold text-white">{model} Image Generator</h3>
                 {renderInputs(model)}
                 {model === 'FLUX' && renderFluxSettings()}
                 <div className="mt-4">
