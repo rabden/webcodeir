@@ -13,7 +13,7 @@ import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
 import { Palette, Code, Wrench } from 'lucide-react';
 
-const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, setShowCssToolsPanel, setShowHtmlToolsPanel, setShowJsToolsPanel, isMobile, activeTab }) => {
+const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
   const editorRef = useRef(null);
 
@@ -46,7 +46,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     };
   }, []);
 
-  const renderEditor = (lang, codeValue, setCodeValue, setShowToolsPanel) => {
+  const renderEditor = (lang, codeValue, setCodeValue) => {
     const languageExtension = getLanguageExtension(lang);
     const extensions = [
       languageExtension,
@@ -100,13 +100,6 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               <div className={`w-4 h-4 rounded-full mr-2 ${lang === 'html' ? 'bg-[#ff5f56]' : lang === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
               <span className="text-sm font-semibold text-white">{lang.toUpperCase()}</span>
             </div>
-            <button
-              onClick={() => setShowToolsPanel(true)}
-              className="p-1 rounded-full hover:bg-gray-700 transition-colors"
-              title={`Open ${lang.toUpperCase()} Tools`}
-            >
-              {lang === 'html' ? <Code className="w-4 h-4 text-white" /> : lang === 'css' ? <Palette className="w-4 h-4 text-white" /> : <Wrench className="w-4 h-4 text-white" />}
-            </button>
           </div>
         )}
         <div className="flex-grow overflow-hidden" ref={editorRef}>
@@ -141,11 +134,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   const renderMobileEditor = () => {
     switch (activeTab) {
       case 'html':
-        return renderEditor('html', htmlCode, setHtmlCode, setShowHtmlToolsPanel);
+        return renderEditor('html', htmlCode, setHtmlCode);
       case 'css':
-        return renderEditor('css', cssCode, setCssCode, setShowCssToolsPanel);
+        return renderEditor('css', cssCode, setCssCode);
       case 'js':
-        return renderEditor('javascript', jsCode, setJsCode, setShowJsToolsPanel);
+        return renderEditor('javascript', jsCode, setJsCode);
       default:
         return null;
     }
@@ -154,15 +147,15 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   const renderPanelMode = () => (
     <PanelGroup direction={settings.layout === 'stacked' ? 'horizontal' : 'vertical'}>
       <Panel minSize={5} defaultSize={33}>
-        {renderEditor('html', htmlCode, setHtmlCode, setShowHtmlToolsPanel)}
+        {renderEditor('html', htmlCode, setHtmlCode)}
       </Panel>
       <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
-        {renderEditor('css', cssCode, setCssCode, setShowCssToolsPanel)}
+        {renderEditor('css', cssCode, setCssCode)}
       </Panel>
       <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
-        {renderEditor('javascript', jsCode, setJsCode, setShowJsToolsPanel)}
+        {renderEditor('javascript', jsCode, setJsCode)}
       </Panel>
     </PanelGroup>
   );
