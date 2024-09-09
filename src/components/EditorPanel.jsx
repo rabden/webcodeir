@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
@@ -12,10 +12,12 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
 import { Palette, Code, Wrench } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
   const editorRef = useRef(null);
+  const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
 
   const getLanguageExtension = (lang) => {
     switch (lang) {
@@ -45,6 +47,10 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       }
     };
   }, []);
+
+  useEffect(() => {
+    setShowHtmlStructureIcon(isMobile && activeTab === 'html' && !htmlCode.trim());
+  }, [isMobile, activeTab, htmlCode]);
 
   const renderEditor = (lang, codeValue, setCodeValue) => {
     const languageExtension = getLanguageExtension(lang);
@@ -102,7 +108,30 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             </div>
           </div>
         )}
-        <div className="flex-grow overflow-hidden" ref={editorRef}>
+        <div className="flex-grow overflow-hidden relative" ref={editorRef}>
+          {showHtmlStructureIcon && lang === 'html' && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 z-10"
+              onClick={() => {
+                setCodeValue(`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+</html>`);
+                setShowHtmlStructureIcon(false);
+              }}
+            >
+              <Code className="h-4 w-4" />
+            </Button>
+          )}
           <CodeMirror
             value={codeValue}
             height="100%"
