@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,13 @@ const AIImageGenerator = ({ onClose }) => {
     isFluxSettingsOpen: false
   });
   const [isCollectionOpen, setIsCollectionOpen] = useState(false);
+  const [savedImages, setSavedImages] = useState([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const savedImagesFromStorage = JSON.parse(localStorage.getItem('savedImages') || '[]');
+    setSavedImages(savedImagesFromStorage);
+  }, []);
 
   const generateImage = async (model) => {
     setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true } }));
@@ -128,6 +134,26 @@ const AIImageGenerator = ({ onClose }) => {
     setIsCollectionOpen(!isCollectionOpen);
   };
 
+  const saveImage = (image) => {
+    const updatedSavedImages = [...savedImages, image];
+    setSavedImages(updatedSavedImages);
+    localStorage.setItem('savedImages', JSON.stringify(updatedSavedImages));
+    toast({
+      title: "Image Saved",
+      description: "The image has been added to your collection.",
+    });
+  };
+
+  const removeImage = (index) => {
+    const updatedSavedImages = savedImages.filter((_, i) => i !== index);
+    setSavedImages(updatedSavedImages);
+    localStorage.setItem('savedImages', JSON.stringify(updatedSavedImages));
+    toast({
+      title: "Image Removed",
+      description: "The image has been removed from your collection.",
+    });
+  };
+
   return (
     <div className="fixed inset-0 bg-gray-800 z-50 flex flex-col md:inset-y-4 md:right-4 md:left-auto md:w-96 md:rounded-lg overflow-hidden">
       <div className="p-4 border-b border-gray-700 flex justify-between items-center">
@@ -166,15 +192,7 @@ const AIImageGenerator = ({ onClose }) => {
                     <AIImageGeneratorResult 
                       results={state.results[model]} 
                       toast={toast} 
-                      onSave={(image) => {
-                        const savedImages = JSON.parse(localStorage.getItem('savedImages') || '[]');
-                        savedImages.push(image);
-                        localStorage.setItem('savedImages', JSON.stringify(savedImages));
-                        toast({
-                          title: "Image Saved",
-                          description: "The image has been added to your collection.",
-                        });
-                      }}
+                      onSave={saveImage}
                     />
                   </div>
                 </div>
@@ -183,7 +201,13 @@ const AIImageGenerator = ({ onClose }) => {
           </Tabs>
         </div>
       </ScrollArea>
-      {isCollectionOpen && <ImageCollection onClose={toggleCollection} />}
+      {isCollectionOpen && (
+        <ImageCollection
+          onClose={toggleCollection}
+          savedImages={savedImages}
+          onRemoveImage={removeImage}
+        />
+      )}
     </div>
   );
 };
