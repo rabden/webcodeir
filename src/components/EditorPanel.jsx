@@ -11,72 +11,68 @@ import { Button } from "@/components/ui/button";
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
-  const editorRef = useRef(null);
+  const editorRefs = useRef({
+    html: null,
+    css: null,
+    js: null
+  });
   const [editors, setEditors] = useState({});
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
 
   useEffect(() => {
-    if (!editorRef.current) return;
+    const initEditor = (language) => {
+      if (editorRefs.current[language] && !editors[language]) {
+        const editor = monaco.editor.create(editorRefs.current[language], {
+          value: language === 'html' ? htmlCode : language === 'css' ? cssCode : jsCode,
+          language,
+          theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
+          fontSize: settings.fontSize,
+          minimap: { enabled: settings.minimap },
+          lineNumbers: settings.lineNumbers ? 'on' : 'off',
+          tabSize: settings.tabSize,
+          insertSpaces: !settings.indentWithTabs,
+          cursorStyle: settings.cursorStyle,
+          scrollBeyondLastLine: false,
+          automaticLayout: true,
+        });
 
-    const commonOptions = {
-      fontSize: settings.fontSize,
-      minimap: { enabled: settings.minimap },
-      lineNumbers: settings.lineNumbers ? 'on' : 'off',
-      tabSize: settings.tabSize,
-      insertSpaces: !settings.indentWithTabs,
-      cursorStyle: settings.cursorStyle,
-      scrollBeyondLastLine: false,
-      automaticLayout: true,
-      theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
+        editor.onDidChangeModelContent(() => {
+          const value = editor.getValue();
+          if (language === 'html') setHtmlCode(value);
+          else if (language === 'css') setCssCode(value);
+          else if (language === 'js') setJsCode(value);
+        });
+
+        setEditors(prev => ({ ...prev, [language]: editor }));
+      }
     };
 
-    const htmlEditor = monaco.editor.create(editorRef.current.querySelector('#html-editor'), {
-      ...commonOptions,
-      language: 'html',
-      value: htmlCode,
-    });
-
-    const cssEditor = monaco.editor.create(editorRef.current.querySelector('#css-editor'), {
-      ...commonOptions,
-      language: 'css',
-      value: cssCode,
-    });
-
-    const jsEditor = monaco.editor.create(editorRef.current.querySelector('#js-editor'), {
-      ...commonOptions,
-      language: 'javascript',
-      value: jsCode,
-    });
-
-    setEditors({ html: htmlEditor, css: cssEditor, js: jsEditor });
-
-    htmlEditor.onDidChangeModelContent(() => setHtmlCode(htmlEditor.getValue()));
-    cssEditor.onDidChangeModelContent(() => setCssCode(cssEditor.getValue()));
-    jsEditor.onDidChangeModelContent(() => setJsCode(jsEditor.getValue()));
+    initEditor('html');
+    initEditor('css');
+    initEditor('js');
 
     return () => {
-      htmlEditor.dispose();
-      cssEditor.dispose();
-      jsEditor.dispose();
+      Object.values(editors).forEach(editor => editor?.dispose());
     };
-  }, []);
+  }, [htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings]);
 
   useEffect(() => {
     setShowHtmlStructureIcon(isMobile && activeTab === 'html' && !htmlCode.trim());
   }, [isMobile, activeTab, htmlCode]);
 
   useEffect(() => {
-    if (!editors.html) return;
     Object.values(editors).forEach(editor => {
-      editor.updateOptions({
-        fontSize: settings.fontSize,
-        minimap: { enabled: settings.minimap },
-        lineNumbers: settings.lineNumbers ? 'on' : 'off',
-        tabSize: settings.tabSize,
-        insertSpaces: !settings.indentWithTabs,
-        cursorStyle: settings.cursorStyle,
-        theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
-      });
+      if (editor) {
+        editor.updateOptions({
+          fontSize: settings.fontSize,
+          minimap: { enabled: settings.minimap },
+          lineNumbers: settings.lineNumbers ? 'on' : 'off',
+          tabSize: settings.tabSize,
+          insertSpaces: !settings.indentWithTabs,
+          cursorStyle: settings.cursorStyle,
+          theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
+        });
+      }
     });
   }, [settings, editors]);
 
@@ -90,7 +86,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           </div>
         </div>
       )}
-      <div className="flex-grow overflow-hidden relative" ref={editorRef}>
+      <div className="flex-grow overflow-hidden relative">
         {showHtmlStructureIcon && lang === 'html' && (
           <Button
             variant="ghost"
@@ -114,7 +110,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             <Code className="h-4 w-4" />
           </Button>
         )}
-        <div id={`${lang}-editor`} className="h-full"></div>
+        <div
+          id={`${lang}-editor`}
+          className="h-full"
+          ref={el => editorRefs.current[lang] = el}
+        ></div>
       </div>
     </div>
   );
