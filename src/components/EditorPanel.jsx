@@ -1,50 +1,63 @@
 import React, { useRef, useEffect, useState } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
-import { html } from '@codemirror/lang-html';
-import { css } from '@codemirror/lang-css';
-import { javascript } from '@codemirror/lang-javascript';
+import * as monaco from 'monaco-editor';
 import { dracula } from '@uiw/codemirror-theme-dracula';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { autocompletion } from '@codemirror/autocomplete';
-import { EditorView } from '@codemirror/view';
 import { Palette, Code, Wrench } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
   const editorRef = useRef(null);
+  const [editors, setEditors] = useState({});
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
 
-  const getLanguageExtension = (lang) => {
-    switch (lang) {
-      case 'html': return html();
-      case 'css': return css();
-      case 'javascript': return javascript();
-      default: return null;
-    }
-  };
-
   useEffect(() => {
-    const handleResize = () => {
-      if (editorRef.current) {
-        const { scrollTop, scrollHeight, clientHeight } = editorRef.current;
-        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px threshold
-        editorRef.current.style.overflowX = isAtBottom ? 'auto' : 'hidden';
-      }
+    if (!editorRef.current) return;
+
+    const commonOptions = {
+      fontSize: settings.fontSize,
+      minimap: { enabled: settings.minimap },
+      lineNumbers: settings.lineNumbers ? 'on' : 'off',
+      tabSize: settings.tabSize,
+      insertSpaces: !settings.indentWithTabs,
+      cursorStyle: settings.cursorStyle,
+      scrollBeyondLastLine: false,
+      automaticLayout: true,
+      theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
     };
 
-    if (editorRef.current) {
-      editorRef.current.addEventListener('scroll', handleResize);
-    }
+    const htmlEditor = monaco.editor.create(editorRef.current.querySelector('#html-editor'), {
+      ...commonOptions,
+      language: 'html',
+      value: htmlCode,
+    });
+
+    const cssEditor = monaco.editor.create(editorRef.current.querySelector('#css-editor'), {
+      ...commonOptions,
+      language: 'css',
+      value: cssCode,
+    });
+
+    const jsEditor = monaco.editor.create(editorRef.current.querySelector('#js-editor'), {
+      ...commonOptions,
+      language: 'javascript',
+      value: jsCode,
+    });
+
+    setEditors({ html: htmlEditor, css: cssEditor, js: jsEditor });
+
+    htmlEditor.onDidChangeModelContent(() => setHtmlCode(htmlEditor.getValue()));
+    cssEditor.onDidChangeModelContent(() => setCssCode(cssEditor.getValue()));
+    jsEditor.onDidChangeModelContent(() => setJsCode(jsEditor.getValue()));
 
     return () => {
-      if (editorRef.current) {
-        editorRef.current.removeEventListener('scroll', handleResize);
-      }
+      htmlEditor.dispose();
+      cssEditor.dispose();
+      jsEditor.dispose();
     };
   }, []);
 
@@ -52,70 +65,39 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     setShowHtmlStructureIcon(isMobile && activeTab === 'html' && !htmlCode.trim());
   }, [isMobile, activeTab, htmlCode]);
 
-  const renderEditor = (lang, codeValue, setCodeValue) => {
-    const languageExtension = getLanguageExtension(lang);
-    const extensions = [
-      languageExtension,
-      EditorView.theme({
-        "&": { height: "100%", overflow: "auto" },
-        ".cm-scroller": { overflow: "auto" },
-        ".cm-content": { 
-          whiteSpace: isMobile ? "pre !important" : "pre-wrap !important",
-          wordBreak: isMobile ? "normal" : "break-word",
-          paddingBottom: "50vh"
-        },
-        "&::-webkit-scrollbar": { width: "2px", height: "2px" },
-        "&::-webkit-scrollbar-track": { background: "transparent" },
-        "&::-webkit-scrollbar-thumb": { background: "rgba(255, 255, 255, 0.1)", borderRadius: "1px" },
-      }),
-    ];
+  useEffect(() => {
+    if (!editors.html) return;
+    Object.values(editors).forEach(editor => {
+      editor.updateOptions({
+        fontSize: settings.fontSize,
+        minimap: { enabled: settings.minimap },
+        lineNumbers: settings.lineNumbers ? 'on' : 'off',
+        tabSize: settings.tabSize,
+        insertSpaces: !settings.indentWithTabs,
+        cursorStyle: settings.cursorStyle,
+        theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
+      });
+    });
+  }, [settings, editors]);
 
-    if (settings.enableAutocompletion) {
-      extensions.push(autocompletion({
-        override: [
-          (context) => {
-            let word = context.matchBefore(/\w+/);
-            if (word && word.from != null && word.to != null && (word.from !== word.to || context.explicit)) {
-              return {
-                from: word.from,
-                options: [
-                  { label: "function", type: "keyword" },
-                  { label: "class", type: "keyword" },
-                  { label: "if", type: "keyword" },
-                  { label: "else", type: "keyword" },
-                  { label: "for", type: "keyword" },
-                  { label: "while", type: "keyword" },
-                  { label: "return", type: "keyword" },
-                  { label: "const", type: "keyword" },
-                  { label: "let", type: "keyword" },
-                  { label: "var", type: "keyword" },
-                ]
-              };
-            }
-            return null;
-          }
-        ]
-      }));
-    }
-
-    return (
-      <div className="h-full flex flex-col">
-        {!isMobile && (
-          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
-            <div className="flex items-center">
-              <div className={`w-4 h-4 rounded-full mr-2 ${lang === 'html' ? 'bg-[#ff5f56]' : lang === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
-              <span className="text-sm font-semibold text-white">{lang.toUpperCase()}</span>
-            </div>
+  const renderEditor = (lang) => (
+    <div className="h-full flex flex-col">
+      {!isMobile && (
+        <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
+          <div className="flex items-center">
+            <div className={`w-4 h-4 rounded-full mr-2 ${lang === 'html' ? 'bg-[#ff5f56]' : lang === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
+            <span className="text-sm font-semibold text-white">{lang.toUpperCase()}</span>
           </div>
-        )}
-        <div className="flex-grow overflow-hidden relative" ref={editorRef}>
-          {showHtmlStructureIcon && lang === 'html' && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 right-2 z-10"
-              onClick={() => {
-                setCodeValue(`<!DOCTYPE html>
+        </div>
+      )}
+      <div className="flex-grow overflow-hidden relative" ref={editorRef}>
+        {showHtmlStructureIcon && lang === 'html' && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 right-2 z-10"
+            onClick={() => {
+              setHtmlCode(`<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -126,48 +108,25 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     
 </body>
 </html>`);
-                setShowHtmlStructureIcon(false);
-              }}
-            >
-              <Code className="h-4 w-4" />
-            </Button>
-          )}
-          <CodeMirror
-            value={codeValue}
-            height="100%"
-            theme={themes[settings.editorTheme]}
-            extensions={extensions}
-            onChange={(value) => setCodeValue(value)}
-            style={{
-              height: '100%',
-              fontSize: `${settings.fontSize}px`,
+              setShowHtmlStructureIcon(false);
             }}
-            className="h-full overflow-auto"
-            basicSetup={{
-              lineNumbers: settings.lineNumbers,
-              foldGutter: false,
-              dropCursor: false,
-              allowMultipleSelections: false,
-              indentOnInput: false,
-              tabSize: settings.tabSize,
-              highlightActiveLine: settings.highlightActiveLine,
-              bracketMatching: settings.matchBrackets,
-            }}
-            indentWithTab={settings.indentWithTabs}
-          />
-        </div>
+          >
+            <Code className="h-4 w-4" />
+          </Button>
+        )}
+        <div id={`${lang}-editor`} className="h-full"></div>
       </div>
-    );
-  };
+    </div>
+  );
 
   const renderMobileEditor = () => {
     switch (activeTab) {
       case 'html':
-        return renderEditor('html', htmlCode, setHtmlCode);
+        return renderEditor('html');
       case 'css':
-        return renderEditor('css', cssCode, setCssCode);
+        return renderEditor('css');
       case 'js':
-        return renderEditor('javascript', jsCode, setJsCode);
+        return renderEditor('javascript');
       default:
         return null;
     }
@@ -176,15 +135,15 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   const renderPanelMode = () => (
     <PanelGroup direction={settings.layout === 'stacked' ? 'horizontal' : 'vertical'}>
       <Panel minSize={5} defaultSize={33}>
-        {renderEditor('html', htmlCode, setHtmlCode)}
+        {renderEditor('html')}
       </Panel>
       <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
-        {renderEditor('css', cssCode, setCssCode)}
+        {renderEditor('css')}
       </Panel>
       <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
-        {renderEditor('javascript', jsCode, setJsCode)}
+        {renderEditor('javascript')}
       </Panel>
     </PanelGroup>
   );
