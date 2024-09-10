@@ -30,7 +30,7 @@ const aspectRatios = {
   "3:2": { width: 2048, height: 1365 },
 };
 
-const AIImageGenerator = () => {
+const AIImageGenerator = ({ onClose }) => {
   const [state, setState] = useState({
     results: { FLUX: [], SD3: [] },
     loading: { FLUX: false, SD3: false },
@@ -242,29 +242,36 @@ const AIImageGenerator = () => {
   }, [state.results]);
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-4 space-y-4">
-        <h2 className="text-2xl font-bold text-white">AI Image Generators</h2>
-        <Tabs defaultValue="FLUX" className="bg-gray-900 p-4 rounded-lg">
-          <TabsList className="bg-gray-800 mb-4">
-            <TabsTrigger value="FLUX" className="data-[state=active]:bg-blue-600">FLUX</TabsTrigger>
-            <TabsTrigger value="SD3" className="data-[state=active]:bg-blue-600">SD3</TabsTrigger>
-          </TabsList>
-          {['FLUX', 'SD3'].map(model => (
-            <TabsContent key={model} value={model}>
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-white">{model} Image Generator</h3>
-                {renderInputs(model)}
-                {model === 'FLUX' && renderFluxSettings()}
-                <div className="mt-4">
-                  {renderResult(model)}
-                </div>
-              </div>
-            </TabsContent>
-          ))}
-        </Tabs>
+    <div className="fixed inset-0 bg-gray-800 z-50 flex flex-col md:inset-y-4 md:right-4 md:left-auto md:w-96 md:rounded-lg overflow-hidden">
+      <div className="p-4 border-b border-gray-700 flex justify-between items-center">
+        <h2 className="text-xl font-bold text-white">AI Image Generator</h2>
+        <Button variant="ghost" size="icon" onClick={onClose}>
+          <X className="h-4 w-4" />
+        </Button>
       </div>
-    </ScrollArea>
+      <ScrollArea className="flex-grow">
+        <div className="p-4 space-y-4">
+          <Tabs defaultValue="FLUX" className="bg-gray-900 p-4 rounded-lg">
+            <TabsList className="bg-gray-800 mb-4">
+              <TabsTrigger value="FLUX" className="data-[state=active]:bg-blue-600">FLUX</TabsTrigger>
+              <TabsTrigger value="SD3" className="data-[state=active]:bg-blue-600">SD3</TabsTrigger>
+            </TabsList>
+            {['FLUX', 'SD3'].map(model => (
+              <TabsContent key={model} value={model}>
+                <div className="space-y-4">
+                  <h3 className="text-xl font-semibold text-white">{model} Image Generator</h3>
+                  {renderInputs(model)}
+                  {model === 'FLUX' && renderFluxSettings()}
+                  <div className="mt-4">
+                    {renderResult(model)}
+                  </div>
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
+        </div>
+      </ScrollArea>
+    </div>
   );
 };
 
