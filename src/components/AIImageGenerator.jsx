@@ -11,6 +11,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Wand2, MoreVertical, Download, Link, Image, Loader2, Settings, X } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
+import AIImageGeneratorSettings from './AIImageGeneratorSettings';
+import AIImageGeneratorResult from './AIImageGeneratorResult';
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -107,11 +109,6 @@ const AIImageGenerator = ({ onClose }) => {
     return [result, data.parameters?.seed];
   };
 
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    toast({ title: "Copied!", description: "Copied to clipboard" });
-  };
-
   const renderInputs = (model) => (
     <div className="flex space-x-2 mb-4">
       <Input
@@ -130,116 +127,6 @@ const AIImageGenerator = ({ onClose }) => {
       </Button>
     </div>
   );
-
-  const renderFluxSettings = () => (
-    <Collapsible open={state.isFluxSettingsOpen} onOpenChange={(open) => setState(prev => ({ ...prev, isFluxSettingsOpen: open }))}>
-      <CollapsibleTrigger asChild>
-        <Button variant="outline" size="sm" className="mb-2">
-          {state.isFluxSettingsOpen ? <X className="h-4 w-4" /> : <Settings className="h-4 w-4" />}
-        </Button>
-      </CollapsibleTrigger>
-      <CollapsibleContent className="space-y-4">
-        <div className="flex space-x-2">
-          <div className="flex-1">
-            <label className="text-sm font-medium text-white">Inference Steps: {state.fluxParams.num_inference_steps}</label>
-            <Slider
-              value={[state.fluxParams.num_inference_steps]}
-              onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, num_inference_steps: value[0] } }))}
-              min={1}
-              max={50}
-              step={1}
-              className="bg-gray-800"
-            />
-          </div>
-          <div className="flex-1">
-            <label className="text-sm font-medium text-white">Aspect Ratio</label>
-            <Select 
-              value={state.fluxParams.aspectRatio} 
-              onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, aspectRatio: value } }))}
-            >
-              <SelectTrigger className="bg-gray-800 text-white border-gray-700">
-                <SelectValue placeholder="Select aspect ratio" />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 text-white border-gray-700">
-                {Object.keys(aspectRatios).map((ratio) => (
-                  <SelectItem key={ratio} value={ratio}>{ratio}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-white">Seed: {state.fluxParams.seed}</label>
-          <Slider
-            value={[state.fluxParams.seed]}
-            onValueChange={(value) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, seed: value[0] } }))}
-            max={MAX_SEED}
-            step={1}
-            className="bg-gray-800"
-          />
-        </div>
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="randomize-seed"
-            checked={state.fluxParams.randomize_seed}
-            onCheckedChange={(checked) => setState(prev => ({ ...prev, fluxParams: { ...prev.fluxParams, randomize_seed: checked } }))}
-          />
-          <label htmlFor="randomize-seed" className="text-sm text-gray-400">Randomize seed</label>
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
-  );
-
-  const renderResult = useCallback((model) => {
-    return state.results[model].map((result, index) => (
-      <Card key={index} className="mb-4 bg-gray-800 border-gray-700">
-        <CardContent className="p-0">
-          {result.loading ? (
-            <div className="w-full h-64 flex items-center justify-center bg-gray-700">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-            </div>
-          ) : result.error ? (
-            <div className="w-full h-64 flex items-center justify-center bg-gray-700">
-              <p className="text-red-500">{result.error}</p>
-            </div>
-          ) : (
-            <img src={result.imageUrl} alt="Generated image" className="w-full h-auto rounded-t-lg" />
-          )}
-        </CardContent>
-        <CardFooter className="flex justify-between items-center p-4 bg-gray-900">
-          <div>
-            <p className="text-sm text-gray-400">Seed: {result.seed}</p>
-            <p className="text-sm text-gray-400">Prompt: {result.prompt}</p>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-gray-800 text-white border-gray-700">
-              {!result.loading && !result.error && (
-                <>
-                  <DropdownMenuItem onClick={() => window.open(result.imageUrl, '_blank')} className="hover:bg-gray-700">
-                    <Download className="mr-2 h-4 w-4" />
-                    <span>Download</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => copyToClipboard(result.imageUrl)} className="hover:bg-gray-700">
-                    <Link className="mr-2 h-4 w-4" />
-                    <span>Copy Link</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => copyToClipboard(`<img src="${result.imageUrl}" alt="Generated image" />`)} className="hover:bg-gray-700">
-                    <Image className="mr-2 h-4 w-4" />
-                    <span>Copy Image Tag</span>
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </CardFooter>
-      </Card>
-    ));
-  }, [state.results]);
 
   return (
     <div className="fixed inset-0 bg-gray-800 z-50 flex flex-col md:inset-y-4 md:right-4 md:left-auto md:w-96 md:rounded-lg overflow-hidden">
@@ -261,9 +148,16 @@ const AIImageGenerator = ({ onClose }) => {
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold text-white">{model} Image Generator</h3>
                   {renderInputs(model)}
-                  {model === 'FLUX' && renderFluxSettings()}
+                  {model === 'FLUX' && (
+                    <AIImageGeneratorSettings
+                      fluxParams={state.fluxParams}
+                      setFluxParams={(params) => setState(prev => ({ ...prev, fluxParams: params }))}
+                      isFluxSettingsOpen={state.isFluxSettingsOpen}
+                      setIsFluxSettingsOpen={(isOpen) => setState(prev => ({ ...prev, isFluxSettingsOpen: isOpen }))}
+                    />
+                  )}
                   <div className="mt-4">
-                    {renderResult(model)}
+                    <AIImageGeneratorResult results={state.results[model]} toast={toast} />
                   </div>
                 </div>
               </TabsContent>
