@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Wand2, MoreVertical, Download, Link, Image, Loader2, Settings, X } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -45,55 +44,6 @@ const AIImageGenerator = () => {
     isFluxSettingsOpen: false
   });
   const { toast } = useToast();
-  const editorRef = useRef(null);
-
-  useEffect(() => {
-    if (!editorRef.current) {
-      editorRef.current = monaco.editor.create(document.getElementById('monaco-editor-container'), {
-        value: '',
-        language: 'plaintext',
-        theme: 'vs-dark',
-        minimap: { enabled: false },
-        lineNumbers: 'off',
-        glyphMargin: false,
-        folding: false,
-        lineDecorationsWidth: 0,
-        lineNumbersMinChars: 0,
-      });
-    }
-
-    monaco.languages.registerCompletionItemProvider('plaintext', {
-      provideCompletionItems: (model, position) => {
-        const word = model.getWordUntilPosition(position);
-        const range = {
-          startLineNumber: position.lineNumber,
-          endLineNumber: position.lineNumber,
-          startColumn: word.startColumn,
-          endColumn: word.endColumn
-        };
-
-        const suggestions = [
-          { label: 'realistic', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'realistic' },
-          { label: 'photorealistic', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'photorealistic' },
-          { label: 'high quality', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'high quality' },
-          { label: 'detailed', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'detailed' },
-          { label: 'cinematic', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'cinematic' },
-          { label: 'portrait', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'portrait' },
-          { label: 'landscape', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'landscape' },
-          { label: 'sci-fi', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'sci-fi' },
-          { label: 'fantasy', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'fantasy' },
-        ];
-
-        return { suggestions: suggestions.map(s => ({ ...s, range })) };
-      }
-    });
-
-    return () => {
-      if (editorRef.current) {
-        editorRef.current.dispose();
-      }
-    };
-  }, []);
 
   const generateImage = async (model) => {
     setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true } }));
@@ -164,7 +114,12 @@ const AIImageGenerator = () => {
 
   const renderInputs = (model) => (
     <div className="flex space-x-2 mb-4">
-      <div id="monaco-editor-container" style={{ width: '100%', height: '100px' }}></div>
+      <Input
+        value={state.prompts[model]}
+        onChange={(e) => setState(prev => ({ ...prev, prompts: { ...prev.prompts, [model]: e.target.value } }))}
+        placeholder="Enter prompt"
+        className="flex-grow"
+      />
       <Button
         onClick={() => generateImage(model)}
         disabled={state.loading[model]}
