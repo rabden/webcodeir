@@ -17,17 +17,6 @@ const Settings = ({ settings, setSettings, onClose, isMobile }) => {
       </div>
       <div className="flex-grow overflow-y-auto p-6 space-y-4">
         <div>
-          <label className="block mb-2 text-white">Editor Theme</label>
-          <select
-            value={settings.editorTheme}
-            onChange={(e) => handleChange('editorTheme', e.target.value)}
-            className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="vs-dark">VS Code Dark</option>
-            <option value="hc-black">High Contrast Dark</option>
-          </select>
-        </div>
-        <div>
           <label className="block mb-2 text-white">Font Size</label>
           <input
             type="number"

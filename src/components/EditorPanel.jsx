@@ -30,7 +30,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         overviewRulerLanes: 0,
       });
 
-      monaco.editor.setTheme(settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs-light');
+      monaco.editor.setTheme('vs-dark');
     }
   }, [settings, isEditorReady]);
 
@@ -108,7 +108,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               insertSpaces: !settings.indentWithTabs,
               wordWrap: 'on',
               wrappingIndent: 'indent',
-              theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs-light',
+              theme: 'vs-dark',
               lineNumbersMinChars: 3,
               overviewRulerLanes: 0,
             }}

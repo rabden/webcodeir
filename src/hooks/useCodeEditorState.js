@@ -12,7 +12,6 @@ export const useCodeEditorState = () => {
     showIconPanel: false,
     showToolsPanel: false,
     settings: {
-      editorTheme: 'vscodeDark',
       fontSize: 14,
       autoSave: true,
       tabSize: 2,
