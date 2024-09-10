@@ -1,37 +1,63 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as monaco from 'monaco-editor';
+import { dracula } from '@uiw/codemirror-theme-dracula';
+import { vscodeDark } from '@uiw/codemirror-theme-vscode';
+import { solarizedDark } from '@uiw/codemirror-theme-solarized';
+import { githubDark } from '@uiw/codemirror-theme-github';
+import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Code } from 'lucide-react';
+import { Palette, Code, Wrench } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
-// Import language contributions
-import 'monaco-editor/esm/vs/language/html/monaco.contribution';
-import 'monaco-editor/esm/vs/language/css/monaco.contribution';
-import 'monaco-editor/esm/vs/language/typescript/monaco.contribution';
-import 'monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution';
-
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
-  const editorRefs = useRef({
-    html: null,
-    css: null,
-    js: null
-  });
+  const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
+  const editorRef = useRef(null);
   const [editors, setEditors] = useState({});
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
 
   useEffect(() => {
-    // Initialize Monaco editor
-    monaco.editor.onDidCreateEditor((editor) => {
-      updateEditorOptions(editor);
+    if (!editorRef.current) return;
+
+    const commonOptions = {
+      fontSize: settings.fontSize,
+      minimap: { enabled: settings.minimap },
+      lineNumbers: settings.lineNumbers ? 'on' : 'off',
+      tabSize: settings.tabSize,
+      insertSpaces: !settings.indentWithTabs,
+      cursorStyle: settings.cursorStyle,
+      scrollBeyondLastLine: false,
+      automaticLayout: true,
+      theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
+    };
+
+    const htmlEditor = monaco.editor.create(editorRef.current.querySelector('#html-editor'), {
+      ...commonOptions,
+      language: 'html',
+      value: htmlCode,
     });
 
-    // Initialize editors
-    initEditor('html');
-    initEditor('css');
-    initEditor('js');
+    const cssEditor = monaco.editor.create(editorRef.current.querySelector('#css-editor'), {
+      ...commonOptions,
+      language: 'css',
+      value: cssCode,
+    });
+
+    const jsEditor = monaco.editor.create(editorRef.current.querySelector('#js-editor'), {
+      ...commonOptions,
+      language: 'javascript',
+      value: jsCode,
+    });
+
+    setEditors({ html: htmlEditor, css: cssEditor, js: jsEditor });
+
+    htmlEditor.onDidChangeModelContent(() => setHtmlCode(htmlEditor.getValue()));
+    cssEditor.onDidChangeModelContent(() => setCssCode(cssEditor.getValue()));
+    jsEditor.onDidChangeModelContent(() => setJsCode(jsEditor.getValue()));
 
     return () => {
-      Object.values(editors).forEach(editor => editor?.dispose());
+      htmlEditor.dispose();
+      cssEditor.dispose();
+      jsEditor.dispose();
     };
   }, []);
 
@@ -40,15 +66,8 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   }, [isMobile, activeTab, htmlCode]);
 
   useEffect(() => {
+    if (!editors.html) return;
     Object.values(editors).forEach(editor => {
-      if (editor) {
-        updateEditorOptions(editor);
-      }
-    });
-  }, [settings, editors]);
-
-  const updateEditorOptions = (editor) => {
-    if (editor) {
       editor.updateOptions({
         fontSize: settings.fontSize,
         minimap: { enabled: settings.minimap },
@@ -56,40 +75,10 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         tabSize: settings.tabSize,
         insertSpaces: !settings.indentWithTabs,
         cursorStyle: settings.cursorStyle,
-        scrollBeyondLastLine: false,
-        automaticLayout: true,
         theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
-        highlightActiveIndentGuide: settings.highlightActiveLine,
-        matchBrackets: settings.matchBrackets ? 'always' : 'never',
       });
-    }
-  };
-
-  const initEditor = (language) => {
-    if (editorRefs.current[language] && !editors[language]) {
-      try {
-        const editor = monaco.editor.create(editorRefs.current[language], {
-          value: language === 'html' ? htmlCode : language === 'css' ? cssCode : jsCode,
-          language: language === 'js' ? 'javascript' : language,
-          automaticLayout: true,
-          theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
-        });
-
-        updateEditorOptions(editor);
-
-        editor.onDidChangeModelContent(() => {
-          const value = editor.getValue();
-          if (language === 'html') setHtmlCode(value);
-          else if (language === 'css') setCssCode(value);
-          else if (language === 'js') setJsCode(value);
-        });
-
-        setEditors(prev => ({ ...prev, [language]: editor }));
-      } catch (error) {
-        console.error(`Error initializing ${language} editor:`, error);
-      }
-    }
-  };
+    });
+  }, [settings, editors]);
 
   const renderEditor = (lang) => (
     <div className="h-full flex flex-col">
@@ -101,7 +90,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           </div>
         </div>
       )}
-      <div className="flex-grow overflow-hidden relative">
+      <div className="flex-grow overflow-hidden relative" ref={editorRef}>
         {showHtmlStructureIcon && lang === 'html' && (
           <Button
             variant="ghost"
@@ -125,11 +114,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             <Code className="h-4 w-4" />
           </Button>
         )}
-        <div
-          id={`${lang}-editor`}
-          className="h-full"
-          ref={el => editorRefs.current[lang] = el}
-        ></div>
+        <div id={`${lang}-editor`} className="h-full"></div>
       </div>
     </div>
   );
@@ -158,7 +143,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       </Panel>
       <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
-        {renderEditor('js')}
+        {renderEditor('javascript')}
       </Panel>
     </PanelGroup>
   );
