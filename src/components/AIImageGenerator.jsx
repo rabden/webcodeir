@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -10,10 +11,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Wand2, MoreVertical, Download, Link, Image, Loader2, Settings, X } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
-import AceEditor from 'react-ace';
-import 'ace-builds/src-noconflict/mode-text';
-import 'ace-builds/src-noconflict/theme-monokai';
-import 'ace-builds/src-noconflict/ext-language_tools';
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -117,21 +114,11 @@ const AIImageGenerator = () => {
 
   const renderInputs = (model) => (
     <div className="flex space-x-2 mb-4">
-      <AceEditor
-        mode="text"
-        theme="monokai"
-        onChange={(value) => setState(prev => ({ ...prev, prompts: { ...prev.prompts, [model]: value } }))}
-        name={`${model}-editor`}
-        editorProps={{ $blockScrolling: true }}
-        setOptions={{
-          enableBasicAutocompletion: true,
-          enableLiveAutocompletion: true,
-          enableSnippets: true,
-          showLineNumbers: true,
-          tabSize: 2,
-        }}
+      <Input
         value={state.prompts[model]}
-        style={{ width: '100%', height: '100px' }}
+        onChange={(e) => setState(prev => ({ ...prev, prompts: { ...prev.prompts, [model]: e.target.value } }))}
+        placeholder="Enter prompt"
+        className="flex-grow"
       />
       <Button
         onClick={() => generateImage(model)}
@@ -203,7 +190,7 @@ const AIImageGenerator = () => {
     </Collapsible>
   );
 
-  const renderResult = (model) => {
+  const renderResult = useCallback((model) => {
     return state.results[model].map((result, index) => (
       <Card key={index} className="mb-4 bg-gray-800 border-gray-700">
         <CardContent className="p-0">
@@ -252,7 +239,7 @@ const AIImageGenerator = () => {
         </CardFooter>
       </Card>
     ));
-  };
+  }, [state.results]);
 
   return (
     <ScrollArea className="h-full">
