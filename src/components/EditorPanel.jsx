@@ -26,15 +26,34 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         scrollBeyondLastLine: false,
         wordWrap: 'on',
         wrappingIndent: 'indent',
+        lineDecorationsWidth: 10, // Reduce the width of the line number column
+        renderLineHighlight: 'line', // Highlight the entire line
+        renderLineHighlightOnlyWhenFocus: false,
+        hideCursorInOverviewRuler: true,
+        overviewRulerLanes: 0, // Remove the overview ruler (right-side indicator)
       });
 
-      monaco.editor.setTheme(settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs-light');
+      monaco.editor.setTheme(settings.editorTheme);
     }
   }, [settings, isEditorReady]);
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
     setIsEditorReady(true);
+
+    // Apply custom styles to the editor
+    const editorElement = editor.getContainerDomNode();
+    editorElement.style.padding = '0.5rem';
+    editorElement.style.borderRadius = '0.375rem';
+    editorElement.style.backgroundColor = '#1e1e1e';
+
+    // Customize the active line highlight
+    editor.updateOptions({
+      renderLineHighlight: 'all',
+      renderLineHighlightOnlyWhenFocus: false,
+      lineHighlightBackground: '#2a2a2a',
+      lineHighlightBorder: '#3a3a3a'
+    });
   };
 
   const getLanguage = (lang) => {
@@ -97,7 +116,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               insertSpaces: !settings.indentWithTabs,
               wordWrap: 'on',
               wrappingIndent: 'indent',
-              theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs-light',
+              theme: settings.editorTheme,
             }}
             loading={<div className="text-white text-center p-4">Loading editor...</div>}
           />
