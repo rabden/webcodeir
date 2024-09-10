@@ -23,11 +23,8 @@ const Settings = ({ settings, setSettings, onClose, isMobile }) => {
             onChange={(e) => handleChange('editorTheme', e.target.value)}
             className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="dracula">Dracula</option>
-            <option value="vscodeDark">VS Code Dark</option>
-            <option value="solarizedDark">Solarized Dark</option>
-            <option value="githubDark">GitHub Dark</option>
-            <option value="monokai">Monokai</option>
+            <option value="vs-dark">VS Code Dark</option>
+            <option value="hc-black">High Contrast Dark</option>
           </select>
         </div>
         <div>
