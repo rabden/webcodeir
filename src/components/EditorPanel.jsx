@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import * as monaco from 'monaco-editor';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Code } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -23,23 +23,23 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       automaticLayout: true,
     };
 
-    const htmlEditor = monaco.editor.create(editorRef.current, {
-      value: htmlCode,
-      language: 'html',
-      ...commonOptions,
-    });
+    const createEditor = (language, value, onChange) => {
+      const editor = monaco.editor.create(editorRef.current, {
+        value,
+        language,
+        ...commonOptions,
+      });
 
-    const cssEditor = monaco.editor.create(editorRef.current, {
-      value: cssCode,
-      language: 'css',
-      ...commonOptions,
-    });
+      editor.onDidChangeModelContent(() => {
+        onChange(editor.getValue());
+      });
 
-    const jsEditor = monaco.editor.create(editorRef.current, {
-      value: jsCode,
-      language: 'javascript',
-      ...commonOptions,
-    });
+      return editor;
+    };
+
+    const htmlEditor = createEditor('html', htmlCode, setHtmlCode);
+    const cssEditor = createEditor('css', cssCode, setCssCode);
+    const jsEditor = createEditor('javascript', jsCode, setJsCode);
 
     setEditors({ html: htmlEditor, css: cssEditor, js: jsEditor });
 
@@ -49,22 +49,6 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       jsEditor.dispose();
     };
   }, []);
-
-  useEffect(() => {
-    if (!editors.html || !editors.css || !editors.js) return;
-
-    editors.html.onDidChangeModelContent(() => {
-      setHtmlCode(editors.html.getValue());
-    });
-
-    editors.css.onDidChangeModelContent(() => {
-      setCssCode(editors.css.getValue());
-    });
-
-    editors.js.onDidChangeModelContent(() => {
-      setJsCode(editors.js.getValue());
-    });
-  }, [editors, setHtmlCode, setCssCode, setJsCode]);
 
   useEffect(() => {
     setShowHtmlStructureIcon(isMobile && activeTab === 'html' && !htmlCode.trim());
@@ -141,25 +125,24 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     }
   }, [editors]);
 
-  const renderEditor = (lang) => {
-    return (
-      <div className="h-full flex flex-col">
-        {!isMobile && (
-          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
-            <div className="flex items-center">
-              <div className={`w-4 h-4 rounded-full mr-2 ${lang === 'html' ? 'bg-[#ff5f56]' : lang === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
-              <span className="text-sm font-semibold text-white">{lang.toUpperCase()}</span>
-            </div>
+  const renderEditor = (lang) => (
+    <div className="h-full flex flex-col">
+      {!isMobile && (
+        <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
+          <div className="flex items-center">
+            <div className={`w-4 h-4 rounded-full mr-2 ${lang === 'html' ? 'bg-[#ff5f56]' : lang === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
+            <span className="text-sm font-semibold text-white">{lang.toUpperCase()}</span>
           </div>
-        )}
-        <div className="flex-grow overflow-hidden relative" ref={editorRef}>
-          {showHtmlStructureIcon && lang === 'html' && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 right-2 z-10"
-              onClick={() => {
-                const htmlStructure = `<!DOCTYPE html>
+        </div>
+      )}
+      <div className="flex-grow overflow-hidden relative" ref={editorRef}>
+        {showHtmlStructureIcon && lang === 'html' && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 right-2 z-10"
+            onClick={() => {
+              const htmlStructure = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -170,17 +153,16 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     
 </body>
 </html>`;
-                editors.html.setValue(htmlStructure);
-                setShowHtmlStructureIcon(false);
-              }}
-            >
-              <Code className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
+              editors.html.setValue(htmlStructure);
+              setShowHtmlStructureIcon(false);
+            }}
+          >
+            <Code className="h-4 w-4" />
+          </Button>
+        )}
       </div>
-    );
-  };
+    </div>
+  );
 
   const renderMobileEditor = () => {
     switch (activeTab) {
