@@ -3,17 +3,38 @@ import Editor from "@monaco-editor/react";
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Code } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import * as monaco from 'monaco-editor';
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const editorRef = useRef(null);
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
+  const [isEditorReady, setIsEditorReady] = useState(false);
 
   useEffect(() => {
     setShowHtmlStructureIcon(isMobile && activeTab === 'html' && !htmlCode.trim());
   }, [isMobile, activeTab, htmlCode]);
 
+  useEffect(() => {
+    if (isEditorReady && editorRef.current) {
+      const editor = editorRef.current;
+      editor.updateOptions({
+        fontSize: settings.fontSize,
+        lineNumbers: settings.lineNumbers ? 'on' : 'off',
+        tabSize: settings.tabSize,
+        insertSpaces: !settings.indentWithTabs,
+        minimap: { enabled: false },
+        scrollBeyondLastLine: false,
+        wordWrap: 'on',
+        wrappingIndent: 'indent',
+      });
+
+      monaco.editor.setTheme(settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs-light');
+    }
+  }, [settings, isEditorReady]);
+
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
+    setIsEditorReady(true);
   };
 
   const getLanguage = (lang) => {
@@ -67,6 +88,8 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             onChange={(value) => setCodeValue(value)}
             onMount={handleEditorDidMount}
             options={{
+              automaticLayout: true,
+              scrollBeyondLastLine: false,
               minimap: { enabled: false },
               fontSize: settings.fontSize,
               lineNumbers: settings.lineNumbers ? 'on' : 'off',
@@ -74,10 +97,9 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               insertSpaces: !settings.indentWithTabs,
               wordWrap: 'on',
               wrappingIndent: 'indent',
-              automaticLayout: true,
               theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs-light',
-              scrollBeyondLastLine: false,
             }}
+            loading={<div className="text-white text-center p-4">Loading editor...</div>}
           />
         </div>
       </div>
@@ -113,7 +135,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     </PanelGroup>
   );
 
-  return isMobile ? renderMobileEditor() : renderPanelMode();
+  return (
+    <div className="w-full h-full bg-gray-900">
+      {isMobile ? renderMobileEditor() : renderPanelMode()}
+    </div>
+  );
 };
 
 export default EditorPanel;
