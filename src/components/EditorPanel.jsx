@@ -12,9 +12,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   useEffect(() => {
     if (!editorRef.current) return;
 
-    const htmlEditor = monaco.editor.create(editorRef.current, {
-      value: htmlCode,
-      language: 'html',
+    const commonOptions = {
       theme: settings.editorTheme,
       fontSize: settings.fontSize,
       minimap: { enabled: settings.minimap },
@@ -23,32 +21,24 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       insertSpaces: !settings.indentWithTabs,
       wordWrap: 'on',
       automaticLayout: true,
+    };
+
+    const htmlEditor = monaco.editor.create(editorRef.current, {
+      value: htmlCode,
+      language: 'html',
+      ...commonOptions,
     });
 
     const cssEditor = monaco.editor.create(editorRef.current, {
       value: cssCode,
       language: 'css',
-      theme: settings.editorTheme,
-      fontSize: settings.fontSize,
-      minimap: { enabled: settings.minimap },
-      lineNumbers: settings.lineNumbers ? 'on' : 'off',
-      tabSize: settings.tabSize,
-      insertSpaces: !settings.indentWithTabs,
-      wordWrap: 'on',
-      automaticLayout: true,
+      ...commonOptions,
     });
 
     const jsEditor = monaco.editor.create(editorRef.current, {
       value: jsCode,
       language: 'javascript',
-      theme: settings.editorTheme,
-      fontSize: settings.fontSize,
-      minimap: { enabled: settings.minimap },
-      lineNumbers: settings.lineNumbers ? 'on' : 'off',
-      tabSize: settings.tabSize,
-      insertSpaces: !settings.indentWithTabs,
-      wordWrap: 'on',
-      automaticLayout: true,
+      ...commonOptions,
     });
 
     setEditors({ html: htmlEditor, css: cssEditor, js: jsEditor });
@@ -95,67 +85,60 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     });
   }, [editors, settings]);
 
-  const setupAutoCompletion = (editor, language) => {
-    const provideCompletionItems = (model, position) => {
-      const textUntilPosition = model.getValueInRange({
-        startLineNumber: 1,
-        startColumn: 1,
-        endLineNumber: position.lineNumber,
-        endColumn: position.column,
+  const setupAutoCompletion = () => {
+    const languages = ['html', 'css', 'javascript'];
+    languages.forEach(language => {
+      monaco.languages.registerCompletionItemProvider(language, {
+        provideCompletionItems: (model, position) => {
+          const word = model.getWordUntilPosition(position);
+          const range = {
+            startLineNumber: position.lineNumber,
+            endLineNumber: position.lineNumber,
+            startColumn: word.startColumn,
+            endColumn: word.endColumn,
+          };
+
+          const suggestions = [];
+
+          if (language === 'html') {
+            ['div', 'span', 'p', 'a', 'img', 'ul', 'li', 'h1', 'h2', 'h3'].forEach(tag => {
+              suggestions.push({
+                label: tag,
+                kind: monaco.languages.CompletionItemKind.Keyword,
+                insertText: `<${tag}></${tag}>`,
+                range: range,
+              });
+            });
+          } else if (language === 'css') {
+            ['color', 'background-color', 'font-size', 'margin', 'padding'].forEach(prop => {
+              suggestions.push({
+                label: prop,
+                kind: monaco.languages.CompletionItemKind.Property,
+                insertText: `${prop}: `,
+                range: range,
+              });
+            });
+          } else if (language === 'javascript') {
+            ['function', 'const', 'let', 'var', 'if', 'for', 'while'].forEach(keyword => {
+              suggestions.push({
+                label: keyword,
+                kind: monaco.languages.CompletionItemKind.Keyword,
+                insertText: keyword,
+                range: range,
+              });
+            });
+          }
+
+          return { suggestions };
+        },
       });
-
-      const suggestions = [];
-
-      if (language === 'html') {
-        const htmlTags = ['div', 'span', 'p', 'a', 'img', 'ul', 'li', 'h1', 'h2', 'h3'];
-        htmlTags.forEach(tag => {
-          if (tag.startsWith(textUntilPosition.split('<').pop())) {
-            suggestions.push({
-              label: tag,
-              kind: monaco.languages.CompletionItemKind.Keyword,
-              insertText: `${tag}></${tag}>`,
-              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            });
-          }
-        });
-      } else if (language === 'css') {
-        const cssProperties = ['color', 'background-color', 'font-size', 'margin', 'padding'];
-        cssProperties.forEach(prop => {
-          if (prop.startsWith(textUntilPosition.split(':').pop().trim())) {
-            suggestions.push({
-              label: prop,
-              kind: monaco.languages.CompletionItemKind.Property,
-              insertText: `${prop}: `,
-            });
-          }
-        });
-      } else if (language === 'javascript') {
-        const jsFunctions = ['function', 'console.log', 'document.getElementById', 'addEventListener'];
-        jsFunctions.forEach(func => {
-          if (func.startsWith(textUntilPosition.split(' ').pop())) {
-            suggestions.push({
-              label: func,
-              kind: monaco.languages.CompletionItemKind.Function,
-              insertText: func,
-            });
-          }
-        });
-      }
-
-      return { suggestions };
-    };
-
-    monaco.languages.registerCompletionItemProvider(language, {
-      provideCompletionItems,
     });
   };
 
   useEffect(() => {
-    if (!editors.html || !editors.css || !editors.js) return;
-
-    setupAutoCompletion(editors.html, 'html');
-    setupAutoCompletion(editors.css, 'css');
-    setupAutoCompletion(editors.js, 'javascript');
+    if (Object.keys(editors).length > 0) {
+      setupAutoCompletion();
+    }
   }, [editors]);
 
   const renderEditor = (lang) => {
