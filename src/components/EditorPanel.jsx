@@ -4,6 +4,11 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Code } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
+// Import language contributions
+import 'monaco-editor/esm/vs/language/html/monaco.contribution';
+import 'monaco-editor/esm/vs/language/css/monaco.contribution';
+import 'monaco-editor/esm/vs/language/typescript/monaco.contribution';
+
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const editorRefs = useRef({
     html: null,
@@ -16,28 +21,13 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   useEffect(() => {
     // Initialize Monaco editor
     monaco.editor.onDidCreateEditor((editor) => {
-      editor.updateOptions({
-        fontSize: settings.fontSize,
-        minimap: { enabled: settings.minimap },
-        lineNumbers: settings.lineNumbers ? 'on' : 'off',
-        tabSize: settings.tabSize,
-        insertSpaces: !settings.indentWithTabs,
-        cursorStyle: settings.cursorStyle,
-        scrollBeyondLastLine: false,
-        automaticLayout: true,
-      });
+      updateEditorOptions(editor);
     });
 
-    // Load Monaco editor languages
-    Promise.all([
-      import('monaco-editor/esm/vs/language/html/monaco.contribution'),
-      import('monaco-editor/esm/vs/language/css/monaco.contribution'),
-      import('monaco-editor/esm/vs/language/typescript/monaco.contribution')
-    ]).then(() => {
-      initEditor('html');
-      initEditor('css');
-      initEditor('js');
-    });
+    // Initialize editors
+    initEditor('html');
+    initEditor('css');
+    initEditor('js');
 
     return () => {
       Object.values(editors).forEach(editor => editor?.dispose());
@@ -51,35 +41,49 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   useEffect(() => {
     Object.values(editors).forEach(editor => {
       if (editor) {
-        editor.updateOptions({
-          fontSize: settings.fontSize,
-          minimap: { enabled: settings.minimap },
-          lineNumbers: settings.lineNumbers ? 'on' : 'off',
-          tabSize: settings.tabSize,
-          insertSpaces: !settings.indentWithTabs,
-          cursorStyle: settings.cursorStyle,
-        });
+        updateEditorOptions(editor);
       }
     });
   }, [settings, editors]);
 
+  const updateEditorOptions = (editor) => {
+    editor.updateOptions({
+      fontSize: settings.fontSize,
+      minimap: { enabled: settings.minimap },
+      lineNumbers: settings.lineNumbers ? 'on' : 'off',
+      tabSize: settings.tabSize,
+      insertSpaces: !settings.indentWithTabs,
+      cursorStyle: settings.cursorStyle,
+      scrollBeyondLastLine: false,
+      automaticLayout: true,
+      theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
+      highlightActiveIndentGuide: settings.highlightActiveLine,
+      matchBrackets: settings.matchBrackets ? 'always' : 'never',
+    });
+  };
+
   const initEditor = (language) => {
     if (editorRefs.current[language] && !editors[language]) {
-      const editor = monaco.editor.create(editorRefs.current[language], {
-        value: language === 'html' ? htmlCode : language === 'css' ? cssCode : jsCode,
-        language: language === 'js' ? 'javascript' : language,
-        theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
-        automaticLayout: true,
-      });
+      try {
+        const editor = monaco.editor.create(editorRefs.current[language], {
+          value: language === 'html' ? htmlCode : language === 'css' ? cssCode : jsCode,
+          language: language === 'js' ? 'javascript' : language,
+          automaticLayout: true,
+        });
 
-      editor.onDidChangeModelContent(() => {
-        const value = editor.getValue();
-        if (language === 'html') setHtmlCode(value);
-        else if (language === 'css') setCssCode(value);
-        else if (language === 'js') setJsCode(value);
-      });
+        updateEditorOptions(editor);
 
-      setEditors(prev => ({ ...prev, [language]: editor }));
+        editor.onDidChangeModelContent(() => {
+          const value = editor.getValue();
+          if (language === 'html') setHtmlCode(value);
+          else if (language === 'css') setCssCode(value);
+          else if (language === 'js') setJsCode(value);
+        });
+
+        setEditors(prev => ({ ...prev, [language]: editor }));
+      } catch (error) {
+        console.error(`Error initializing ${language} editor:`, error);
+      }
     }
   };
 
