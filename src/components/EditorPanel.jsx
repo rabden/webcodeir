@@ -49,15 +49,19 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         z-index: 50 !important;
       }
       .monaco-editor .suggest-widget {
-        z-index: 100 !important;
+        z-index: 1000 !important;
       }
       .editor-container {
         position: relative;
         z-index: 1;
+        overflow: visible !important;
       }
       .editor-header {
         position: relative;
         z-index: 2;
+      }
+      .monaco-editor .overflow-guard {
+        overflow: visible !important;
       }
     `;
     document.head.appendChild(styleElement);
