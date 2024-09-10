@@ -38,11 +38,18 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     editorRef.current = editor;
     setIsEditorReady(true);
 
-    // Add custom CSS to reduce line number column width
+    // Add custom CSS to reduce line number column width and ensure editor popups are on top
     const styleElement = document.createElement('style');
     styleElement.textContent = `
       .monaco-editor .margin-view-overlays .line-numbers {
         min-width: 2.5em !important;
+      }
+      .monaco-editor .monaco-editor-background,
+      .monaco-editor .inputarea.ime-input {
+        z-index: 50 !important;
+      }
+      .monaco-editor .suggest-widget {
+        z-index: 51 !important;
       }
     `;
     document.head.appendChild(styleElement);
