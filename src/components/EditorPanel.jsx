@@ -28,47 +28,9 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         wrappingIndent: 'indent',
         lineNumbersMinChars: 3,
         overviewRulerLanes: 0,
-        cursorStyle: settings.cursorStyle,
-        cursorBlinking: 'smooth',
-        smoothScrolling: true,
-        contextmenu: false,
-        folding: true,
-        renderIndentGuides: true,
-        renderLineHighlight: 'all',
-        scrollbar: {
-          vertical: 'visible',
-          horizontal: 'visible',
-          useShadows: false,
-          verticalHasArrows: false,
-          horizontalHasArrows: false,
-          verticalScrollbarSize: 10,
-          horizontalScrollbarSize: 10,
-        },
       });
 
-      // Custom theme
-      monaco.editor.defineTheme('customDarkTheme', {
-        base: 'vs-dark',
-        inherit: true,
-        rules: [
-          { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
-          { token: 'keyword', foreground: 'C586C0' },
-          { token: 'string', foreground: 'CE9178' },
-          { token: 'number', foreground: 'B5CEA8' },
-          { token: 'operator', foreground: 'D4D4D4' },
-        ],
-        colors: {
-          'editor.background': '#1E1E1E',
-          'editor.foreground': '#D4D4D4',
-          'editorCursor.foreground': '#FFFFFF',
-          'editor.lineHighlightBackground': '#2A2D2E',
-          'editorLineNumber.foreground': '#858585',
-          'editor.selectionBackground': '#264F78',
-          'editor.inactiveSelectionBackground': '#3A3D41',
-        },
-      });
-
-      monaco.editor.setTheme('customDarkTheme');
+      monaco.editor.setTheme('vs-dark');
     }
   }, [settings, isEditorReady]);
 
@@ -76,6 +38,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     editorRef.current = editor;
     setIsEditorReady(true);
 
+    // Add custom CSS to reduce line number column width and ensure editor popups are on top
     const styleElement = document.createElement('style');
     styleElement.textContent = `
       .monaco-editor .margin-view-overlays .line-numbers {
@@ -92,22 +55,13 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         position: relative;
         z-index: 1;
         overflow: visible !important;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
       .editor-header {
         position: relative;
         z-index: 2;
-        background-color: #2D2D2D;
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-        padding: 8px 12px;
       }
       .monaco-editor .overflow-guard {
         overflow: visible !important;
-      }
-      .monaco-editor .cursors-layer .cursor {
-        transition: all 0.1s ease;
       }
     `;
     document.head.appendChild(styleElement);
@@ -126,10 +80,10 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     return (
       <div className="h-full flex flex-col editor-container">
         {!isMobile && (
-          <div className="editor-header flex items-center justify-between">
+          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 editor-header">
             <div className="flex items-center">
-              <div className={`w-3 h-3 rounded-full mr-2 ${lang === 'html' ? 'bg-red-500' : lang === 'css' ? 'bg-yellow-500' : 'bg-green-500'}`}></div>
-              <span className="text-sm font-semibold text-gray-300">{lang.toUpperCase()}</span>
+              <div className={`w-4 h-4 rounded-full mr-2 ${lang === 'html' ? 'bg-[#ff5f56]' : lang === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
+              <span className="text-sm font-semibold text-white">{lang.toUpperCase()}</span>
             </div>
           </div>
         )}
@@ -173,25 +127,9 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               insertSpaces: !settings.indentWithTabs,
               wordWrap: 'on',
               wrappingIndent: 'indent',
-              theme: 'customDarkTheme',
+              theme: 'vs-dark',
               lineNumbersMinChars: 3,
               overviewRulerLanes: 0,
-              cursorStyle: settings.cursorStyle,
-              cursorBlinking: 'smooth',
-              smoothScrolling: true,
-              contextmenu: false,
-              folding: true,
-              renderIndentGuides: true,
-              renderLineHighlight: 'all',
-              scrollbar: {
-                vertical: 'visible',
-                horizontal: 'visible',
-                useShadows: false,
-                verticalHasArrows: false,
-                horizontalHasArrows: false,
-                verticalScrollbarSize: 10,
-                horizontalScrollbarSize: 10,
-              },
             }}
             loading={<div className="text-white text-center p-4">Loading editor...</div>}
           />
@@ -218,11 +156,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       <Panel minSize={5} defaultSize={33}>
         {renderEditor('html', htmlCode, setHtmlCode)}
       </Panel>
-      <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-600 hover:bg-gray-500 transition-colors duration-200' : 'h-1 bg-gray-600 hover:bg-gray-500 transition-colors duration-200'} />
+      <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
         {renderEditor('css', cssCode, setCssCode)}
       </Panel>
-      <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-600 hover:bg-gray-500 transition-colors duration-200' : 'h-1 bg-gray-600 hover:bg-gray-500 transition-colors duration-200'} />
+      <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
         {renderEditor('javascript', jsCode, setJsCode)}
       </Panel>
