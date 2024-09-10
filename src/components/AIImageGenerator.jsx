@@ -3,13 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Wand2, MoreVertical, Download, Link, Image, Loader2, Settings, X } from 'lucide-react';
+import { Wand2, X } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 import AIImageGeneratorSettings from './AIImageGeneratorSettings';
 import AIImageGeneratorResult from './AIImageGeneratorResult';
@@ -123,7 +117,7 @@ const AIImageGenerator = ({ onClose }) => {
         size="icon"
         className="bg-blue-600 hover:bg-blue-700"
       >
-        {state.loading[model] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+        {state.loading[model] ? <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div> : <Wand2 className="h-4 w-4" />}
       </Button>
     </div>
   );
@@ -154,6 +148,7 @@ const AIImageGenerator = ({ onClose }) => {
                       setFluxParams={(params) => setState(prev => ({ ...prev, fluxParams: params }))}
                       isFluxSettingsOpen={state.isFluxSettingsOpen}
                       setIsFluxSettingsOpen={(isOpen) => setState(prev => ({ ...prev, isFluxSettingsOpen: isOpen }))}
+                      aspectRatios={aspectRatios}
                     />
                   )}
                   <div className="mt-4">

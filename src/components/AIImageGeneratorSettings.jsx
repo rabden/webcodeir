@@ -6,7 +6,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Settings, X } from 'lucide-react';
 
-const AIImageGeneratorSettings = ({ fluxParams, setFluxParams, isFluxSettingsOpen, setIsFluxSettingsOpen }) => {
+const AIImageGeneratorSettings = ({ fluxParams, setFluxParams, isFluxSettingsOpen, setIsFluxSettingsOpen, aspectRatios }) => {
   return (
     <Collapsible open={isFluxSettingsOpen} onOpenChange={setIsFluxSettingsOpen}>
       <CollapsibleTrigger asChild>
@@ -49,7 +49,7 @@ const AIImageGeneratorSettings = ({ fluxParams, setFluxParams, isFluxSettingsOpe
           <Slider
             value={[fluxParams.seed]}
             onValueChange={(value) => setFluxParams({ ...fluxParams, seed: value[0] })}
-            max={MAX_SEED}
+            max={4294967295}
             step={1}
             className="bg-gray-800"
           />
