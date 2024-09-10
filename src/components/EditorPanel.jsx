@@ -1,99 +1,31 @@
 import React, { useRef, useEffect, useState } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
-import { html } from '@codemirror/lang-html';
-import { css } from '@codemirror/lang-css';
-import { javascript } from '@codemirror/lang-javascript';
-import { dracula } from '@uiw/codemirror-theme-dracula';
-import { vscodeDark } from '@uiw/codemirror-theme-vscode';
-import { solarizedDark } from '@uiw/codemirror-theme-solarized';
-import { githubDark } from '@uiw/codemirror-theme-github';
-import { monokai } from '@uiw/codemirror-theme-monokai';
+import Editor from "@monaco-editor/react";
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { autocompletion, CompletionContext, CompletionResult } from '@codemirror/autocomplete';
-import { EditorView } from '@codemirror/view';
-import { Palette, Code, Wrench } from 'lucide-react';
+import { Code } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
-  const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
   const editorRef = useRef(null);
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
-
-  const getLanguageExtension = (lang) => {
-    switch (lang) {
-      case 'html': return html();
-      case 'css': return css();
-      case 'javascript': return javascript();
-      default: return null;
-    }
-  };
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (editorRef.current) {
-        const { scrollTop, scrollHeight, clientHeight } = editorRef.current;
-        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
-        editorRef.current.style.overflowX = isAtBottom ? 'auto' : 'hidden';
-      }
-    };
-
-    if (editorRef.current) {
-      editorRef.current.addEventListener('scroll', handleResize);
-    }
-
-    return () => {
-      if (editorRef.current) {
-        editorRef.current.removeEventListener('scroll', handleResize);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     setShowHtmlStructureIcon(isMobile && activeTab === 'html' && !htmlCode.trim());
   }, [isMobile, activeTab, htmlCode]);
 
-  const myCompletions = (context: CompletionContext): CompletionResult | null => {
-    let word = context.matchBefore(/\w+/);
-    if (word && word.from != null && word.to != null && (word.from !== word.to || context.explicit)) {
-      return {
-        from: word.from,
-        options: [
-          { label: "function", type: "keyword" },
-          { label: "class", type: "keyword" },
-          { label: "if", type: "keyword" },
-          { label: "else", type: "keyword" },
-          { label: "for", type: "keyword" },
-          { label: "while", type: "keyword" },
-          { label: "return", type: "keyword" },
-          { label: "const", type: "keyword" },
-          { label: "let", type: "keyword" },
-          { label: "var", type: "keyword" },
-          // Add more completions as needed
-        ]
-      };
+  const handleEditorDidMount = (editor, monaco) => {
+    editorRef.current = editor;
+  };
+
+  const getLanguage = (lang) => {
+    switch (lang) {
+      case 'html': return 'html';
+      case 'css': return 'css';
+      case 'javascript': return 'javascript';
+      default: return 'plaintext';
     }
-    return null;
   };
 
   const renderEditor = (lang, codeValue, setCodeValue) => {
-    const languageExtension = getLanguageExtension(lang);
-    const extensions = [
-      languageExtension,
-      EditorView.theme({
-        "&": { height: "100%", overflow: "auto" },
-        ".cm-scroller": { overflow: "auto" },
-        ".cm-content": { 
-          whiteSpace: isMobile ? "pre !important" : "pre-wrap !important",
-          wordBreak: isMobile ? "normal" : "break-word",
-          paddingBottom: "50vh"
-        },
-        "&::-webkit-scrollbar": { width: "2px", height: "2px" },
-        "&::-webkit-scrollbar-track": { background: "transparent" },
-        "&::-webkit-scrollbar-thumb": { background: "rgba(255, 255, 255, 0.1)", borderRadius: "1px" },
-      }),
-      autocompletion({ override: [myCompletions] })
-    ];
-
     return (
       <div className="h-full flex flex-col">
         {!isMobile && (
@@ -128,28 +60,24 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               <Code className="h-4 w-4" />
             </Button>
           )}
-          <CodeMirror
-            value={codeValue}
+          <Editor
             height="100%"
-            theme={themes[settings.editorTheme]}
-            extensions={extensions}
+            language={getLanguage(lang)}
+            value={codeValue}
             onChange={(value) => setCodeValue(value)}
-            style={{
-              height: '100%',
-              fontSize: `${settings.fontSize}px`,
-            }}
-            className="h-full overflow-auto"
-            basicSetup={{
-              lineNumbers: settings.lineNumbers,
-              foldGutter: false,
-              dropCursor: false,
-              allowMultipleSelections: false,
-              indentOnInput: false,
+            onMount={handleEditorDidMount}
+            options={{
+              minimap: { enabled: false },
+              fontSize: settings.fontSize,
+              lineNumbers: settings.lineNumbers ? 'on' : 'off',
               tabSize: settings.tabSize,
-              highlightActiveLine: settings.highlightActiveLine,
-              bracketMatching: settings.matchBrackets,
+              insertSpaces: !settings.indentWithTabs,
+              wordWrap: 'on',
+              wrappingIndent: 'indent',
+              automaticLayout: true,
+              theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs-light',
+              scrollBeyondLastLine: false,
             }}
-            indentWithTab={settings.indentWithTabs}
           />
         </div>
       </div>
