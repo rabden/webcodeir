@@ -26,6 +26,8 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         scrollBeyondLastLine: false,
         wordWrap: 'on',
         wrappingIndent: 'indent',
+        lineNumbersMinChars: 3,
+        overviewRulerLanes: 0,
       });
 
       monaco.editor.setTheme(settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs-light');
@@ -35,6 +37,15 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
     setIsEditorReady(true);
+
+    // Add custom CSS to reduce line number column width
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+      .monaco-editor .margin-view-overlays .line-numbers {
+        min-width: 2.5em !important;
+      }
+    `;
+    document.head.appendChild(styleElement);
   };
 
   const getLanguage = (lang) => {
@@ -98,6 +109,8 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               wordWrap: 'on',
               wrappingIndent: 'indent',
               theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs-light',
+              lineNumbersMinChars: 3,
+              overviewRulerLanes: 0,
             }}
             loading={<div className="text-white text-center p-4">Loading editor...</div>}
           />
