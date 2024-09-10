@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
+import * as monaco from 'monaco-editor';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
@@ -13,6 +13,7 @@ import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
 import { Palette, Code, Wrench } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import axios from 'axios';
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
@@ -32,7 +33,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     const handleResize = () => {
       if (editorRef.current) {
         const { scrollTop, scrollHeight, clientHeight } = editorRef.current;
-        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px threshold
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
         editorRef.current.style.overflowX = isAtBottom ? 'auto' : 'hidden';
       }
     };
@@ -52,6 +53,29 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     setShowHtmlStructureIcon(isMobile && activeTab === 'html' && !htmlCode.trim());
   }, [isMobile, activeTab, htmlCode]);
 
+  const npmIntellisense = async (context) => {
+    let word = context.matchBefore(/[\w@/\-]+/);
+    if (word.from == word.to && !context.explicit) return null;
+
+    const packageName = word.text;
+    try {
+      const response = await axios.get(`https://api.npms.io/v2/search?q=${packageName}`);
+      const packages = response.data.results.slice(0, 5);
+      return {
+        from: word.from,
+        options: packages.map(pkg => ({
+          label: pkg.package.name,
+          type: "variable",
+          detail: pkg.package.version,
+          info: pkg.package.description
+        }))
+      };
+    } catch (error) {
+      console.error('Error fetching npm packages:', error);
+      return null;
+    }
+  };
+
   const renderEditor = (lang, codeValue, setCodeValue) => {
     const languageExtension = getLanguageExtension(lang);
     const extensions = [
@@ -68,35 +92,10 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         "&::-webkit-scrollbar-track": { background: "transparent" },
         "&::-webkit-scrollbar-thumb": { background: "rgba(255, 255, 255, 0.1)", borderRadius: "1px" },
       }),
+      autocompletion({
+        override: [npmIntellisense]
+      })
     ];
-
-    if (settings.enableAutocompletion) {
-      extensions.push(autocompletion({
-        override: [
-          (context) => {
-            let word = context.matchBefore(/\w+/);
-            if (word && word.from != null && word.to != null && (word.from !== word.to || context.explicit)) {
-              return {
-                from: word.from,
-                options: [
-                  { label: "function", type: "keyword" },
-                  { label: "class", type: "keyword" },
-                  { label: "if", type: "keyword" },
-                  { label: "else", type: "keyword" },
-                  { label: "for", type: "keyword" },
-                  { label: "while", type: "keyword" },
-                  { label: "return", type: "keyword" },
-                  { label: "const", type: "keyword" },
-                  { label: "let", type: "keyword" },
-                  { label: "var", type: "keyword" },
-                ]
-              };
-            }
-            return null;
-          }
-        ]
-      }));
-    }
 
     return (
       <div className="h-full flex flex-col">
@@ -132,29 +131,26 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               <Code className="h-4 w-4" />
             </Button>
           )}
-          <CodeMirror
-            value={codeValue}
-            height="100%"
-            theme={themes[settings.editorTheme]}
-            extensions={extensions}
-            onChange={(value) => setCodeValue(value)}
-            style={{
-              height: '100%',
-              fontSize: `${settings.fontSize}px`,
-            }}
-            className="h-full overflow-auto"
-            basicSetup={{
-              lineNumbers: settings.lineNumbers,
-              foldGutter: false,
-              dropCursor: false,
-              allowMultipleSelections: false,
-              indentOnInput: false,
-              tabSize: settings.tabSize,
-              highlightActiveLine: settings.highlightActiveLine,
-              bracketMatching: settings.matchBrackets,
-            }}
-            indentWithTab={settings.indentWithTabs}
-          />
+          <monaco.editor.create(editorRef.current, {
+            value: codeValue,
+            language: lang,
+            theme: settings.editorTheme,
+            fontSize: settings.fontSize,
+            lineNumbers: settings.lineNumbers ? 'on' : 'off',
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            tabSize: settings.tabSize,
+            insertSpaces: !settings.indentWithTabs,
+            wordWrap: 'on',
+            wrappingStrategy: 'advanced',
+            scrollbar: {
+              vertical: 'visible',
+              horizontal: 'visible',
+              verticalScrollbarSize: 2,
+              horizontalScrollbarSize: 2,
+            },
+          });
         </div>
       </div>
     );
@@ -176,7 +172,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   const renderPanelMode = () => (
     <PanelGroup direction={settings.layout === 'stacked' ? 'horizontal' : 'vertical'}>
       <Panel minSize={5} defaultSize={33}>
-        {renderEditor('html', htmlCode, setHtmlCode)}
+        {settings.layout === 'horizontal' ? renderEditor('html', htmlCode, setHtmlCode) : renderEditor('javascript', jsCode, setJsCode)}
       </Panel>
       <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
@@ -184,7 +180,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       </Panel>
       <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
-        {renderEditor('javascript', jsCode, setJsCode)}
+        {settings.layout === 'horizontal' ? renderEditor('javascript', jsCode, setJsCode) : renderEditor('html', htmlCode, setHtmlCode)}
       </Panel>
     </PanelGroup>
   );
