@@ -9,7 +9,7 @@ import { solarizedDark } from '@uiw/codemirror-theme-solarized';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { autocompletion } from '@codemirror/autocomplete';
+import { autocompletion, CompletionContext, CompletionResult } from '@codemirror/autocomplete';
 import { EditorView } from '@codemirror/view';
 import { Palette, Code, Wrench } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     const handleResize = () => {
       if (editorRef.current) {
         const { scrollTop, scrollHeight, clientHeight } = editorRef.current;
-        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px threshold
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
         editorRef.current.style.overflowX = isAtBottom ? 'auto' : 'hidden';
       }
     };
@@ -52,6 +52,29 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     setShowHtmlStructureIcon(isMobile && activeTab === 'html' && !htmlCode.trim());
   }, [isMobile, activeTab, htmlCode]);
 
+  const myCompletions = (context: CompletionContext): CompletionResult | null => {
+    let word = context.matchBefore(/\w+/);
+    if (word && word.from != null && word.to != null && (word.from !== word.to || context.explicit)) {
+      return {
+        from: word.from,
+        options: [
+          { label: "function", type: "keyword" },
+          { label: "class", type: "keyword" },
+          { label: "if", type: "keyword" },
+          { label: "else", type: "keyword" },
+          { label: "for", type: "keyword" },
+          { label: "while", type: "keyword" },
+          { label: "return", type: "keyword" },
+          { label: "const", type: "keyword" },
+          { label: "let", type: "keyword" },
+          { label: "var", type: "keyword" },
+          // Add more completions as needed
+        ]
+      };
+    }
+    return null;
+  };
+
   const renderEditor = (lang, codeValue, setCodeValue) => {
     const languageExtension = getLanguageExtension(lang);
     const extensions = [
@@ -68,35 +91,8 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         "&::-webkit-scrollbar-track": { background: "transparent" },
         "&::-webkit-scrollbar-thumb": { background: "rgba(255, 255, 255, 0.1)", borderRadius: "1px" },
       }),
+      autocompletion({ override: [myCompletions] })
     ];
-
-    if (settings.enableAutocompletion) {
-      extensions.push(autocompletion({
-        override: [
-          (context) => {
-            let word = context.matchBefore(/\w+/);
-            if (word && word.from != null && word.to != null && (word.from !== word.to || context.explicit)) {
-              return {
-                from: word.from,
-                options: [
-                  { label: "function", type: "keyword" },
-                  { label: "class", type: "keyword" },
-                  { label: "if", type: "keyword" },
-                  { label: "else", type: "keyword" },
-                  { label: "for", type: "keyword" },
-                  { label: "while", type: "keyword" },
-                  { label: "return", type: "keyword" },
-                  { label: "const", type: "keyword" },
-                  { label: "let", type: "keyword" },
-                  { label: "var", type: "keyword" },
-                ]
-              };
-            }
-            return null;
-          }
-        ]
-      }));
-    }
 
     return (
       <div className="h-full flex flex-col">
