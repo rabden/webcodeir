@@ -1,16 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as monaco from 'monaco-editor';
-import { dracula } from '@uiw/codemirror-theme-dracula';
-import { vscodeDark } from '@uiw/codemirror-theme-vscode';
-import { solarizedDark } from '@uiw/codemirror-theme-solarized';
-import { githubDark } from '@uiw/codemirror-theme-github';
-import { monokai } from '@uiw/codemirror-theme-monokai';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Palette, Code, Wrench } from 'lucide-react';
+import { Code } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
-  const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
   const editorRefs = useRef({
     html: null,
     css: null,
@@ -20,41 +14,35 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
 
   useEffect(() => {
-    const initEditor = (language) => {
-      if (editorRefs.current[language] && !editors[language]) {
-        const editor = monaco.editor.create(editorRefs.current[language], {
-          value: language === 'html' ? htmlCode : language === 'css' ? cssCode : jsCode,
-          language,
-          theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
-          fontSize: settings.fontSize,
-          minimap: { enabled: settings.minimap },
-          lineNumbers: settings.lineNumbers ? 'on' : 'off',
-          tabSize: settings.tabSize,
-          insertSpaces: !settings.indentWithTabs,
-          cursorStyle: settings.cursorStyle,
-          scrollBeyondLastLine: false,
-          automaticLayout: true,
-        });
+    // Initialize Monaco editor
+    monaco.editor.onDidCreateEditor((editor) => {
+      editor.updateOptions({
+        fontSize: settings.fontSize,
+        minimap: { enabled: settings.minimap },
+        lineNumbers: settings.lineNumbers ? 'on' : 'off',
+        tabSize: settings.tabSize,
+        insertSpaces: !settings.indentWithTabs,
+        cursorStyle: settings.cursorStyle,
+        scrollBeyondLastLine: false,
+        automaticLayout: true,
+      });
+    });
 
-        editor.onDidChangeModelContent(() => {
-          const value = editor.getValue();
-          if (language === 'html') setHtmlCode(value);
-          else if (language === 'css') setCssCode(value);
-          else if (language === 'js') setJsCode(value);
-        });
-
-        setEditors(prev => ({ ...prev, [language]: editor }));
-      }
-    };
-
-    initEditor('html');
-    initEditor('css');
-    initEditor('js');
+    // Load Monaco editor languages
+    Promise.all([
+      import('monaco-editor/esm/vs/language/html/monaco.contribution'),
+      import('monaco-editor/esm/vs/language/css/monaco.contribution'),
+      import('monaco-editor/esm/vs/language/typescript/monaco.contribution')
+    ]).then(() => {
+      initEditor('html');
+      initEditor('css');
+      initEditor('js');
+    });
 
     return () => {
       Object.values(editors).forEach(editor => editor?.dispose());
     };
-  }, [htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings]);
+  }, []);
 
   useEffect(() => {
     setShowHtmlStructureIcon(isMobile && activeTab === 'html' && !htmlCode.trim());
@@ -70,11 +58,30 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           tabSize: settings.tabSize,
           insertSpaces: !settings.indentWithTabs,
           cursorStyle: settings.cursorStyle,
-          theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
         });
       }
     });
   }, [settings, editors]);
+
+  const initEditor = (language) => {
+    if (editorRefs.current[language] && !editors[language]) {
+      const editor = monaco.editor.create(editorRefs.current[language], {
+        value: language === 'html' ? htmlCode : language === 'css' ? cssCode : jsCode,
+        language: language === 'js' ? 'javascript' : language,
+        theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
+        automaticLayout: true,
+      });
+
+      editor.onDidChangeModelContent(() => {
+        const value = editor.getValue();
+        if (language === 'html') setHtmlCode(value);
+        else if (language === 'css') setCssCode(value);
+        else if (language === 'js') setJsCode(value);
+      });
+
+      setEditors(prev => ({ ...prev, [language]: editor }));
+    }
+  };
 
   const renderEditor = (lang) => (
     <div className="h-full flex flex-col">
@@ -143,7 +150,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       </Panel>
       <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
-        {renderEditor('javascript')}
+        {renderEditor('js')}
       </Panel>
     </PanelGroup>
   );
