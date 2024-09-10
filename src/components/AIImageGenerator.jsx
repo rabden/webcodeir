@@ -3,10 +3,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Wand2, X } from 'lucide-react';
+import { Wand2, X, Save, Image } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 import AIImageGeneratorSettings from './AIImageGeneratorSettings';
 import AIImageGeneratorResult from './AIImageGeneratorResult';
+import ImageCollection from './ImageCollection';
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -39,6 +40,7 @@ const AIImageGenerator = ({ onClose }) => {
     },
     isFluxSettingsOpen: false
   });
+  const [isCollectionOpen, setIsCollectionOpen] = useState(false);
   const { toast } = useToast();
 
   const generateImage = async (model) => {
@@ -122,13 +124,22 @@ const AIImageGenerator = ({ onClose }) => {
     </div>
   );
 
+  const toggleCollection = () => {
+    setIsCollectionOpen(!isCollectionOpen);
+  };
+
   return (
     <div className="fixed inset-0 bg-gray-800 z-50 flex flex-col md:inset-y-4 md:right-4 md:left-auto md:w-96 md:rounded-lg overflow-hidden">
       <div className="p-4 border-b border-gray-700 flex justify-between items-center">
         <h2 className="text-xl font-bold text-white">AI Image Generator</h2>
-        <Button variant="ghost" size="icon" onClick={onClose}>
-          <X className="h-4 w-4" />
-        </Button>
+        <div className="flex space-x-2">
+          <Button variant="ghost" size="icon" onClick={toggleCollection}>
+            <Image className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
       <ScrollArea className="flex-grow">
         <div className="p-4 space-y-4">
@@ -152,7 +163,19 @@ const AIImageGenerator = ({ onClose }) => {
                     />
                   )}
                   <div className="mt-4">
-                    <AIImageGeneratorResult results={state.results[model]} toast={toast} />
+                    <AIImageGeneratorResult 
+                      results={state.results[model]} 
+                      toast={toast} 
+                      onSave={(image) => {
+                        const savedImages = JSON.parse(localStorage.getItem('savedImages') || '[]');
+                        savedImages.push(image);
+                        localStorage.setItem('savedImages', JSON.stringify(savedImages));
+                        toast({
+                          title: "Image Saved",
+                          description: "The image has been added to your collection.",
+                        });
+                      }}
+                    />
                   </div>
                 </div>
               </TabsContent>
@@ -160,6 +183,7 @@ const AIImageGenerator = ({ onClose }) => {
           </Tabs>
         </div>
       </ScrollArea>
+      {isCollectionOpen && <ImageCollection onClose={toggleCollection} />}
     </div>
   );
 };
