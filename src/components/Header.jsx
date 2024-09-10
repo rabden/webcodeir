@@ -49,7 +49,7 @@ const Header = ({
           variant="ghost"
           size="icon"
           onClick={onClick}
-          className="text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-200"
+          className="text-white hover:bg-gray-700"
         >
           {icon}
         </Button>
@@ -61,26 +61,26 @@ const Header = ({
   );
 
   return (
-    <header className="bg-gray-900 p-2 flex justify-between items-center border-b border-gray-800">
+    <header className="bg-gray-800 p-2 flex justify-between items-center">
       <div className="flex items-center space-x-2">
         {isMobile && (
           <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(true)}>
-            <Menu className="h-6 w-6 text-gray-300" />
+            <Menu className="h-6 w-6" />
           </Button>
         )}
         <input
           type="text"
           value={currentCodeName}
           onChange={(e) => setCurrentCodeName(e.target.value)}
-          className="text-lg font-semibold bg-transparent border-none focus:outline-none text-gray-300 max-w-[150px] sm:max-w-none"
+          className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white max-w-[150px] sm:max-w-none"
         />
       </div>
       {isMobile && (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-grow mx-2">
-          <TabsList className="bg-gray-800">
-            <TabsTrigger value="html" className="text-xs text-gray-300 data-[state=active]:bg-gray-700 data-[state=active]:text-white">HTML</TabsTrigger>
-            <TabsTrigger value="css" className="text-xs text-gray-300 data-[state=active]:bg-gray-700 data-[state=active]:text-white">CSS</TabsTrigger>
-            <TabsTrigger value="js" className="text-xs text-gray-300 data-[state=active]:bg-gray-700 data-[state=active]:text-white">JS</TabsTrigger>
+          <TabsList className="bg-gray-700">
+            <TabsTrigger value="html" className="text-xs">HTML</TabsTrigger>
+            <TabsTrigger value="css" className="text-xs">CSS</TabsTrigger>
+            <TabsTrigger value="js" className="text-xs">JS</TabsTrigger>
           </TabsList>
         </Tabs>
       )}
@@ -90,28 +90,28 @@ const Header = ({
             {renderButton(<Save className="w-5 h-5" />, saveCurrentCode, "Save current code (Ctrl + S)")}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-gray-300 hover:text-white hover:bg-gray-700">
+                <Button variant="ghost" size="icon" className="text-white hover:bg-gray-700">
                   <Library className="w-5 h-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-gray-800 text-gray-300 border-gray-700">
-                <DropdownMenuItem onSelect={() => setShowSavedCodes(true)} className="hover:bg-gray-700">
+              <DropdownMenuContent className="bg-gray-700 text-white">
+                <DropdownMenuItem onSelect={() => setShowSavedCodes(true)}>
                   <BookOpen className="w-4 h-4 mr-2" />
                   <span>Saved Codes</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowFontPanel(true)} className="hover:bg-gray-700">
+                <DropdownMenuItem onSelect={() => setShowFontPanel(true)}>
                   <Type className="w-4 h-4 mr-2" />
                   <span>Font Library</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowIconPanel(true)} className="hover:bg-gray-700">
+                <DropdownMenuItem onSelect={() => setShowIconPanel(true)}>
                   <Image className="w-4 h-4 mr-2" />
                   <span>Icon Library</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowPexelsPanel(true)} className="hover:bg-gray-700">
+                <DropdownMenuItem onSelect={() => setShowPexelsPanel(true)}>
                   <Image className="w-4 h-4 mr-2" />
                   <span>Pexels Images</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={toggleSnippetLibrary} className="hover:bg-gray-700">
+                <DropdownMenuItem onSelect={toggleSnippetLibrary}>
                   <Code className="w-4 h-4 mr-2" />
                   <span>{showSnippetLibrary ? 'Hide' : 'Show'} Snippet Library</span>
                 </DropdownMenuItem>
@@ -119,28 +119,28 @@ const Header = ({
             </DropdownMenu>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-gray-300 hover:text-white hover:bg-gray-700">
+                <Button variant="ghost" size="icon" className="text-white hover:bg-gray-700">
                   <Wrench className="w-5 h-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-gray-800 text-gray-300 border-gray-700">
-                <DropdownMenuItem onSelect={toggleConsole} className="hover:bg-gray-700">
+              <DropdownMenuContent className="bg-gray-700 text-white">
+                <DropdownMenuItem onSelect={toggleConsole}>
                   <Terminal className="w-4 h-4 mr-2" />
                   <span>{showConsole ? 'Hide' : 'Show'} Console</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => { setShowCodeToolsPanel(true); setCodeToolsInitialTab('html'); }} className="hover:bg-gray-700">
+                <DropdownMenuItem onSelect={() => { setShowCodeToolsPanel(true); setCodeToolsInitialTab('html'); }}>
                   <Code className="w-4 h-4 mr-2" />
                   <span>HTML Tools</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => { setShowCodeToolsPanel(true); setCodeToolsInitialTab('css'); }} className="hover:bg-gray-700">
+                <DropdownMenuItem onSelect={() => { setShowCodeToolsPanel(true); setCodeToolsInitialTab('css'); }}>
                   <Palette className="w-4 h-4 mr-2" />
                   <span>CSS Tools</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => { setShowCodeToolsPanel(true); setCodeToolsInitialTab('js'); }} className="hover:bg-gray-700">
+                <DropdownMenuItem onSelect={() => { setShowCodeToolsPanel(true); setCodeToolsInitialTab('js'); }}>
                   <Code className="w-4 h-4 mr-2" />
                   <span>JS Tools</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowAIImageGeneratorPanel(true)} className="hover:bg-gray-700">
+                <DropdownMenuItem onSelect={() => setShowAIImageGeneratorPanel(true)}>
                   <Image className="w-4 h-4 mr-2" />
                   <span>AI Image Generator</span>
                 </DropdownMenuItem>

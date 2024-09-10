@@ -28,43 +28,9 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         wrappingIndent: 'indent',
         lineNumbersMinChars: 3,
         overviewRulerLanes: 0,
-        cursorBlinking: 'smooth',
-        cursorSmoothCaretAnimation: true,
-        smoothScrolling: true,
-        contextmenu: false,
       });
 
-      monaco.editor.defineTheme('customDarkTheme', {
-        base: 'vs-dark',
-        inherit: true,
-        rules: [
-          { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
-          { token: 'keyword', foreground: 'C586C0' },
-          { token: 'string', foreground: 'CE9178' },
-          { token: 'number', foreground: 'B5CEA8' },
-          { token: 'regexp', foreground: 'D16969' },
-          { token: 'type', foreground: '4EC9B0' },
-          { token: 'class', foreground: '4EC9B0' },
-          { token: 'function', foreground: 'DCDCAA' },
-          { token: 'variable', foreground: '9CDCFE' },
-          { token: 'constant', foreground: '4FC1FF' },
-          { token: 'parameter', foreground: '9CDCFE' },
-          { token: 'tag', foreground: '569CD6' },
-          { token: 'attribute', foreground: '9CDCFE' },
-          { token: 'meta', foreground: 'D4D4D4' },
-        ],
-        colors: {
-          'editor.background': '#1E1E1E',
-          'editor.foreground': '#D4D4D4',
-          'editorCursor.foreground': '#AEAFAD',
-          'editor.lineHighlightBackground': '#2F3137',
-          'editorLineNumber.foreground': '#858585',
-          'editor.selectionBackground': '#264F78',
-          'editor.inactiveSelectionBackground': '#3A3D41',
-        }
-      });
-
-      monaco.editor.setTheme('customDarkTheme');
+      monaco.editor.setTheme('vs-dark');
     }
   }, [settings, isEditorReady]);
 
@@ -72,6 +38,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     editorRef.current = editor;
     setIsEditorReady(true);
 
+    // Add custom CSS to reduce line number column width and ensure editor popups are on top
     const styleElement = document.createElement('style');
     styleElement.textContent = `
       .monaco-editor .margin-view-overlays .line-numbers {
@@ -111,12 +78,12 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
 
   const renderEditor = (lang, codeValue, setCodeValue) => {
     return (
-      <div className="h-full flex flex-col editor-container bg-gray-900">
+      <div className="h-full flex flex-col editor-container">
         {!isMobile && (
-          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 editor-header border-b border-gray-700">
+          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 editor-header">
             <div className="flex items-center">
-              <div className={`w-3 h-3 rounded-full mr-2 ${lang === 'html' ? 'bg-red-500' : lang === 'css' ? 'bg-blue-500' : 'bg-yellow-500'}`}></div>
-              <span className="text-sm font-semibold text-gray-300">{lang.toUpperCase()}</span>
+              <div className={`w-4 h-4 rounded-full mr-2 ${lang === 'html' ? 'bg-[#ff5f56]' : lang === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
+              <span className="text-sm font-semibold text-white">{lang.toUpperCase()}</span>
             </div>
           </div>
         )}
@@ -125,7 +92,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-2 right-2 z-10 text-gray-400 hover:text-white hover:bg-gray-700"
+              className="absolute top-2 right-2 z-10"
               onClick={() => {
                 setCodeValue(`<!DOCTYPE html>
 <html lang="en">
@@ -160,15 +127,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               insertSpaces: !settings.indentWithTabs,
               wordWrap: 'on',
               wrappingIndent: 'indent',
-              theme: 'customDarkTheme',
+              theme: 'vs-dark',
               lineNumbersMinChars: 3,
               overviewRulerLanes: 0,
-              cursorBlinking: 'smooth',
-              cursorSmoothCaretAnimation: true,
-              smoothScrolling: true,
-              contextmenu: false,
             }}
-            loading={<div className="text-gray-400 text-center p-4">Loading editor...</div>}
+            loading={<div className="text-white text-center p-4">Loading editor...</div>}
           />
         </div>
       </div>
@@ -193,11 +156,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       <Panel minSize={5} defaultSize={33}>
         {renderEditor('html', htmlCode, setHtmlCode)}
       </Panel>
-      <PanelResizeHandle className={`${settings.layout === 'stacked' ? 'w-1' : 'h-1'} bg-gray-700 hover:bg-gray-600 transition-colors duration-200`} />
+      <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
         {renderEditor('css', cssCode, setCssCode)}
       </Panel>
-      <PanelResizeHandle className={`${settings.layout === 'stacked' ? 'w-1' : 'h-1'} bg-gray-700 hover:bg-gray-600 transition-colors duration-200`} />
+      <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
         {renderEditor('javascript', jsCode, setJsCode)}
       </Panel>
