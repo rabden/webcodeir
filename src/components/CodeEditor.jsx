@@ -1,40 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import Header from './Header';
 import EditorPanel from './EditorPanel';
 import PreviewPanel from './PreviewPanel';
 import MobileMenu from './MobileMenu';
-import Settings from './Settings';
-import SavedCodes from './SavedCodes';
-import FontPanel from './FontPanel';
-import IconPanel from './IconPanel';
-import CodeToolsPanel from './CodeToolsPanel';
 import MobilePreviewButton from './MobilePreviewButton';
-import KeyboardShortcutsPanel from './KeyboardShortcutsPanel';
-import PexelsImagePanel from './PexelsImagePanel';
-import ConsolePanel from './ConsolePanel';
-import CodeSnippetLibrary from './CodeSnippetLibrary';
-import AIImageGenerator from './AIImageGenerator';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+
+const Settings = lazy(() => import('./Settings'));
+const SavedCodes = lazy(() => import('./SavedCodes'));
+const FontPanel = lazy(() => import('./FontPanel'));
+const IconPanel = lazy(() => import('./IconPanel'));
+const CodeToolsPanel = lazy(() => import('./CodeToolsPanel'));
+const KeyboardShortcutsPanel = lazy(() => import('./KeyboardShortcutsPanel'));
+const PexelsImagePanel = lazy(() => import('./PexelsImagePanel'));
+const ConsolePanel = lazy(() => import('./ConsolePanel'));
+const CodeSnippetLibrary = lazy(() => import('./CodeSnippetLibrary'));
+const AIImageGenerator = lazy(() => import('./AIImageGenerator'));
 
 const CodeEditor = () => {
   const [state, setState] = useCodeEditorState();
   const { saveToLocalStorage, loadFromLocalStorage } = useLocalStorage(setState);
-  const [activeTab, setActiveTab] = useState('html');
-  const [showConsole, setShowConsole] = useState(false);
-  const [showSnippetLibrary, setShowSnippetLibrary] = useState(false);
-  const [showCodeToolsPanel, setShowCodeToolsPanel] = useState(false);
-  const [codeToolsInitialTab, setCodeToolsInitialTab] = useState('html');
+  const [activeTab, setActiveTab] = React.useState('html');
+  const [showConsole, setShowConsole] = React.useState(false);
+  const [showSnippetLibrary, setShowSnippetLibrary] = React.useState(false);
+  const [showCodeToolsPanel, setShowCodeToolsPanel] = React.useState(false);
+  const [codeToolsInitialTab, setCodeToolsInitialTab] = React.useState('html');
 
-  useEffect(() => {
+  React.useEffect(() => {
     loadFromLocalStorage();
     const handleResize = () => setState(s => ({ ...s, isMobile: window.innerWidth < 768 }));
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const debounce = setTimeout(() => {
       updatePreview();
       if (state.settings.autoSave) saveToLocalStorage(state);
@@ -122,7 +123,7 @@ const CodeEditor = () => {
             {state.settings.layout === 'horizontal' ? previewPanel : editorPanel}
           </Panel>
           <PanelResizeHandle className={state.settings.layout === 'stacked' ? 'h-2' : 'w-2'}>
-            <div className={`${state.settings.layout === 'stacked' ? 'h-0.5 w-full' : 'w-0.5 h-full'} bg-gray-300 group-hover:bg-gray-100 transition-colors duration-200`}></div>
+            <div className={`${state.settings.layout === 'stacked' ? 'h-0.5 w-full' : 'w-0.5 h-full'} bg-gray-600 group-hover:bg-gray-400 transition-colors duration-200`}></div>
           </PanelResizeHandle>
           <Panel minSize={0} defaultSize={50}>
             {state.settings.layout === 'horizontal' ? editorPanel : previewPanel}
@@ -133,7 +134,7 @@ const CodeEditor = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
+    <div className="h-screen flex flex-col bg-gray-900 text-gray-300">
       <Header
         currentCodeName={state.currentCodeName}
         setCurrentCodeName={(name) => setState(s => ({ ...s, currentCodeName: name }))}
@@ -161,16 +162,18 @@ const CodeEditor = () => {
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
       </div>
-      {state.showSettings && <Settings settings={state.settings} setSettings={(newSettings) => setState(s => ({ ...s, settings: newSettings }))} onClose={() => setState(s => ({ ...s, showSettings: false }))} isMobile={state.isMobile} />}
-      {state.showSavedCodes && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html, cssCode: code.css, jsCode: code.js, currentCodeName: code.name, showSavedCodes: false }))} isMobile={state.iMobile} />}
-      {state.showFontPanel && <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.iMobile} />}
-      {state.showIconPanel && <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} isMobile={state.iMobile} />}
-      {showCodeToolsPanel && <CodeToolsPanel onClose={() => setShowCodeToolsPanel(false)} initialTab={codeToolsInitialTab} />}
-      {state.showAIImageGeneratorPanel && <AIImageGenerator onClose={() => setState(s => ({ ...s, showAIImageGeneratorPanel: false }))} />}
-      {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
-      {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
-      {showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.isMobile} />}
-      {showSnippetLibrary && <CodeSnippetLibrary onClose={() => setShowSnippetLibrary(false)} isMobile={state.iMobile} />}
+      <Suspense fallback={<LoadingAnimation />}>
+        {state.showSettings && <Settings settings={state.settings} setSettings={(newSettings) => setState(s => ({ ...s, settings: newSettings }))} onClose={() => setState(s => ({ ...s, showSettings: false }))} isMobile={state.iMobile} />}
+        {state.showSavedCodes && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html, cssCode: code.css, jsCode: code.js, currentCodeName: code.name, showSavedCodes: false }))} isMobile={state.iMobile} />}
+        {state.showFontPanel && <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.iMobile} />}
+        {state.showIconPanel && <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} isMobile={state.iMobile} />}
+        {showCodeToolsPanel && <CodeToolsPanel onClose={() => setShowCodeToolsPanel(false)} initialTab={codeToolsInitialTab} />}
+        {state.showAIImageGeneratorPanel && <AIImageGenerator onClose={() => setState(s => ({ ...s, showAIImageGeneratorPanel: false }))} />}
+        {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
+        {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
+        {showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.iMobile} />}
+        {showSnippetLibrary && <CodeSnippetLibrary onClose={() => setShowSnippetLibrary(false)} isMobile={state.iMobile} />}
+      </Suspense>
       <MobileMenu
         isOpen={state.isMenuOpen}
         setIsOpen={(isOpen) => setState(s => ({ ...s, isMenuOpen: isOpen }))}
