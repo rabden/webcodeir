@@ -72,6 +72,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           value: language === 'html' ? htmlCode : language === 'css' ? cssCode : jsCode,
           language: language === 'js' ? 'javascript' : language,
           automaticLayout: true,
+          theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
         });
 
         updateEditorOptions(editor);
