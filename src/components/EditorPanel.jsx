@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import 'monaco-editor/esm/vs/language/html/monaco.contribution';
 import 'monaco-editor/esm/vs/language/css/monaco.contribution';
 import 'monaco-editor/esm/vs/language/typescript/monaco.contribution';
+import 'monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution';
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const editorRefs = useRef({
@@ -47,19 +48,21 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   }, [settings, editors]);
 
   const updateEditorOptions = (editor) => {
-    editor.updateOptions({
-      fontSize: settings.fontSize,
-      minimap: { enabled: settings.minimap },
-      lineNumbers: settings.lineNumbers ? 'on' : 'off',
-      tabSize: settings.tabSize,
-      insertSpaces: !settings.indentWithTabs,
-      cursorStyle: settings.cursorStyle,
-      scrollBeyondLastLine: false,
-      automaticLayout: true,
-      theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
-      highlightActiveIndentGuide: settings.highlightActiveLine,
-      matchBrackets: settings.matchBrackets ? 'always' : 'never',
-    });
+    if (editor) {
+      editor.updateOptions({
+        fontSize: settings.fontSize,
+        minimap: { enabled: settings.minimap },
+        lineNumbers: settings.lineNumbers ? 'on' : 'off',
+        tabSize: settings.tabSize,
+        insertSpaces: !settings.indentWithTabs,
+        cursorStyle: settings.cursorStyle,
+        scrollBeyondLastLine: false,
+        automaticLayout: true,
+        theme: settings.editorTheme === 'vscodeDark' ? 'vs-dark' : 'vs',
+        highlightActiveIndentGuide: settings.highlightActiveLine,
+        matchBrackets: settings.matchBrackets ? 'always' : 'never',
+      });
+    }
   };
 
   const initEditor = (language) => {
