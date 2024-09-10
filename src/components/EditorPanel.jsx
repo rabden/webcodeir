@@ -49,7 +49,15 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         z-index: 50 !important;
       }
       .monaco-editor .suggest-widget {
-        z-index: 51 !important;
+        z-index: 100 !important;
+      }
+      .editor-container {
+        position: relative;
+        z-index: 1;
+      }
+      .editor-header {
+        position: relative;
+        z-index: 2;
       }
     `;
     document.head.appendChild(styleElement);
@@ -66,9 +74,9 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
 
   const renderEditor = (lang, codeValue, setCodeValue) => {
     return (
-      <div className="h-full flex flex-col">
+      <div className="h-full flex flex-col editor-container">
         {!isMobile && (
-          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 z-10">
+          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 editor-header">
             <div className="flex items-center">
               <div className={`w-4 h-4 rounded-full mr-2 ${lang === 'html' ? 'bg-[#ff5f56]' : lang === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
               <span className="text-sm font-semibold text-white">{lang.toUpperCase()}</span>
