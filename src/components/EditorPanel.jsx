@@ -1,103 +1,164 @@
 import React, { useRef, useEffect, useState } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
-import { html } from '@codemirror/lang-html';
-import { css } from '@codemirror/lang-css';
-import { javascript } from '@codemirror/lang-javascript';
-import { dracula } from '@uiw/codemirror-theme-dracula';
-import { vscodeDark } from '@uiw/codemirror-theme-vscode';
-import { solarizedDark } from '@uiw/codemirror-theme-solarized';
-import { githubDark } from '@uiw/codemirror-theme-github';
-import { monokai } from '@uiw/codemirror-theme-monokai';
+import * as monaco from 'monaco-editor';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { autocompletion } from '@codemirror/autocomplete';
-import { EditorView } from '@codemirror/view';
-import { Palette, Code, Wrench } from 'lucide-react';
+import { Code } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
-  const themes = { dracula, vscodeDark, solarizedDark, githubDark, monokai };
   const editorRef = useRef(null);
+  const [editors, setEditors] = useState({});
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
 
-  const getLanguageExtension = (lang) => {
-    switch (lang) {
-      case 'html': return html();
-      case 'css': return css();
-      case 'javascript': return javascript();
-      default: return null;
-    }
-  };
-
   useEffect(() => {
-    const handleResize = () => {
-      if (editorRef.current) {
-        const { scrollTop, scrollHeight, clientHeight } = editorRef.current;
-        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px threshold
-        editorRef.current.style.overflowX = isAtBottom ? 'auto' : 'hidden';
-      }
-    };
+    if (!editorRef.current) return;
 
-    if (editorRef.current) {
-      editorRef.current.addEventListener('scroll', handleResize);
-    }
+    const htmlEditor = monaco.editor.create(editorRef.current, {
+      value: htmlCode,
+      language: 'html',
+      theme: settings.editorTheme,
+      fontSize: settings.fontSize,
+      minimap: { enabled: settings.minimap },
+      lineNumbers: settings.lineNumbers ? 'on' : 'off',
+      tabSize: settings.tabSize,
+      insertSpaces: !settings.indentWithTabs,
+      wordWrap: 'on',
+      automaticLayout: true,
+    });
+
+    const cssEditor = monaco.editor.create(editorRef.current, {
+      value: cssCode,
+      language: 'css',
+      theme: settings.editorTheme,
+      fontSize: settings.fontSize,
+      minimap: { enabled: settings.minimap },
+      lineNumbers: settings.lineNumbers ? 'on' : 'off',
+      tabSize: settings.tabSize,
+      insertSpaces: !settings.indentWithTabs,
+      wordWrap: 'on',
+      automaticLayout: true,
+    });
+
+    const jsEditor = monaco.editor.create(editorRef.current, {
+      value: jsCode,
+      language: 'javascript',
+      theme: settings.editorTheme,
+      fontSize: settings.fontSize,
+      minimap: { enabled: settings.minimap },
+      lineNumbers: settings.lineNumbers ? 'on' : 'off',
+      tabSize: settings.tabSize,
+      insertSpaces: !settings.indentWithTabs,
+      wordWrap: 'on',
+      automaticLayout: true,
+    });
+
+    setEditors({ html: htmlEditor, css: cssEditor, js: jsEditor });
 
     return () => {
-      if (editorRef.current) {
-        editorRef.current.removeEventListener('scroll', handleResize);
-      }
+      htmlEditor.dispose();
+      cssEditor.dispose();
+      jsEditor.dispose();
     };
   }, []);
+
+  useEffect(() => {
+    if (!editors.html || !editors.css || !editors.js) return;
+
+    editors.html.onDidChangeModelContent(() => {
+      setHtmlCode(editors.html.getValue());
+    });
+
+    editors.css.onDidChangeModelContent(() => {
+      setCssCode(editors.css.getValue());
+    });
+
+    editors.js.onDidChangeModelContent(() => {
+      setJsCode(editors.js.getValue());
+    });
+  }, [editors, setHtmlCode, setCssCode, setJsCode]);
 
   useEffect(() => {
     setShowHtmlStructureIcon(isMobile && activeTab === 'html' && !htmlCode.trim());
   }, [isMobile, activeTab, htmlCode]);
 
-  const renderEditor = (lang, codeValue, setCodeValue) => {
-    const languageExtension = getLanguageExtension(lang);
-    const extensions = [
-      languageExtension,
-      EditorView.theme({
-        "&": { height: "100%", overflow: "auto" },
-        ".cm-scroller": { overflow: "auto" },
-        ".cm-content": { 
-          whiteSpace: isMobile ? "pre !important" : "pre-wrap !important",
-          wordBreak: isMobile ? "normal" : "break-word",
-          paddingBottom: "50vh"
-        },
-        "&::-webkit-scrollbar": { width: "2px", height: "2px" },
-        "&::-webkit-scrollbar-track": { background: "transparent" },
-        "&::-webkit-scrollbar-thumb": { background: "rgba(255, 255, 255, 0.1)", borderRadius: "1px" },
-      }),
-    ];
+  useEffect(() => {
+    if (!editors.html || !editors.css || !editors.js) return;
 
-    if (settings.enableAutocompletion) {
-      extensions.push(autocompletion({
-        override: [
-          (context) => {
-            let word = context.matchBefore(/\w+/);
-            if (word && word.from != null && word.to != null && (word.from !== word.to || context.explicit)) {
-              return {
-                from: word.from,
-                options: [
-                  { label: "function", type: "keyword" },
-                  { label: "class", type: "keyword" },
-                  { label: "if", type: "keyword" },
-                  { label: "else", type: "keyword" },
-                  { label: "for", type: "keyword" },
-                  { label: "while", type: "keyword" },
-                  { label: "return", type: "keyword" },
-                  { label: "const", type: "keyword" },
-                  { label: "let", type: "keyword" },
-                  { label: "var", type: "keyword" },
-                ]
-              };
-            }
-            return null;
+    Object.values(editors).forEach(editor => {
+      editor.updateOptions({
+        theme: settings.editorTheme,
+        fontSize: settings.fontSize,
+        minimap: { enabled: settings.minimap },
+        lineNumbers: settings.lineNumbers ? 'on' : 'off',
+        tabSize: settings.tabSize,
+        insertSpaces: !settings.indentWithTabs,
+      });
+    });
+  }, [editors, settings]);
+
+  const setupAutoCompletion = (editor, language) => {
+    const provideCompletionItems = (model, position) => {
+      const textUntilPosition = model.getValueInRange({
+        startLineNumber: 1,
+        startColumn: 1,
+        endLineNumber: position.lineNumber,
+        endColumn: position.column,
+      });
+
+      const suggestions = [];
+
+      if (language === 'html') {
+        const htmlTags = ['div', 'span', 'p', 'a', 'img', 'ul', 'li', 'h1', 'h2', 'h3'];
+        htmlTags.forEach(tag => {
+          if (tag.startsWith(textUntilPosition.split('<').pop())) {
+            suggestions.push({
+              label: tag,
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertText: `${tag}></${tag}>`,
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            });
           }
-        ]
-      }));
-    }
+        });
+      } else if (language === 'css') {
+        const cssProperties = ['color', 'background-color', 'font-size', 'margin', 'padding'];
+        cssProperties.forEach(prop => {
+          if (prop.startsWith(textUntilPosition.split(':').pop().trim())) {
+            suggestions.push({
+              label: prop,
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: `${prop}: `,
+            });
+          }
+        });
+      } else if (language === 'javascript') {
+        const jsFunctions = ['function', 'console.log', 'document.getElementById', 'addEventListener'];
+        jsFunctions.forEach(func => {
+          if (func.startsWith(textUntilPosition.split(' ').pop())) {
+            suggestions.push({
+              label: func,
+              kind: monaco.languages.CompletionItemKind.Function,
+              insertText: func,
+            });
+          }
+        });
+      }
 
+      return { suggestions };
+    };
+
+    monaco.languages.registerCompletionItemProvider(language, {
+      provideCompletionItems,
+    });
+  };
+
+  useEffect(() => {
+    if (!editors.html || !editors.css || !editors.js) return;
+
+    setupAutoCompletion(editors.html, 'html');
+    setupAutoCompletion(editors.css, 'css');
+    setupAutoCompletion(editors.js, 'javascript');
+  }, [editors]);
+
+  const renderEditor = (lang) => {
     return (
       <div className="h-full flex flex-col">
         {!isMobile && (
@@ -115,7 +176,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               size="icon"
               className="absolute top-2 right-2 z-10"
               onClick={() => {
-                setCodeValue(`<!DOCTYPE html>
+                const htmlStructure = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -125,36 +186,14 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
 <body>
     
 </body>
-</html>`);
+</html>`;
+                editors.html.setValue(htmlStructure);
                 setShowHtmlStructureIcon(false);
               }}
             >
               <Code className="h-4 w-4" />
             </Button>
           )}
-          <CodeMirror
-            value={codeValue}
-            height="100%"
-            theme={themes[settings.editorTheme]}
-            extensions={extensions}
-            onChange={(value) => setCodeValue(value)}
-            style={{
-              height: '100%',
-              fontSize: `${settings.fontSize}px`,
-            }}
-            className="h-full overflow-auto"
-            basicSetup={{
-              lineNumbers: settings.lineNumbers,
-              foldGutter: false,
-              dropCursor: false,
-              allowMultipleSelections: false,
-              indentOnInput: false,
-              tabSize: settings.tabSize,
-              highlightActiveLine: settings.highlightActiveLine,
-              bracketMatching: settings.matchBrackets,
-            }}
-            indentWithTab={settings.indentWithTabs}
-          />
         </div>
       </div>
     );
@@ -163,11 +202,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   const renderMobileEditor = () => {
     switch (activeTab) {
       case 'html':
-        return renderEditor('html', htmlCode, setHtmlCode);
+        return renderEditor('html');
       case 'css':
-        return renderEditor('css', cssCode, setCssCode);
+        return renderEditor('css');
       case 'js':
-        return renderEditor('javascript', jsCode, setJsCode);
+        return renderEditor('javascript');
       default:
         return null;
     }
@@ -176,15 +215,15 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   const renderPanelMode = () => (
     <PanelGroup direction={settings.layout === 'stacked' ? 'horizontal' : 'vertical'}>
       <Panel minSize={5} defaultSize={33}>
-        {renderEditor('html', htmlCode, setHtmlCode)}
+        {renderEditor('html')}
       </Panel>
       <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
-        {renderEditor('css', cssCode, setCssCode)}
+        {renderEditor('css')}
       </Panel>
       <PanelResizeHandle className={settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
       <Panel minSize={5} defaultSize={33}>
-        {renderEditor('javascript', jsCode, setJsCode)}
+        {renderEditor('javascript')}
       </Panel>
     </PanelGroup>
   );
