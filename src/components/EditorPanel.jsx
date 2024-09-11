@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Editor from "@monaco-editor/react";
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Code, ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import EditorHeader from './EditorHeader';
 import { editorOptions } from '../utils/editorConfig';
@@ -169,7 +169,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-gray-800 hover:bg-gray-700"
+          className="absolute bottom-4 right-4 bg-gray-800 hover:bg-gray-700"
           onClick={() => setShowMinimap(!showMinimap)}
         >
           <ChevronLeft className={`h-4 w-4 transition-transform ${showMinimap ? 'rotate-180' : ''}`} />
