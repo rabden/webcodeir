@@ -8,16 +8,20 @@ import * as monaco from 'monaco-editor';
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const editorRef = useRef(null);
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
-  const [isEditorReady, setIsEditorReady] = useState(false);
 
   useEffect(() => {
     setShowHtmlStructureIcon(isMobile && activeTab === 'html' && !htmlCode.trim());
   }, [isMobile, activeTab, htmlCode]);
 
   useEffect(() => {
-    if (isEditorReady && editorRef.current) {
-      const editor = editorRef.current;
-      editor.updateOptions({
+    if (editorRef.current) {
+      updateEditorOptions();
+    }
+  }, [settings]);
+
+  const updateEditorOptions = () => {
+    if (editorRef.current && editorRef.current.getModel()) {
+      editorRef.current.updateOptions({
         fontSize: settings.fontSize,
         lineNumbers: settings.lineNumbers ? 'on' : 'off',
         tabSize: settings.tabSize,
@@ -29,14 +33,14 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         lineNumbersMinChars: 3,
         overviewRulerLanes: 0,
       });
-
-      monaco.editor.setTheme('vs-dark');
     }
-  }, [settings, isEditorReady]);
+  };
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
-    setIsEditorReady(true);
+    updateEditorOptions();
+
+    monaco.editor.setTheme('vs-dark');
 
     // Add custom CSS to reduce line number column width and ensure editor popups are on top
     const styleElement = document.createElement('style');
@@ -87,7 +91,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             </div>
           </div>
         )}
-        <div className="flex-grow overflow-hidden relative" ref={editorRef}>
+        <div className="flex-grow overflow-hidden relative">
           {showHtmlStructureIcon && lang === 'html' && (
             <Button
               variant="ghost"
