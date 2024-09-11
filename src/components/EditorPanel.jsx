@@ -28,8 +28,12 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         insertSpaces: !settings.indentWithTabs,
         minimap: { 
           enabled: true,
-          scale: 2,
-          showSlider: "mouseover"
+          side: 'right',
+          size: 'fit',
+          showSlider: 'always',
+          renderCharacters: false,
+          maxColumn: 120,
+          scale: 1
         },
         scrollBeyondLastLine: false,
         wordWrap: 'on',
@@ -70,6 +74,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
       }
       .monaco-editor .overflow-guard {
         overflow: visible !important;
+      }
+      .monaco-editor .minimap {
+        right: 0;
+        top: 0;
+        height: 100% !important;
       }
     `;
     document.head.appendChild(styleElement);
@@ -130,8 +139,12 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               scrollBeyondLastLine: false,
               minimap: { 
                 enabled: true,
-                scale: 2,
-                showSlider: "mouseover"
+                side: 'right',
+                size: 'fit',
+                showSlider: 'always',
+                renderCharacters: false,
+                maxColumn: 120,
+                scale: 1
               },
               fontSize: settings.fontSize,
               lineNumbers: settings.lineNumbers ? 'on' : 'off',
