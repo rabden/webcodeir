@@ -76,18 +76,21 @@
 }
 
 /* Custom scrollbar styles for code editor */
-.cm-scroller::-webkit-scrollbar {
-  width: 2px !important;
-  height: 2px !important;
+.monaco-editor .scrollbar {
+  width: 10px !important;
 }
 
-.cm-scroller::-webkit-scrollbar-track {
-  background: transparent !important;
+.monaco-editor .scrollbar.vertical {
+  right: 0 !important;
 }
 
-.cm-scroller::-webkit-scrollbar-thumb {
-  background-color: rgba(155, 155, 155, 0.5) !important;
-  border-radius: 1px !important;
+.monaco-editor .scrollbar .slider {
+  background: rgba(155, 155, 155, 0.5) !important;
+  border-radius: 5px !important;
+}
+
+.monaco-editor .scrollbar:hover .slider {
+  background: rgba(155, 155, 155, 0.7) !important;
 }
 
 /* Custom scrollbar styles for preview panel */

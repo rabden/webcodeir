@@ -34,6 +34,16 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           maxColumn: 120,
           scale: 1
         },
+        scrollbar: {
+          vertical: 'visible',
+          horizontal: 'visible',
+          useShadows: false,
+          verticalScrollbarSize: 10,
+          horizontalScrollbarSize: 10
+        },
+        padding: {
+          bottom: '70vh'
+        }
       });
     }
   };
@@ -74,6 +84,12 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         right: 0;
         top: 0;
         height: 100% !important;
+      }
+      .monaco-editor .scrollbar {
+        z-index: 11;
+      }
+      .monaco-editor .scrollbar.vertical {
+        right: 0;
       }
     `;
     document.head.appendChild(styleElement);
@@ -123,6 +139,16 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               maxColumn: 120,
               scale: 1
             },
+            scrollbar: {
+              vertical: 'visible',
+              horizontal: 'visible',
+              useShadows: false,
+              verticalScrollbarSize: 10,
+              horizontalScrollbarSize: 10
+            },
+            padding: {
+              bottom: '70vh'
+            }
           }}
           loading={<div className="text-white text-center p-4">Loading editor...</div>}
         />
