@@ -10,6 +10,18 @@ import { editorOptions } from '../utils/editorConfig';
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const editorRef = useRef(null);
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 768);
+      if (editorRef.current) {
+        updateEditorOptions();
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     setShowHtmlStructureIcon(isMobile && activeTab === 'html' && !htmlCode.trim());
@@ -19,12 +31,13 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     if (editorRef.current) {
       updateEditorOptions();
     }
-  }, [settings]);
+  }, [settings, isSmallScreen]);
 
   const updateEditorOptions = () => {
     if (editorRef.current && editorRef.current.getModel()) {
       editorRef.current.updateOptions({
         ...editorOptions(settings),
+        wordWrap: isSmallScreen || isMobile ? 'off' : 'on',
         minimap: { 
           enabled: true,
           side: 'right',
@@ -42,7 +55,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           horizontalScrollbarSize: 10
         },
         padding: {
-          bottom: '70vh'
+          bottom: '100vh'
         }
       });
     }
@@ -130,6 +143,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           onMount={handleEditorDidMount}
           options={{
             ...editorOptions(settings),
+            wordWrap: isSmallScreen || isMobile ? 'off' : 'on',
             minimap: { 
               enabled: true,
               side: 'right',
@@ -147,7 +161,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               horizontalScrollbarSize: 10
             },
             padding: {
-              bottom: '70vh'
+              bottom: '100vh'
             }
           }}
           loading={<div className="text-white text-center p-4">Loading editor...</div>}
