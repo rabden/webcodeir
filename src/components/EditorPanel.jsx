@@ -9,16 +9,20 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const editorRef = useRef(null);
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
-  const [isEditorReady, setIsEditorReady] = useState(false);
 
   useEffect(() => {
     setShowHtmlStructureIcon(isMobile && activeTab === 'html' && !htmlCode.trim());
   }, [isMobile, activeTab, htmlCode]);
 
   useEffect(() => {
-    if (isEditorReady && editorRef.current) {
-      const editor = editorRef.current;
-      editor.updateOptions({
+    if (editorRef.current) {
+      updateEditorOptions();
+    }
+  }, [settings]);
+
+  const updateEditorOptions = () => {
+    if (editorRef.current) {
+      editorRef.current.updateOptions({
         fontSize: settings.fontSize,
         lineNumbers: settings.lineNumbers ? 'on' : 'off',
         tabSize: settings.tabSize,
@@ -30,14 +34,13 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         lineNumbersMinChars: 3,
         overviewRulerLanes: 0,
       });
-
-      monaco.editor.setTheme('vs-dark');
     }
-  }, [settings, isEditorReady]);
+  };
 
-  const handleEditorDidMount = (editor, monaco) => {
+  const handleEditorDidMount = (editor, monacoInstance) => {
     editorRef.current = editor;
-    setIsEditorReady(true);
+    updateEditorOptions();
+    monacoInstance.editor.setTheme('vs-dark');
 
     const styleElement = document.createElement('style');
     styleElement.textContent = `
