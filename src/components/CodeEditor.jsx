@@ -7,6 +7,7 @@ import MobileMenu from './MobileMenu';
 import MobilePreviewButton from './MobilePreviewButton';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import LoadingAnimation from './LoadingAnimation';
 
 const Settings = lazy(() => import('./Settings'));
 const SavedCodes = lazy(() => import('./SavedCodes'));
