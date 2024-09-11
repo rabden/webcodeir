@@ -47,14 +47,18 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           scale: 1
         },
         scrollbar: {
-          vertical: 'visible',
-          horizontal: 'visible',
+          vertical: 'hidden',
+          horizontal: 'hidden',
           useShadows: false,
-          verticalScrollbarSize: 10,
-          horizontalScrollbarSize: 10
+          verticalScrollbarSize: 0,
+          horizontalScrollbarSize: 0
         },
+        overviewRulerLanes: 0,
+        hideCursorInOverviewRuler: true,
+        overviewRulerBorder: false,
         padding: {
-          bottom: '100vh'
+          top: 10,
+          bottom: '50vh'
         }
       });
     }
@@ -112,14 +116,18 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               scale: 1
             },
             scrollbar: {
-              vertical: 'visible',
-              horizontal: 'visible',
+              vertical: 'hidden',
+              horizontal: 'hidden',
               useShadows: false,
-              verticalScrollbarSize: 10,
-              horizontalScrollbarSize: 10
+              verticalScrollbarSize: 0,
+              horizontalScrollbarSize: 0
             },
+            overviewRulerLanes: 0,
+            hideCursorInOverviewRuler: true,
+            overviewRulerBorder: false,
             padding: {
-              bottom: '100vh'
+              top: 10,
+              bottom: '50vh'
             }
           }}
           loading={<div className="text-white text-center p-4">Loading editor...</div>}
