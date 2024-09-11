@@ -24,13 +24,14 @@ export const useCodeEditorState = () => {
       minimap: false,
       scrollSpeed: 5,
       enableAutocompletion: true,
-      tabMode: false, // Add this line
+      tabMode: false,
     },
     currentCodeName: 'Untitled',
     isMobile: window.innerWidth < 768,
     previewSize: 50,
     isMenuOpen: false,
     showMobilePreview: false,
+    activeTab: 'html',
   });
 
   return [state, setState];

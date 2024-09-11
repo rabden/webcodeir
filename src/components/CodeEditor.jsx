@@ -8,7 +8,6 @@ import MobilePreviewButton from './MobilePreviewButton';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import LoadingAnimation from './LoadingAnimation';
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Settings = lazy(() => import('./Settings'));
 const SavedCodes = lazy(() => import('./SavedCodes'));
@@ -24,7 +23,6 @@ const AIImageGenerator = lazy(() => import('./AIImageGenerator'));
 const CodeEditor = () => {
   const [state, setState] = useCodeEditorState();
   const { saveToLocalStorage, loadFromLocalStorage } = useLocalStorage(setState);
-  const [activeTab, setActiveTab] = React.useState('html');
   const [showConsole, setShowConsole] = React.useState(false);
   const [showSnippetLibrary, setShowSnippetLibrary] = React.useState(false);
   const [showCodeToolsPanel, setShowCodeToolsPanel] = React.useState(false);
@@ -82,66 +80,20 @@ const CodeEditor = () => {
     }));
   };
 
-  const renderTabMode = () => (
-    <div className="h-full flex flex-col">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="bg-gray-700 w-full justify-start">
-          <TabsTrigger value="html" className="text-sm">HTML</TabsTrigger>
-          <TabsTrigger value="css" className="text-sm">CSS</TabsTrigger>
-          <TabsTrigger value="js" className="text-sm">JS</TabsTrigger>
-        </TabsList>
-      </Tabs>
-      <div className="flex-grow overflow-hidden">
-        {activeTab === 'html' && (
-          <EditorPanel
-            code={state.htmlCode}
-            setCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
-            language="html"
-            settings={state.settings}
-          />
-        )}
-        {activeTab === 'css' && (
-          <EditorPanel
-            code={state.cssCode}
-            setCode={(code) => setState(s => ({ ...s, cssCode: code }))}
-            language="css"
-            settings={state.settings}
-          />
-        )}
-        {activeTab === 'js' && (
-          <EditorPanel
-            code={state.jsCode}
-            setCode={(code) => setState(s => ({ ...s, jsCode: code }))}
-            language="javascript"
-            settings={state.settings}
-          />
-        )}
-      </div>
-    </div>
-  );
-
   const renderLayout = () => {
-    const editorPanel = state.settings.tabMode && !state.isMobile ? renderTabMode() : (
-      <div className="relative h-full">
-        <EditorPanel
-          htmlCode={state.htmlCode}
-          cssCode={state.cssCode}
-          jsCode={state.jsCode}
-          setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
-          setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
-          setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
-          settings={state.settings}
-          isMobile={state.isMobile}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-        />
-        {state.isMobile && (
-          <MobilePreviewButton
-            onClick={() => setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }))}
-            isPreviewVisible={state.showMobilePreview}
-          />
-        )}
-      </div>
+    const editorPanel = (
+      <EditorPanel
+        htmlCode={state.htmlCode}
+        cssCode={state.cssCode}
+        jsCode={state.jsCode}
+        setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
+        setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
+        setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
+        settings={state.settings}
+        isMobile={state.isMobile}
+        activeTab={state.activeTab}
+        setActiveTab={(tab) => setState(s => ({ ...s, activeTab: tab }))}
+      />
     );
     const previewPanel = <PreviewPanel preview={state.preview} />;
 
@@ -189,8 +141,8 @@ const CodeEditor = () => {
         layout={state.settings.layout}
         setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true }))}
         setShowPexelsPanel={() => setState(s => ({ ...s, showPexelsPanel: true }))}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        activeTab={state.activeTab}
+        setActiveTab={(tab) => setState(s => ({ ...s, activeTab: tab }))}
         toggleConsole={() => setShowConsole(s => !s)}
         showConsole={showConsole}
         toggleSnippetLibrary={() => setShowSnippetLibrary(s => !s)}
