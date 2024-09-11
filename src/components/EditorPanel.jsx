@@ -4,25 +4,20 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Code } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import * as monaco from 'monaco-editor';
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const editorRef = useRef(null);
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
+  const [isEditorReady, setIsEditorReady] = useState(false);
 
   useEffect(() => {
     setShowHtmlStructureIcon(isMobile && activeTab === 'html' && !htmlCode.trim());
   }, [isMobile, activeTab, htmlCode]);
 
   useEffect(() => {
-    if (editorRef.current) {
-      updateEditorOptions();
-    }
-  }, [settings]);
-
-  const updateEditorOptions = () => {
-    if (editorRef.current) {
-      editorRef.current.updateOptions({
+    if (isEditorReady && editorRef.current) {
+      const editor = editorRef.current;
+      editor.updateOptions({
         fontSize: settings.fontSize,
         lineNumbers: settings.lineNumbers ? 'on' : 'off',
         tabSize: settings.tabSize,
@@ -34,14 +29,16 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         lineNumbersMinChars: 3,
         overviewRulerLanes: 0,
       });
+
+      monaco.editor.setTheme('vs-dark');
     }
-  };
+  }, [settings, isEditorReady]);
 
-  const handleEditorDidMount = (editor, monacoInstance) => {
+  const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
-    updateEditorOptions();
-    monacoInstance.editor.setTheme('vs-dark');
+    setIsEditorReady(true);
 
+    // Add custom CSS to reduce line number column width and ensure editor popups are on top
     const styleElement = document.createElement('style');
     styleElement.textContent = `
       .monaco-editor .margin-view-overlays .line-numbers {
@@ -82,6 +79,14 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   const renderEditor = (lang, codeValue, setCodeValue) => {
     return (
       <div className="h-full flex flex-col editor-container">
+        {!isMobile && (
+          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 editor-header">
+            <div className="flex items-center">
+              <div className={`w-4 h-4 rounded-full mr-2 ${lang === 'html' ? 'bg-[#ff5f56]' : lang === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
+              <span className="text-sm font-semibold text-white">{lang.toUpperCase()}</span>
+            </div>
+          </div>
+        )}
         <div className="flex-grow overflow-hidden relative" ref={editorRef}>
           {showHtmlStructureIcon && lang === 'html' && (
             <Button
@@ -133,22 +138,18 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     );
   };
 
-  const renderTabMode = () => (
-    <div className="h-full flex flex-col">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="bg-gray-700 w-full justify-start">
-          <TabsTrigger value="html" className="text-sm">HTML</TabsTrigger>
-          <TabsTrigger value="css" className="text-sm">CSS</TabsTrigger>
-          <TabsTrigger value="js" className="text-sm">JS</TabsTrigger>
-        </TabsList>
-      </Tabs>
-      <div className="flex-grow overflow-hidden">
-        {activeTab === 'html' && renderEditor('html', htmlCode, setHtmlCode)}
-        {activeTab === 'css' && renderEditor('css', cssCode, setCssCode)}
-        {activeTab === 'js' && renderEditor('javascript', jsCode, setJsCode)}
-      </div>
-    </div>
-  );
+  const renderMobileEditor = () => {
+    switch (activeTab) {
+      case 'html':
+        return renderEditor('html', htmlCode, setHtmlCode);
+      case 'css':
+        return renderEditor('css', cssCode, setCssCode);
+      case 'js':
+        return renderEditor('javascript', jsCode, setJsCode);
+      default:
+        return null;
+    }
+  };
 
   const renderPanelMode = () => (
     <PanelGroup direction={settings.layout === 'stacked' ? 'horizontal' : 'vertical'}>
@@ -168,7 +169,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
 
   return (
     <div className="w-full h-full bg-gray-900">
-      {isMobile || settings.tabMode ? renderTabMode() : renderPanelMode()}
+      {isMobile ? renderMobileEditor() : renderPanelMode()}
     </div>
   );
 };

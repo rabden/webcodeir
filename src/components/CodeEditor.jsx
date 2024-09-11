@@ -23,6 +23,7 @@ const AIImageGenerator = lazy(() => import('./AIImageGenerator'));
 const CodeEditor = () => {
   const [state, setState] = useCodeEditorState();
   const { saveToLocalStorage, loadFromLocalStorage } = useLocalStorage(setState);
+  const [activeTab, setActiveTab] = React.useState('html');
   const [showConsole, setShowConsole] = React.useState(false);
   const [showSnippetLibrary, setShowSnippetLibrary] = React.useState(false);
   const [showCodeToolsPanel, setShowCodeToolsPanel] = React.useState(false);
@@ -82,18 +83,26 @@ const CodeEditor = () => {
 
   const renderLayout = () => {
     const editorPanel = (
-      <EditorPanel
-        htmlCode={state.htmlCode}
-        cssCode={state.cssCode}
-        jsCode={state.jsCode}
-        setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
-        setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
-        setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
-        settings={state.settings}
-        isMobile={state.isMobile}
-        activeTab={state.activeTab}
-        setActiveTab={(tab) => setState(s => ({ ...s, activeTab: tab }))}
-      />
+      <div className="relative h-full">
+        <EditorPanel
+          htmlCode={state.htmlCode}
+          cssCode={state.cssCode}
+          jsCode={state.jsCode}
+          setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
+          setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
+          setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
+          settings={state.settings}
+          isMobile={state.isMobile}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+        {state.isMobile && (
+          <MobilePreviewButton
+            onClick={() => setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }))}
+            isPreviewVisible={state.showMobilePreview}
+          />
+        )}
+      </div>
     );
     const previewPanel = <PreviewPanel preview={state.preview} />;
 
@@ -141,8 +150,8 @@ const CodeEditor = () => {
         layout={state.settings.layout}
         setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true }))}
         setShowPexelsPanel={() => setState(s => ({ ...s, showPexelsPanel: true }))}
-        activeTab={state.activeTab}
-        setActiveTab={(tab) => setState(s => ({ ...s, activeTab: tab }))}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
         toggleConsole={() => setShowConsole(s => !s)}
         showConsole={showConsole}
         toggleSnippetLibrary={() => setShowSnippetLibrary(s => !s)}
