@@ -24,6 +24,7 @@ export const useCodeEditorState = () => {
       minimap: false,
       scrollSpeed: 5,
       enableAutocompletion: true,
+      tabMode: false, // Add this line
     },
     currentCodeName: 'Untitled',
     isMobile: window.innerWidth < 768,
