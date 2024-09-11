@@ -38,14 +38,23 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         ...editorOptions(settings),
         wordWrap: isSmallScreen || isMobile ? 'off' : 'on',
         minimap: { 
-          enabled: false
+          enabled: true,
+          side: 'right',
+          size: 'fit',
+          showSlider: 'always',
+          renderCharacters: false,
+          maxColumn: 120,
+          scale: 1
         },
         scrollbar: {
-          vertical: 'hidden',
-          horizontal: 'hidden'
+          vertical: 'visible',
+          horizontal: 'visible',
+          useShadows: false,
+          verticalScrollbarSize: 10,
+          horizontalScrollbarSize: 10
         },
         padding: {
-          bottom: '50vh'
+          bottom: '100vh'
         }
       });
     }
@@ -94,14 +103,23 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             ...editorOptions(settings),
             wordWrap: isSmallScreen || isMobile ? 'off' : 'on',
             minimap: { 
-              enabled: false
+              enabled: true,
+              side: 'right',
+              size: 'fit',
+              showSlider: 'always',
+              renderCharacters: false,
+              maxColumn: 120,
+              scale: 1
             },
             scrollbar: {
-              vertical: 'hidden',
-              horizontal: 'hidden'
+              vertical: 'visible',
+              horizontal: 'visible',
+              useShadows: false,
+              verticalScrollbarSize: 10,
+              horizontalScrollbarSize: 10
             },
             padding: {
-              bottom: '50vh'
+              bottom: '100vh'
             }
           }}
           loading={<div className="text-white text-center p-4">Loading editor...</div>}
