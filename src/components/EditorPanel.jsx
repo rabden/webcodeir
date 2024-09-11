@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Editor from "@monaco-editor/react";
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Code, Eye, EyeOff, Map } from 'lucide-react';
+import { Code } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import EditorHeader from './EditorHeader';
 import { editorOptions } from '../utils/editorConfig';
@@ -12,7 +12,6 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
   const [showMinimap, setShowMinimap] = useState(true);
-  const [showMobilePreview, setShowMobilePreview] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -46,7 +45,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           size: 'fit',
           showSlider: 'always',
           renderCharacters: false,
-          maxColumn: isMobile ? 100 : 120,
+          maxColumn: 120,
           scale: 1
         },
         scrollbar: {
@@ -121,7 +120,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               size: 'fit',
               showSlider: 'always',
               renderCharacters: false,
-              maxColumn: isMobile ? 100 : 120,
+              maxColumn: 120,
               scale: 1
             },
             scrollbar: {
@@ -173,26 +172,6 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   return (
     <div className="w-full h-full bg-gray-900">
       {isMobile ? renderMobileEditor() : renderPanelMode()}
-      {isMobile && (
-        <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end space-y-2">
-          <Button
-            variant="secondary"
-            size="icon"
-            className="rounded-full"
-            onClick={() => setShowMinimap(!showMinimap)}
-          >
-            <Map size={20} />
-          </Button>
-          <Button
-            variant="secondary"
-            size="icon"
-            className="rounded-full"
-            onClick={() => setShowMobilePreview(!showMobilePreview)}
-          >
-            {showMobilePreview ? <EyeOff size={20} /> : <Eye size={20} />}
-          </Button>
-        </div>
-      )}
     </div>
   );
 };
