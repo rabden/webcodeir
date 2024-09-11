@@ -4,6 +4,8 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Code } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import * as monaco from 'monaco-editor';
+import EditorHeader from './EditorHeader';
+import { editorOptions } from '../utils/editorConfig';
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const editorRef = useRef(null);
@@ -22,10 +24,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   const updateEditorOptions = () => {
     if (editorRef.current && editorRef.current.getModel()) {
       editorRef.current.updateOptions({
-        fontSize: settings.fontSize,
-        lineNumbers: settings.lineNumbers ? 'on' : 'off',
-        tabSize: settings.tabSize,
-        insertSpaces: !settings.indentWithTabs,
+        ...editorOptions(settings),
         minimap: { 
           enabled: true,
           side: 'right',
@@ -35,11 +34,6 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           maxColumn: 120,
           scale: 1
         },
-        scrollBeyondLastLine: false,
-        wordWrap: 'on',
-        wrappingIndent: 'indent',
-        lineNumbersMinChars: 3,
-        overviewRulerLanes: 0,
       });
     }
   };
@@ -47,10 +41,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
     updateEditorOptions();
-
     monaco.editor.setTheme('vs-dark');
+    applyEditorStyles();
+  };
 
-    // Add custom CSS to reduce line number column width and ensure editor popups are on top
+  const applyEditorStyles = () => {
     const styleElement = document.createElement('style');
     styleElement.textContent = `
       .monaco-editor .margin-view-overlays .line-numbers {
@@ -84,34 +79,17 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     document.head.appendChild(styleElement);
   };
 
-  const getLanguage = (lang) => {
-    switch (lang) {
-      case 'html': return 'html';
-      case 'css': return 'css';
-      case 'javascript': return 'javascript';
-      default: return 'plaintext';
-    }
-  };
-
-  const renderEditor = (lang, codeValue, setCodeValue) => {
-    return (
-      <div className="h-full flex flex-col editor-container">
-        {!isMobile && (
-          <div className="bg-gray-800 p-2 flex items-center justify-between sticky top-0 editor-header">
-            <div className="flex items-center">
-              <div className={`w-4 h-4 rounded-full mr-2 ${lang === 'html' ? 'bg-[#ff5f56]' : lang === 'css' ? 'bg-[#27c93f]' : 'bg-[#ffbd2e]'}`}></div>
-              <span className="text-sm font-semibold text-white">{lang.toUpperCase()}</span>
-            </div>
-          </div>
-        )}
-        <div className="flex-grow overflow-hidden relative">
-          {showHtmlStructureIcon && lang === 'html' && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 right-2 z-10"
-              onClick={() => {
-                setCodeValue(`<!DOCTYPE html>
+  const renderEditor = (lang, codeValue, setCodeValue) => (
+    <div className="h-full flex flex-col editor-container">
+      {!isMobile && <EditorHeader lang={lang} />}
+      <div className="flex-grow overflow-hidden relative">
+        {showHtmlStructureIcon && lang === 'html' && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 right-2 z-10"
+            onClick={() => {
+              setCodeValue(`<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -122,57 +100,42 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     
 </body>
 </html>`);
-                setShowHtmlStructureIcon(false);
-              }}
-            >
-              <Code className="h-4 w-4" />
-            </Button>
-          )}
-          <Editor
-            height="100%"
-            language={getLanguage(lang)}
-            value={codeValue}
-            onChange={(value) => setCodeValue(value)}
-            onMount={handleEditorDidMount}
-            options={{
-              automaticLayout: true,
-              scrollBeyondLastLine: false,
-              minimap: { 
-                enabled: true,
-                side: 'right',
-                size: 'fit',
-                showSlider: 'always',
-                renderCharacters: false,
-                maxColumn: 120,
-                scale: 1
-              },
-              fontSize: settings.fontSize,
-              lineNumbers: settings.lineNumbers ? 'on' : 'off',
-              tabSize: settings.tabSize,
-              insertSpaces: !settings.indentWithTabs,
-              wordWrap: 'on',
-              wrappingIndent: 'indent',
-              theme: 'vs-dark',
-              lineNumbersMinChars: 3,
-              overviewRulerLanes: 0,
+              setShowHtmlStructureIcon(false);
             }}
-            loading={<div className="text-white text-center p-4">Loading editor...</div>}
-          />
-        </div>
+          >
+            <Code className="h-4 w-4" />
+          </Button>
+        )}
+        <Editor
+          height="100%"
+          language={lang === 'html' ? 'html' : lang === 'css' ? 'css' : 'javascript'}
+          value={codeValue}
+          onChange={(value) => setCodeValue(value)}
+          onMount={handleEditorDidMount}
+          options={{
+            ...editorOptions(settings),
+            minimap: { 
+              enabled: true,
+              side: 'right',
+              size: 'fit',
+              showSlider: 'always',
+              renderCharacters: false,
+              maxColumn: 120,
+              scale: 1
+            },
+          }}
+          loading={<div className="text-white text-center p-4">Loading editor...</div>}
+        />
       </div>
-    );
-  };
+    </div>
+  );
 
   const renderMobileEditor = () => {
     switch (activeTab) {
-      case 'html':
-        return renderEditor('html', htmlCode, setHtmlCode);
-      case 'css':
-        return renderEditor('css', cssCode, setCssCode);
-      case 'js':
-        return renderEditor('javascript', jsCode, setJsCode);
-      default:
-        return null;
+      case 'html': return renderEditor('html', htmlCode, setHtmlCode);
+      case 'css': return renderEditor('css', cssCode, setCssCode);
+      case 'js': return renderEditor('javascript', jsCode, setJsCode);
+      default: return null;
     }
   };
 
