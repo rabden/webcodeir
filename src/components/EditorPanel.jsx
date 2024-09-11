@@ -26,7 +26,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         lineNumbers: settings.lineNumbers ? 'on' : 'off',
         tabSize: settings.tabSize,
         insertSpaces: !settings.indentWithTabs,
-        minimap: { enabled: false },
+        minimap: { 
+          enabled: true,
+          scale: 2,
+          showSlider: "mouseover"
+        },
         scrollBeyondLastLine: false,
         wordWrap: 'on',
         wrappingIndent: 'indent',
@@ -124,7 +128,11 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             options={{
               automaticLayout: true,
               scrollBeyondLastLine: false,
-              minimap: { enabled: false },
+              minimap: { 
+                enabled: true,
+                scale: 2,
+                showSlider: "mouseover"
+              },
               fontSize: settings.fontSize,
               lineNumbers: settings.lineNumbers ? 'on' : 'off',
               tabSize: settings.tabSize,
