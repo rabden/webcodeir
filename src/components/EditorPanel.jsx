@@ -3,7 +3,6 @@ import Editor from "@monaco-editor/react";
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Code } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import * as monaco from 'monaco-editor';
 import EditorHeader from './EditorHeader';
 import { editorOptions } from '../utils/editorConfig';
 
@@ -65,47 +64,6 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     editorRef.current = editor;
     updateEditorOptions();
     monaco.editor.setTheme('vs-dark');
-    applyEditorStyles();
-  };
-
-  const applyEditorStyles = () => {
-    const styleElement = document.createElement('style');
-    styleElement.textContent = `
-      .monaco-editor .margin-view-overlays .line-numbers {
-        min-width: 2.5em !important;
-      }
-      .monaco-editor .monaco-editor-background,
-      .monaco-editor .inputarea.ime-input {
-        z-index: 50 !important;
-      }
-      .monaco-editor .suggest-widget {
-        z-index: 1000 !important;
-      }
-      .editor-container {
-        position: relative;
-        z-index: 1;
-        overflow: visible !important;
-      }
-      .editor-header {
-        position: relative;
-        z-index: 2;
-      }
-      .monaco-editor .overflow-guard {
-        overflow: visible !important;
-      }
-      .monaco-editor .minimap {
-        right: 0;
-        top: 0;
-        height: 100% !important;
-      }
-      .monaco-editor .scrollbar {
-        z-index: 11;
-      }
-      .monaco-editor .scrollbar.vertical {
-        right: 0;
-      }
-    `;
-    document.head.appendChild(styleElement);
   };
 
   const renderEditor = (lang, codeValue, setCodeValue) => (

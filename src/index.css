@@ -126,3 +126,44 @@
   left: 1rem;
   z-index: 50;
 }
+
+/* Z-index adjustments */
+.monaco-editor .monaco-editor-background,
+.monaco-editor .inputarea.ime-input {
+  z-index: 1 !important;
+}
+
+.monaco-editor .suggest-widget {
+  z-index: 2 !important;
+}
+
+.editor-container {
+  position: relative;
+  z-index: 1;
+}
+
+.editor-header {
+  position: relative;
+  z-index: 2;
+}
+
+.monaco-editor .overflow-guard {
+  z-index: 1;
+}
+
+.monaco-editor .minimap {
+  z-index: 2;
+}
+
+.monaco-editor .scrollbar {
+  z-index: 3;
+}
+
+.monaco-editor .scrollbar.vertical {
+  z-index: 4;
+}
+
+/* Ensure loading animation is visible */
+.fixed.inset-0.flex.items-center.justify-center.bg-gray-900 {
+  z-index: 9999;
+}
