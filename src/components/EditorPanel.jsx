@@ -5,11 +5,13 @@ import { Code } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import EditorHeader from './EditorHeader';
 import { editorOptions } from '../utils/editorConfig';
+import { useSwipeable } from 'react-swipeable';
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const editorRef = useRef(null);
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
+  const [showMinimap, setShowMinimap] = useState(true);
 
   useEffect(() => {
     const handleResize = () => {
@@ -30,7 +32,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     if (editorRef.current) {
       updateEditorOptions();
     }
-  }, [settings, isSmallScreen]);
+  }, [settings, isSmallScreen, showMinimap]);
 
   const updateEditorOptions = () => {
     if (editorRef.current && editorRef.current.getModel()) {
@@ -38,7 +40,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         ...editorOptions(settings),
         wordWrap: isSmallScreen || isMobile ? 'off' : 'on',
         minimap: { 
-          enabled: true,
+          enabled: showMinimap,
           side: 'right',
           size: 'fit',
           showSlider: 'always',
@@ -70,8 +72,14 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     monaco.editor.setTheme('vs-dark');
   };
 
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => setShowMinimap(false),
+    onSwipedRight: () => setShowMinimap(true),
+    trackMouse: true
+  });
+
   const renderEditor = (lang, codeValue, setCodeValue) => (
-    <div className="h-full flex flex-col editor-container">
+    <div className="h-full flex flex-col editor-container" {...swipeHandlers}>
       {!isMobile && <EditorHeader lang={lang} />}
       <div className="flex-grow overflow-hidden relative">
         {showHtmlStructureIcon && lang === 'html' && (
@@ -107,7 +115,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             ...editorOptions(settings),
             wordWrap: isSmallScreen || isMobile ? 'off' : 'on',
             minimap: { 
-              enabled: true,
+              enabled: showMinimap,
               side: 'right',
               size: 'fit',
               showSlider: 'always',
