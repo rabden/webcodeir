@@ -48,18 +48,18 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           scale: 1
         },
         scrollbar: {
-          vertical: 'hidden',
-          horizontal: 'hidden',
+          vertical: 'visible',
+          horizontal: 'visible',
           useShadows: false,
-          verticalScrollbarSize: 0,
-          horizontalScrollbarSize: 0
+          verticalScrollbarSize: 10,
+          horizontalScrollbarSize: 10
         },
         overviewRulerLanes: 0,
         hideCursorInOverviewRuler: true,
         overviewRulerBorder: false,
         padding: {
           top: 10,
-          bottom: '50vh'
+          bottom: 10
         }
       });
     }
@@ -95,7 +95,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               setShowHtmlStructureIcon(false);
             }}
           >
-            <Code className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" />
           </Button>
         )}
         <Editor
@@ -117,18 +117,18 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               scale: 1
             },
             scrollbar: {
-              vertical: 'hidden',
-              horizontal: 'hidden',
+              vertical: 'visible',
+              horizontal: 'visible',
               useShadows: false,
-              verticalScrollbarSize: 0,
-              horizontalScrollbarSize: 0
+              verticalScrollbarSize: 10,
+              horizontalScrollbarSize: 10
             },
             overviewRulerLanes: 0,
             hideCursorInOverviewRuler: true,
             overviewRulerBorder: false,
             padding: {
               top: 10,
-              bottom: '50vh'
+              bottom: 10
             }
           }}
           loading={<div className="text-white text-center p-4">Loading editor...</div>}
