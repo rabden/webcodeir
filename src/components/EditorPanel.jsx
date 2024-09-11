@@ -1,17 +1,16 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Editor from "@monaco-editor/react";
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Code } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import EditorHeader from './EditorHeader';
 import { editorOptions } from '../utils/editorConfig';
-import { useSwipeable } from 'react-swipeable';
 
 const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJsCode, settings, isMobile, activeTab, setActiveTab }) => {
   const editorRef = useRef(null);
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
-  const [showMinimap, setShowMinimap] = useState(true);
+  const [showMinimap, setShowMinimap] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -40,7 +39,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
         ...editorOptions(settings),
         wordWrap: isSmallScreen || isMobile ? 'off' : 'on',
         minimap: { 
-          enabled: showMinimap,
+          enabled: !isMobile || (isMobile && showMinimap),
           side: 'right',
           size: 'fit',
           showSlider: 'always',
@@ -49,18 +48,18 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           scale: 1
         },
         scrollbar: {
-          vertical: 'hidden',
-          horizontal: 'hidden',
+          vertical: 'visible',
+          horizontal: 'visible',
           useShadows: false,
-          verticalScrollbarSize: 0,
-          horizontalScrollbarSize: 0
+          verticalScrollbarSize: 10,
+          horizontalScrollbarSize: 10
         },
         overviewRulerLanes: 0,
         hideCursorInOverviewRuler: true,
         overviewRulerBorder: false,
         padding: {
           top: 10,
-          bottom: '50vh'
+          bottom: 10
         }
       });
     }
@@ -72,14 +71,8 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
     monaco.editor.setTheme('vs-dark');
   };
 
-  const swipeHandlers = useSwipeable({
-    onSwipedLeft: () => setShowMinimap(false),
-    onSwipedRight: () => setShowMinimap(true),
-    trackMouse: true
-  });
-
   const renderEditor = (lang, codeValue, setCodeValue) => (
-    <div className="h-full flex flex-col editor-container" {...swipeHandlers}>
+    <div className="h-full flex flex-col editor-container">
       {!isMobile && <EditorHeader lang={lang} />}
       <div className="flex-grow overflow-hidden relative">
         {showHtmlStructureIcon && lang === 'html' && (
@@ -102,7 +95,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               setShowHtmlStructureIcon(false);
             }}
           >
-            <Code className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" />
           </Button>
         )}
         <Editor
@@ -115,7 +108,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             ...editorOptions(settings),
             wordWrap: isSmallScreen || isMobile ? 'off' : 'on',
             minimap: { 
-              enabled: showMinimap,
+              enabled: !isMobile || (isMobile && showMinimap),
               side: 'right',
               size: 'fit',
               showSlider: 'always',
@@ -124,18 +117,18 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               scale: 1
             },
             scrollbar: {
-              vertical: 'hidden',
-              horizontal: 'hidden',
+              vertical: 'visible',
+              horizontal: 'visible',
               useShadows: false,
-              verticalScrollbarSize: 0,
-              horizontalScrollbarSize: 0
+              verticalScrollbarSize: 10,
+              horizontalScrollbarSize: 10
             },
             overviewRulerLanes: 0,
             hideCursorInOverviewRuler: true,
             overviewRulerBorder: false,
             padding: {
               top: 10,
-              bottom: '50vh'
+              bottom: 10
             }
           }}
           loading={<div className="text-white text-center p-4">Loading editor...</div>}
@@ -170,8 +163,18 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   );
 
   return (
-    <div className="w-full h-full bg-gray-900">
+    <div className="w-full h-full bg-gray-900 relative">
       {isMobile ? renderMobileEditor() : renderPanelMode()}
+      {isMobile && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute bottom-4 right-4 bg-gray-800 hover:bg-gray-700"
+          onClick={() => setShowMinimap(!showMinimap)}
+        >
+          <ChevronLeft className={`h-4 w-4 transition-transform ${showMinimap ? 'rotate-180' : ''}`} />
+        </Button>
+      )}
     </div>
   );
 };
