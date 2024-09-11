@@ -12,6 +12,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
   const [showHtmlStructureIcon, setShowHtmlStructureIcon] = useState(isMobile && activeTab === 'html' && !htmlCode.trim());
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
   const [showMinimap, setShowMinimap] = useState(true);
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -45,7 +46,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
           size: 'fit',
           showSlider: 'always',
           renderCharacters: false,
-          maxColumn: isMobile ? 80 : 120,
+          maxColumn: isMobile ? 100 : 120,
           scale: 1
         },
         scrollbar: {
@@ -120,7 +121,7 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
               size: 'fit',
               showSlider: 'always',
               renderCharacters: false,
-              maxColumn: isMobile ? 80 : 120,
+              maxColumn: isMobile ? 100 : 120,
               scale: 1
             },
             scrollbar: {
@@ -186,9 +187,9 @@ const EditorPanel = ({ htmlCode, cssCode, jsCode, setHtmlCode, setCssCode, setJs
             variant="secondary"
             size="icon"
             className="rounded-full"
-            onClick={() => setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }))}
+            onClick={() => setShowMobilePreview(!showMobilePreview)}
           >
-            {state.showMobilePreview ? <EyeOff size={20} /> : <Eye size={20} />}
+            {showMobilePreview ? <EyeOff size={20} /> : <Eye size={20} />}
           </Button>
         </div>
       )}
