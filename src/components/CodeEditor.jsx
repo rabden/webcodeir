@@ -8,6 +8,7 @@ import MobilePreviewButton from './MobilePreviewButton';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import LoadingAnimation from './LoadingAnimation';
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Settings = lazy(() => import('./Settings'));
 const SavedCodes = lazy(() => import('./SavedCodes'));
@@ -81,21 +82,56 @@ const CodeEditor = () => {
     }));
   };
 
+  const renderEditor = (lang) => (
+    <EditorPanel
+      htmlCode={state.htmlCode}
+      cssCode={state.cssCode}
+      jsCode={state.jsCode}
+      setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
+      setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
+      setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
+      settings={state.settings}
+      isMobile={state.isMobile}
+      activeTab={lang}
+      setActiveTab={setActiveTab}
+    />
+  );
+
+  const renderTabMode = () => (
+    <div className="h-full flex flex-col">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList>
+          <TabsTrigger value="html">HTML</TabsTrigger>
+          <TabsTrigger value="css">CSS</TabsTrigger>
+          <TabsTrigger value="js">JavaScript</TabsTrigger>
+        </TabsList>
+      </Tabs>
+      <div className="flex-grow overflow-hidden">
+        {renderEditor(activeTab)}
+      </div>
+    </div>
+  );
+
+  const renderPanelMode = () => (
+    <PanelGroup direction={state.settings.layout === 'stacked' ? 'horizontal' : 'vertical'}>
+      <Panel minSize={5} defaultSize={33}>
+        {renderEditor('html')}
+      </Panel>
+      <PanelResizeHandle className={state.settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
+      <Panel minSize={5} defaultSize={33}>
+        {renderEditor('css')}
+      </Panel>
+      <PanelResizeHandle className={state.settings.layout === 'stacked' ? 'w-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200' : 'h-1 bg-gray-700 hover:bg-gray-600 transition-colors duration-200'} />
+      <Panel minSize={5} defaultSize={33}>
+        {renderEditor('javascript')}
+      </Panel>
+    </PanelGroup>
+  );
+
   const renderLayout = () => {
     const editorPanel = (
       <div className="relative h-full">
-        <EditorPanel
-          htmlCode={state.htmlCode}
-          cssCode={state.cssCode}
-          jsCode={state.jsCode}
-          setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
-          setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
-          setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
-          settings={state.settings}
-          isMobile={state.isMobile}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-        />
+        {!state.isMobile && state.settings.tabMode ? renderTabMode() : renderPanelMode()}
         {state.isMobile && (
           <MobilePreviewButton
             onClick={() => setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }))}
