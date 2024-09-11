@@ -8,6 +8,7 @@ import MobilePreviewButton from './MobilePreviewButton';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import LoadingAnimation from './LoadingAnimation';
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Settings = lazy(() => import('./Settings'));
 const SavedCodes = lazy(() => import('./SavedCodes'));
@@ -81,8 +82,46 @@ const CodeEditor = () => {
     }));
   };
 
+  const renderTabMode = () => (
+    <div className="h-full flex flex-col">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="bg-gray-700 w-full justify-start">
+          <TabsTrigger value="html" className="text-sm">HTML</TabsTrigger>
+          <TabsTrigger value="css" className="text-sm">CSS</TabsTrigger>
+          <TabsTrigger value="js" className="text-sm">JS</TabsTrigger>
+        </TabsList>
+      </Tabs>
+      <div className="flex-grow overflow-hidden">
+        {activeTab === 'html' && (
+          <EditorPanel
+            code={state.htmlCode}
+            setCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
+            language="html"
+            settings={state.settings}
+          />
+        )}
+        {activeTab === 'css' && (
+          <EditorPanel
+            code={state.cssCode}
+            setCode={(code) => setState(s => ({ ...s, cssCode: code }))}
+            language="css"
+            settings={state.settings}
+          />
+        )}
+        {activeTab === 'js' && (
+          <EditorPanel
+            code={state.jsCode}
+            setCode={(code) => setState(s => ({ ...s, jsCode: code }))}
+            language="javascript"
+            settings={state.settings}
+          />
+        )}
+      </div>
+    </div>
+  );
+
   const renderLayout = () => {
-    const editorPanel = (
+    const editorPanel = state.settings.tabMode && !state.isMobile ? renderTabMode() : (
       <div className="relative h-full">
         <EditorPanel
           htmlCode={state.htmlCode}

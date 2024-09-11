@@ -81,6 +81,14 @@ const Settings = ({ settings, setSettings, onClose, isMobile }) => {
             onCheckedChange={(checked) => handleChange('matchBrackets', checked)}
           />
         </div>
+        <div className="flex items-center justify-between">
+          <label htmlFor="tabMode" className="text-white">Tab Mode (Big Screen)</label>
+          <Switch
+            id="tabMode"
+            checked={settings.tabMode}
+            onCheckedChange={(checked) => handleChange('tabMode', checked)}
+          />
+        </div>
       </div>
     </div>
   );
