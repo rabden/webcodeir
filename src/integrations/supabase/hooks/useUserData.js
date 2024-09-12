@@ -8,17 +8,17 @@ const fromSupabase = async (query) => {
 };
 
 export const useUserData = (userId) => useQuery({
-  queryKey: ['user_data', userId],
-  queryFn: () => fromSupabase(supabase.from('user_data').select('*').eq('user_id', userId).single()),
+  queryKey: ['user_profiles', userId],
+  queryFn: () => fromSupabase(supabase.from('user_profiles').select('*').eq('user_id', userId).single()),
   enabled: !!userId,
 });
 
 export const useUpdateUserData = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ userId, ...updateData }) => fromSupabase(supabase.from('user_data').upsert({ user_id: userId, ...updateData })),
+    mutationFn: ({ userId, ...updateData }) => fromSupabase(supabase.from('user_profiles').upsert({ user_id: userId, ...updateData })),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries(['user_data', variables.userId]);
+      queryClient.invalidateQueries(['user_profiles', variables.userId]);
     },
   });
 };
@@ -33,10 +33,10 @@ export const useUploadProfileImage = () => {
       if (uploadError) throw uploadError;
       const { data: { publicUrl }, error: urlError } = supabase.storage.from('profile_images').getPublicUrl(filePath);
       if (urlError) throw urlError;
-      return fromSupabase(supabase.from('user_data').upsert({ user_id: userId, profile_image: publicUrl }));
+      return fromSupabase(supabase.from('user_profiles').upsert({ user_id: userId, profile_image_url: publicUrl }));
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries(['user_data', variables.userId]);
+      queryClient.invalidateQueries(['user_profiles', variables.userId]);
     },
   });
 };

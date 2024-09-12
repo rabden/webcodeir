@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSupabaseAuth } from '../integrations/supabase';
 import { SupabaseAuthUI } from '../integrations/supabase';
 import { useUserData, useUpdateUserData, useUploadProfileImage } from '../integrations/supabase/hooks/useUserData';
@@ -17,7 +17,15 @@ const ProfilePanel = ({ onClose }) => {
   const { data: userData, isLoading } = useUserData(session?.user?.id);
   const updateUserData = useUpdateUserData();
   const uploadProfileImage = useUploadProfileImage();
-  const [name, setName] = useState(userData?.name || '');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    if (userData) {
+      setName(userData.name || '');
+      setEmail(userData.email || '');
+    }
+  }, [userData]);
 
   const handleSignOut = async () => {
     try {
@@ -61,7 +69,7 @@ const ProfilePanel = ({ onClose }) => {
 
   const handleUpdateProfile = async () => {
     try {
-      await updateUserData.mutateAsync({ userId: session.user.id, name });
+      await updateUserData.mutateAsync({ userId: session.user.id, name, email });
       toast({
         title: "Profile updated successfully",
         type: "success"
@@ -114,7 +122,7 @@ const ProfilePanel = ({ onClose }) => {
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
               <img
-                src={userData?.profile_image || 'https://via.placeholder.com/100'}
+                src={userData?.profile_image_url || 'https://via.placeholder.com/100'}
                 alt="Profile"
                 className="w-20 h-20 rounded-full object-cover"
               />
@@ -143,7 +151,15 @@ const ProfilePanel = ({ onClose }) => {
                 className="bg-gray-800 text-white border-gray-700"
               />
             </div>
-            <p className="text-white">Email: {session.user.email}</p>
+            <div>
+              <Label htmlFor="email" className="text-white">Email</Label>
+              <Input
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-gray-800 text-white border-gray-700"
+              />
+            </div>
             <Button onClick={handleUpdateProfile} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
               Update Profile
             </Button>
