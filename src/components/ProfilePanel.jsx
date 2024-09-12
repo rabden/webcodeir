@@ -1,44 +1,49 @@
-import React, { useState } from 'react';
-import { useSupabaseAuth, SupabaseAuthUI } from '../integrations/supabase';
+import React, { useState, useEffect } from 'react';
+import { useSupabaseAuth, SupabaseAuthUI, useUserProfile, useAddUserProfile, useUpdateUserProfile } from '../integrations/supabase';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { X } from 'lucide-react';
 
 const ProfilePanel = ({ onClose }) => {
-  const { session, loading, signUp, signIn, signOut } = useSupabaseAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+  const { session, loading } = useSupabaseAuth();
+  const userId = session?.user?.id;
+  const { data: profile, isLoading, error } = useUserProfile(userId);
+  const addProfile = useAddUserProfile();
+  const updateProfile = useUpdateUserProfile();
 
-  const handleSignUp = async (e) => {
-    e.preventDefault();
-    setError(null);
-    try {
-      const { error } = await signUp({ email, password });
-      if (error) throw error;
-    } catch (error) {
-      setError(error.message);
+  const [formData, setFormData] = useState({
+    username: '',
+    full_name: '',
+    bio: '',
+    avatar_url: '',
+  });
+
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        username: profile.username || '',
+        full_name: profile.full_name || '',
+        bio: profile.bio || '',
+        avatar_url: profile.avatar_url || '',
+      });
     }
+  }, [profile]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSignIn = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-    try {
-      const { error } = await signIn({ email, password });
-      if (error) throw error;
-    } catch (error) {
-      setError(error.message);
+    if (profile) {
+      await updateProfile.mutateAsync({ id: profile.id, ...formData, user_id: userId });
+    } else {
+      await addProfile.mutateAsync({ ...formData, user_id: userId });
     }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      setError(error.message);
-    }
+    onClose();
   };
 
   if (loading) return <div>Loading...</div>;
@@ -50,43 +55,55 @@ const ProfilePanel = ({ onClose }) => {
           <X size={24} />
         </button>
         <h2 className="text-2xl font-bold mb-6 text-white">User Profile</h2>
-        {session ? (
+        {!session ? (
           <div>
-            <p className="text-white mb-4">Logged in as: {session.user.email}</p>
-            <Button onClick={handleSignOut} className="w-full bg-red-600 hover:bg-red-700 text-white">
-              Sign Out
-            </Button>
+            <p className="text-white mb-4">Please sign in or sign up to view and edit your profile.</p>
+            <SupabaseAuthUI />
           </div>
         ) : (
-          <form onSubmit={handleSignUp} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="email" className="text-white">Email</Label>
+              <Label htmlFor="username" className="text-white">Username</Label>
               <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
                 className="bg-gray-800 text-white border-gray-700"
-                required
               />
             </div>
             <div>
-              <Label htmlFor="password" className="text-white">Password</Label>
+              <Label htmlFor="full_name" className="text-white">Full Name</Label>
               <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                id="full_name"
+                name="full_name"
+                value={formData.full_name}
+                onChange={handleChange}
                 className="bg-gray-800 text-white border-gray-700"
-                required
               />
             </div>
-            {error && <p className="text-red-500">{error}</p>}
+            <div>
+              <Label htmlFor="bio" className="text-white">Bio</Label>
+              <Textarea
+                id="bio"
+                name="bio"
+                value={formData.bio}
+                onChange={handleChange}
+                className="bg-gray-800 text-white border-gray-700"
+              />
+            </div>
+            <div>
+              <Label htmlFor="avatar_url" className="text-white">Avatar URL</Label>
+              <Input
+                id="avatar_url"
+                name="avatar_url"
+                value={formData.avatar_url}
+                onChange={handleChange}
+                className="bg-gray-800 text-white border-gray-700"
+              />
+            </div>
             <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-              Sign Up
-            </Button>
-            <Button onClick={handleSignIn} className="w-full bg-green-600 hover:bg-green-700 text-white">
-              Sign In
+              {profile ? 'Update Profile' : 'Create Profile'}
             </Button>
           </form>
         )}
