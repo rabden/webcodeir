@@ -2,9 +2,9 @@ import React from 'react';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Download, Link, Image, Loader2, Save } from 'lucide-react';
+import { MoreVertical, Download, Link, Image, Loader2 } from 'lucide-react';
 
-const AIImageGeneratorResult = ({ results, toast, onSave }) => {
+const AIImageGeneratorResult = ({ results, toast }) => {
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     toast({
@@ -53,10 +53,6 @@ const AIImageGeneratorResult = ({ results, toast, onSave }) => {
                 <DropdownMenuItem onClick={() => copyToClipboard(`<img src="${result.imageUrl}" alt="Generated image" />`)} className="hover:bg-gray-700">
                   <Image className="mr-2 h-4 w-4" />
                   <span>Copy Image Tag</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onSave(result)} className="hover:bg-gray-700">
-                  <Save className="mr-2 h-4 w-4" />
-                  <span>Save to Collection</span>
                 </DropdownMenuItem>
               </>
             )}
