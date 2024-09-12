@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { navItems } from "./nav-items";
 import LoadingAnimation from './components/LoadingAnimation';
+import { SupabaseAuthProvider } from './integrations/supabase';
 
 const queryClient = new QueryClient();
 
@@ -17,22 +18,24 @@ const LazyCodeEditor = lazy(() => new Promise(resolve => {
 const App = () => (
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <BrowserRouter>
-          <Suspense fallback={<LoadingAnimation />}>
-            <Routes>
-              {navItems.map(({ to, page }) => (
-                <Route key={to} path={to} element={
-                  <Suspense fallback={<LoadingAnimation />}>
-                    {page}
-                  </Suspense>
-                } />
-              ))}
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </TooltipProvider>
+      <SupabaseAuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <BrowserRouter>
+            <Suspense fallback={<LoadingAnimation />}>
+              <Routes>
+                {navItems.map(({ to, page }) => (
+                  <Route key={to} path={to} element={
+                    <Suspense fallback={<LoadingAnimation />}>
+                      {page}
+                    </Suspense>
+                  } />
+                ))}
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </TooltipProvider>
+      </SupabaseAuthProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );

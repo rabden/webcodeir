@@ -46,6 +46,20 @@ const ProfilePanel = ({ onClose }) => {
     onClose();
   };
 
+  if (!session) {
+    return (
+      <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+        <div className="bg-gray-900 p-8 rounded-lg w-full max-w-md relative">
+          <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">
+            <X size={24} />
+          </button>
+          <h2 className="text-2xl font-bold mb-6 text-white">User Profile</h2>
+          <p className="text-white">Please sign in to view and edit your profile.</p>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
