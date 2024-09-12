@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Save, BookOpen, Settings as SettingsIcon, ChevronDown, ChevronUp, Library, Wrench, Image } from 'lucide-react';
+import { X, Save, BookOpen, Settings as SettingsIcon, ChevronDown, ChevronUp, Library, Wrench, Image, User } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -57,6 +57,7 @@ const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, set
         </Collapsible>
 
         <MenuButton icon={<SettingsIcon className="w-4 h-4" />} label="Settings" onClick={() => { setShowSettings(true); setIsOpen(false); }} />
+        <MenuButton icon={<User className="w-4 h-4" />} label="Profile" onClick={() => { setShowSettings(true); setIsOpen(false); }} />
       </nav>
     </div>
   );
