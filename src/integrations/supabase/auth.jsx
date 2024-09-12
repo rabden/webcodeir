@@ -3,6 +3,9 @@ import { supabase } from './supabase.js';
 import { useQueryClient } from '@tanstack/react-query';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const SupabaseAuthContext = createContext();
 
@@ -58,11 +61,125 @@ export const useSupabaseAuth = () => {
   return useContext(SupabaseAuthContext);
 };
 
-export const SupabaseAuthUI = () => (
-  <Auth
-    supabaseClient={supabase}
-    appearance={{ theme: ThemeSupa }}
-    theme="default"
-    providers={[]}
-  />
-);
+export const SupabaseAuthUI = () => {
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [error, setError] = useState(null);
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setError(null);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name: name,
+        },
+      },
+    });
+    if (error) setError(error.message);
+    else {
+      // Handle successful sign up
+      console.log('Signed up successfully', data);
+    }
+  };
+
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    setError(null);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) setError(error.message);
+    else {
+      // Handle successful sign in
+      console.log('Signed in successfully', data);
+    }
+  };
+
+  if (isSignUp) {
+    return (
+      <div className="space-y-4">
+        <form onSubmit={handleSignUp} className="space-y-4">
+          <div>
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <Button type="submit" className="w-full">Sign Up</Button>
+        </form>
+        {error && <p className="text-red-500">{error}</p>}
+        <p className="text-center">
+          Already have an account?{' '}
+          <Button variant="link" onClick={() => setIsSignUp(false)}>
+            Sign In
+          </Button>
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <form onSubmit={handleSignIn} className="space-y-4">
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <Button type="submit" className="w-full">Sign In</Button>
+      </form>
+      {error && <p className="text-red-500">{error}</p>}
+      <p className="text-center">
+        Don't have an account?{' '}
+        <Button variant="link" onClick={() => setIsSignUp(true)}>
+          Sign Up
+        </Button>
+      </p>
+    </div>
+  );
+};
