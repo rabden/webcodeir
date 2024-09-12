@@ -2,9 +2,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../supabase';
 
 const fromSupabase = async (query) => {
-    const { data, error } = await query;
-    if (error) throw new Error(error.message);
-    return data;
+    try {
+        const { data, error } = await query;
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Supabase query error:', error);
+        return null;
+    }
 };
 
 /*
@@ -31,34 +36,59 @@ export const useUserProfile = (userId) => useQuery({
     queryKey: ['user_profiles', userId],
     queryFn: () => fromSupabase(supabase.from('user_profiles').select('*').eq('user_id', userId).single()),
     enabled: !!userId,
+    retry: false,
+    onError: (error) => {
+        console.error('Error fetching user profile:', error);
+    }
 });
 
 export const useAddUserProfile = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newProfile) => fromSupabase(supabase.from('user_profiles').insert([newProfile])),
+        mutationFn: async (newProfile) => {
+            const result = await fromSupabase(supabase.from('user_profiles').insert([newProfile]));
+            if (!result) throw new Error('Failed to add user profile');
+            return result;
+        },
         onSuccess: (data, variables) => {
             queryClient.invalidateQueries(['user_profiles', variables.user_id]);
         },
+        onError: (error) => {
+            console.error('Error adding user profile:', error);
+        }
     });
 };
 
 export const useUpdateUserProfile = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, ...updateData }) => fromSupabase(supabase.from('user_profiles').update(updateData).eq('id', id)),
+        mutationFn: async ({ id, ...updateData }) => {
+            const result = await fromSupabase(supabase.from('user_profiles').update(updateData).eq('id', id));
+            if (!result) throw new Error('Failed to update user profile');
+            return result;
+        },
         onSuccess: (data, variables) => {
             queryClient.invalidateQueries(['user_profiles', variables.user_id]);
         },
+        onError: (error) => {
+            console.error('Error updating user profile:', error);
+        }
     });
 };
 
 export const useDeleteUserProfile = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (id) => fromSupabase(supabase.from('user_profiles').delete().eq('id', id)),
+        mutationFn: async (id) => {
+            const result = await fromSupabase(supabase.from('user_profiles').delete().eq('id', id));
+            if (!result) throw new Error('Failed to delete user profile');
+            return result;
+        },
         onSuccess: (data, variables) => {
             queryClient.invalidateQueries('user_profiles');
         },
+        onError: (error) => {
+            console.error('Error deleting user profile:', error);
+        }
     });
 };
