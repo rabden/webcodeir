@@ -45,7 +45,7 @@ const AIImageGenerator = ({ onClose }) => {
   });
   const { toast } = useToast();
   const { session } = useSupabaseAuth();
-  const { generationCount, canGenerate, incrementCount, lastResetTime } = useImageGenerationLimit(session?.user?.id);
+  const { generationCount, canGenerate, incrementCount } = useImageGenerationLimit(session?.user?.id);
   const addGeneratedImage = useAddGeneratedImage();
 
   const generateImage = async (model) => {
@@ -53,7 +53,7 @@ const AIImageGenerator = ({ onClose }) => {
       toast({
         title: "Generation Limit Reached",
         description: "You've reached the maximum number of generations for the current period.",
-        type: "error"
+        variant: "destructive"
       });
       return;
     }
@@ -63,7 +63,7 @@ const AIImageGenerator = ({ onClose }) => {
       toast({
         title: "Generation Failed",
         description: "Unable to increment generation count. Please try again later.",
-        type: "error"
+        variant: "destructive"
       });
       return;
     }
