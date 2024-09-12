@@ -9,7 +9,8 @@ const SavedCodes = ({ onClose, onLoad }) => {
   const [expandedCode, setExpandedCode] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const { session } = useSupabaseAuth();
-  const { data: savedCodes, isLoading, error } = useCodeSnippets(session?.user?.id);
+  const userId = session?.user?.id;
+  const { data: savedCodes, isLoading, error } = useCodeSnippets(userId);
   const deleteCodeSnippet = useDeleteCodeSnippet();
   const { toast } = useToast();
 
@@ -74,11 +75,11 @@ const SavedCodes = ({ onClose, onLoad }) => {
         </button>
       </div>
       <div className="flex-grow overflow-y-auto p-4">
-        {savedCodes.length === 0 ? (
+        {savedCodes && savedCodes.length === 0 ? (
           <p className="text-center text-gray-400 text-xl">No saved codes yet.</p>
         ) : (
           <ul className="space-y-4">
-            {savedCodes.map((code) => (
+            {savedCodes && savedCodes.map((code) => (
               <li key={code.id} className={`p-3 rounded-lg bg-gray-700 shadow ${isMobile ? 'text-sm' : ''}`}>
                 <div className="flex items-center justify-between mb-2">
                   <input
