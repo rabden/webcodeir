@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
+import { X, Search, Check, MoreVertical, Copy } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Wand2, X, Save, Image } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import AIImageGeneratorSettings from './AIImageGeneratorSettings';
 import AIImageGeneratorResult from './AIImageGeneratorResult';
 import ImageCollection from './ImageCollection';
+import { useSupabaseAuth } from '../integrations/supabase';
+import { useImageGenerationLimit } from '../hooks/useImageGenerationLimit';
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -38,11 +41,13 @@ const AIImageGenerator = ({ onClose }) => {
       aspectRatio: "1:1",
       num_inference_steps: 4
     },
-    isFluxSettingsOpen: false
+    isFluxSettingsOpen: false,
+    isCollectionOpen: false
   });
-  const [isCollectionOpen, setIsCollectionOpen] = useState(false);
   const [savedImages, setSavedImages] = useState([]);
   const { toast } = useToast();
+  const { session } = useSupabaseAuth();
+  const { generationCount, canGenerate, incrementCount } = useImageGenerationLimit(session?.user?.id);
 
   useEffect(() => {
     const savedImagesFromStorage = JSON.parse(localStorage.getItem('savedImages') || '[]');
@@ -50,6 +55,25 @@ const AIImageGenerator = ({ onClose }) => {
   }, []);
 
   const generateImage = async (model) => {
+    if (!canGenerate) {
+      toast({
+        title: "Generation Limit Reached",
+        description: "You've reached the maximum number of generations for the current period.",
+        type: "error"
+      });
+      return;
+    }
+
+    const success = await incrementCount();
+    if (!success) {
+      toast({
+        title: "Generation Failed",
+        description: "Unable to increment generation count. Please try again later.",
+        type: "error"
+      });
+      return;
+    }
+
     setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true } }));
     let data = { inputs: state.prompts[model] };
     if (model === 'FLUX') {
@@ -125,13 +149,13 @@ const AIImageGenerator = ({ onClose }) => {
         size="icon"
         className="bg-blue-600 hover:bg-blue-700"
       >
-        {state.loading[model] ? <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div> : <Wand2 className="h-4 w-4" />}
+        {state.loading[model] ? <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div> : <Search className="h-4 w-4" />}
       </Button>
     </div>
   );
 
   const toggleCollection = () => {
-    setIsCollectionOpen(!isCollectionOpen);
+    setState(prev => ({ ...prev, isCollectionOpen: !prev.isCollectionOpen }));
   };
 
   const saveImage = (image) => {
@@ -160,7 +184,7 @@ const AIImageGenerator = ({ onClose }) => {
         <h2 className="text-xl font-bold text-white">AI Image Generator</h2>
         <div className="flex space-x-2">
           <Button variant="ghost" size="icon" onClick={toggleCollection}>
-            <Image className="h-4 w-4" />
+            <Copy className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -169,39 +193,25 @@ const AIImageGenerator = ({ onClose }) => {
       </div>
       <ScrollArea className="flex-grow">
         <div className="p-4 space-y-4">
-          <Tabs defaultValue="FLUX" className="bg-gray-900 p-4 rounded-lg">
-            <TabsList className="bg-gray-800 mb-4">
-              <TabsTrigger value="FLUX" className="data-[state=active]:bg-blue-600">FLUX</TabsTrigger>
-              <TabsTrigger value="SD3" className="data-[state=active]:bg-blue-600">SD3</TabsTrigger>
-            </TabsList>
-            {['FLUX', 'SD3'].map(model => (
-              <TabsContent key={model} value={model}>
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-white">{model} Image Generator</h3>
-                  {renderInputs(model)}
-                  {model === 'FLUX' && (
-                    <AIImageGeneratorSettings
-                      fluxParams={state.fluxParams}
-                      setFluxParams={(params) => setState(prev => ({ ...prev, fluxParams: params }))}
-                      isFluxSettingsOpen={state.isFluxSettingsOpen}
-                      setIsFluxSettingsOpen={(isOpen) => setState(prev => ({ ...prev, isFluxSettingsOpen: isOpen }))}
-                      aspectRatios={aspectRatios}
-                    />
-                  )}
-                  <div className="mt-4">
-                    <AIImageGeneratorResult 
-                      results={state.results[model]} 
-                      toast={toast} 
-                      onSave={saveImage}
-                    />
-                  </div>
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
+          <div className="text-sm text-white">
+            Available generations: {20 - generationCount} / 20
+          </div>
+          <AIImageGeneratorSettings
+            fluxParams={state.fluxParams}
+            setFluxParams={(params) => setState(prev => ({ ...prev, fluxParams: params }))}
+            isFluxSettingsOpen={state.isFluxSettingsOpen}
+            setIsFluxSettingsOpen={(isOpen) => setState(prev => ({ ...prev, isFluxSettingsOpen: isOpen }))}
+            aspectRatios={aspectRatios}
+          />
+          {renderInputs('FLUX')}
+          <AIImageGeneratorResult 
+            results={state.results.FLUX} 
+            toast={toast} 
+            onSave={saveImage}
+          />
         </div>
       </ScrollArea>
-      {isCollectionOpen && (
+      {state.isCollectionOpen && (
         <ImageCollection
           onClose={toggleCollection}
           savedImages={savedImages}
