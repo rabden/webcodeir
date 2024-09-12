@@ -73,17 +73,19 @@ const Header = ({
             <Menu className="h-6 w-6" />
           </Button>
         )}
-        <input
-          type="text"
-          value={currentCodeName}
-          onChange={(e) => setCurrentCodeName(e.target.value)}
-          className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white max-w-[150px] sm:max-w-none"
-        />
-        <Link to="/">
-          <Button variant="ghost" size="icon" className="text-white hover:bg-gray-700">
-            <Home className="h-5 w-5" />
-          </Button>
-        </Link>
+        <div className="flex items-center">
+          <input
+            type="text"
+            value={currentCodeName}
+            onChange={(e) => setCurrentCodeName(e.target.value)}
+            className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white max-w-[150px] sm:max-w-none"
+          />
+          <Link to="/">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-gray-700 ml-2">
+              <Home className="h-5 w-5" />
+            </Button>
+          </Link>
+        </div>
       </div>
       {isMobile && (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-grow mx-2">
