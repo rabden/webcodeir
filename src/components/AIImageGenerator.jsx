@@ -9,7 +9,6 @@ import AIImageGeneratorResult from './AIImageGeneratorResult';
 import ImageCollection from './ImageCollection';
 import { useSupabaseAuth } from '../integrations/supabase';
 import { useImageGenerationLimit } from '../hooks/useImageGenerationLimit';
-import { useAddGeneratedImage } from '../hooks/useGeneratedImages';
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -42,12 +41,17 @@ const AIImageGenerator = ({ onClose }) => {
     },
     isFluxSettingsOpen: false,
     isCollectionOpen: false,
+    savedImages: []
   });
   const { toast } = useToast();
   const { session } = useSupabaseAuth();
   const { generationCount, canGenerate, incrementCount, lastResetTime } = useImageGenerationLimit(session?.user?.id);
   const [timeUntilRefresh, setTimeUntilRefresh] = useState(0);
-  const addGeneratedImage = useAddGeneratedImage();
+
+  useEffect(() => {
+    const savedImagesFromStorage = JSON.parse(localStorage.getItem('savedImages') || '[]');
+    setState(prev => ({ ...prev, savedImages: savedImagesFromStorage }));
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -101,32 +105,25 @@ const AIImageGenerator = ({ onClose }) => {
         }
       });
       const imageUrl = URL.createObjectURL(response[0]);
-      const newImage = { 
-        imageUrl, 
-        seed: response[1], 
-        prompt: state.prompts[model] 
-      };
       setState(prev => ({ 
         ...prev, 
         results: { 
           ...prev.results, 
-          [model]: [newImage, ...prev.results[model].slice(1)]
+          [model]: prev.results[model].map((item, index) => 
+            index === 0 ? { imageUrl, seed: response[1], prompt: prev.prompts[model] } : item
+          )
         },
         fluxParams: { ...prev.fluxParams, seed: response[1] }
       }));
-      await addGeneratedImage.mutateAsync({
-        user_id: session.user.id,
-        image_url: imageUrl,
-        seed: response[1],
-        prompt: state.prompts[model]
-      });
     } catch (error) {
       console.error('Error:', error);
       setState(prev => ({ 
         ...prev, 
         results: { 
           ...prev.results, 
-          [model]: [{ error: 'Error generating image. Please try again.', seed: prev.fluxParams.seed, prompt: prev.prompts[model] }, ...prev.results[model].slice(1)]
+          [model]: prev.results[model].map((item, index) => 
+            index === 0 ? { error: 'Error generating image. Please try again.', seed: prev.fluxParams.seed, prompt: prev.prompts[model] } : item
+          )
         }
       }));
     }
@@ -144,6 +141,30 @@ const AIImageGenerator = ({ onClose }) => {
     );
     const result = await response.blob();
     return [result, data.parameters?.seed];
+  };
+
+  const saveImage = (image) => {
+    setState(prev => {
+      const updatedSavedImages = [...prev.savedImages, image];
+      localStorage.setItem('savedImages', JSON.stringify(updatedSavedImages));
+      return { ...prev, savedImages: updatedSavedImages };
+    });
+    toast({
+      title: "Image Saved",
+      description: "The image has been added to your collection.",
+    });
+  };
+
+  const removeImage = (index) => {
+    setState(prev => {
+      const updatedSavedImages = prev.savedImages.filter((_, i) => i !== index);
+      localStorage.setItem('savedImages', JSON.stringify(updatedSavedImages));
+      return { ...prev, savedImages: updatedSavedImages };
+    });
+    toast({
+      title: "Image Removed",
+      description: "The image has been removed from your collection.",
+    });
   };
 
   const formatTimeLeft = (ms) => {
@@ -199,12 +220,15 @@ const AIImageGenerator = ({ onClose }) => {
           <AIImageGeneratorResult 
             results={state.results.FLUX} 
             toast={toast} 
+            onSave={saveImage}
           />
         </div>
       </ScrollArea>
       {state.isCollectionOpen && (
         <ImageCollection
           onClose={() => setState(prev => ({ ...prev, isCollectionOpen: false }))}
+          savedImages={state.savedImages}
+          onRemoveImage={removeImage}
         />
       )}
     </div>
