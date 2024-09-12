@@ -9,7 +9,7 @@ import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import LoadingAnimation from './LoadingAnimation';
 import { useSupabaseAuth } from '../integrations/supabase';
-import { useAddCodeSnippet, useUpdateCodeSnippet } from '../integrations/supabase';
+import { useAddCodeSnippet } from '../integrations/supabase';
 import { useToast } from "@/components/ui/use-toast";
 
 const Settings = lazy(() => import('./Settings'));
@@ -33,7 +33,6 @@ const CodeEditor = () => {
   const [codeToolsInitialTab, setCodeToolsInitialTab] = React.useState('html');
   const { session } = useSupabaseAuth();
   const addCodeSnippet = useAddCodeSnippet();
-  const updateCodeSnippet = useUpdateCodeSnippet();
   const { toast } = useToast();
 
   React.useEffect(() => {
@@ -74,32 +73,17 @@ const CodeEditor = () => {
     }
 
     try {
-      if (state.currentCodeId) {
-        await updateCodeSnippet.mutateAsync({
-          id: state.currentCodeId,
-          title: state.currentCodeName,
-          html_code: state.htmlCode,
-          css_code: state.cssCode,
-          js_code: state.jsCode,
-        });
-        toast({
-          title: "Success",
-          description: "Code updated successfully!",
-        });
-      } else {
-        const { data } = await addCodeSnippet.mutateAsync({
-          user_id: session.user.id,
-          title: state.currentCodeName,
-          html_code: state.htmlCode,
-          css_code: state.cssCode,
-          js_code: state.jsCode,
-        });
-        setState(s => ({ ...s, currentCodeId: data[0].id }));
-        toast({
-          title: "Success",
-          description: "Code saved successfully!",
-        });
-      }
+      await addCodeSnippet.mutateAsync({
+        user_id: session.user.id,
+        title: state.currentCodeName,
+        html_code: state.htmlCode,
+        css_code: state.cssCode,
+        js_code: state.jsCode,
+      });
+      toast({
+        title: "Success",
+        description: "Code saved successfully!",
+      });
     } catch (error) {
       console.error('Error saving code:', error);
       toast({
@@ -198,14 +182,13 @@ const CodeEditor = () => {
         setShowCodeToolsPanel={setShowCodeToolsPanel}
         setCodeToolsInitialTab={setCodeToolsInitialTab}
         setShowAIImageGeneratorPanel={() => setState(s => ({ ...s, showAIImageGeneratorPanel: true }))}
-        session={session}
       />
       <div className="flex-grow overflow-hidden">
-        {session ? renderLayout() : <AIImageGenerator onClose={() => {}} />}
+        {renderLayout()}
       </div>
       <Suspense fallback={<LoadingAnimation />}>
         {state.showSettings && <Settings settings={state.settings} setSettings={(newSettings) => setState(s => ({ ...s, settings: newSettings }))} onClose={() => setState(s => ({ ...s, showSettings: false }))} isMobile={state.iMobile} />}
-        {state.showSavedCodes && session && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html_code, cssCode: code.css_code, jsCode: code.js_code, currentCodeName: code.title, currentCodeId: code.id, showSavedCodes: false }))} isMobile={state.iMobile} />}
+        {state.showSavedCodes && session && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html_code, cssCode: code.css_code, jsCode: code.js_code, currentCodeName: code.title, showSavedCodes: false }))} isMobile={state.iMobile} />}
         {state.showFontPanel && <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.iMobile} />}
         {state.showIconPanel && <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} isMobile={state.iMobile} />}
         {showCodeToolsPanel && <CodeToolsPanel onClose={() => setShowCodeToolsPanel(false)} initialTab={codeToolsInitialTab} />}

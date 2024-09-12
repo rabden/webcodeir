@@ -6,7 +6,6 @@ import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const SupabaseAuthContext = createContext();
 
@@ -59,11 +58,7 @@ export const SupabaseAuthProviderInner = ({ children }) => {
 };
 
 export const useSupabaseAuth = () => {
-  const context = useContext(SupabaseAuthContext);
-  if (context === undefined) {
-    throw new Error('useSupabaseAuth must be used within a SupabaseAuthProvider');
-  }
-  return context;
+  return useContext(SupabaseAuthContext);
 };
 
 export const SupabaseAuthUI = () => {
@@ -72,12 +67,10 @@ export const SupabaseAuthUI = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState(null);
-  const [signUpSuccess, setSignUpSuccess] = useState(false);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
     setError(null);
-    setSignUpSuccess(false);
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -89,7 +82,7 @@ export const SupabaseAuthUI = () => {
     });
     if (error) setError(error.message);
     else {
-      setSignUpSuccess(true);
+      // Handle successful sign up
       console.log('Signed up successfully', data);
     }
   };
@@ -103,6 +96,7 @@ export const SupabaseAuthUI = () => {
     });
     if (error) setError(error.message);
     else {
+      // Handle successful sign in
       console.log('Signed in successfully', data);
     }
   };
@@ -143,14 +137,7 @@ export const SupabaseAuthUI = () => {
           </div>
           <Button type="submit" className="w-full">Sign Up</Button>
         </form>
-        {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
-        {signUpSuccess && (
-          <Alert>
-            <AlertDescription>
-              Sign up successful! Please check your email inbox for a confirmation link.
-            </AlertDescription>
-          </Alert>
-        )}
+        {error && <p className="text-red-500">{error}</p>}
         <p className="text-center">
           Already have an account?{' '}
           <Button variant="link" onClick={() => setIsSignUp(false)}>
@@ -186,7 +173,7 @@ export const SupabaseAuthUI = () => {
         </div>
         <Button type="submit" className="w-full">Sign In</Button>
       </form>
-      {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
+      {error && <p className="text-red-500">{error}</p>}
       <p className="text-center">
         Don't have an account?{' '}
         <Button variant="link" onClick={() => setIsSignUp(true)}>

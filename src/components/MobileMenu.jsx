@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { X, Save, BookOpen, Settings as SettingsIcon, ChevronDown, ChevronUp, Library, Wrench, Image, User } from 'lucide-react';
+import { X, Save, BookOpen, Settings as SettingsIcon, ChevronDown, ChevronUp, Library, Wrench, Image } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCodeToolsPanel, setShowKeyboardShortcuts, setShowPexelsPanel, saveCurrentCode, toggleConsole, showConsole, toggleSnippetLibrary, showSnippetLibrary, setShowAIImageGeneratorPanel, session, setShowProfilePanel }) => {
+const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCodeToolsPanel, setShowKeyboardShortcuts, setShowPexelsPanel, saveCurrentCode, toggleConsole, showConsole, toggleSnippetLibrary, showSnippetLibrary, setShowAIImageGeneratorPanel, session }) => {
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
 
@@ -57,7 +57,6 @@ const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, set
         </Collapsible>
 
         <MenuButton icon={<SettingsIcon className="w-4 h-4" />} label="Settings" onClick={() => { setShowSettings(true); setIsOpen(false); }} />
-        <MenuButton icon={<User className="w-4 h-4" />} label="Profile" onClick={() => { setShowProfilePanel(true); setIsOpen(false); }} />
       </nav>
     </div>
   );
