@@ -5,13 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { X } from 'lucide-react';
+import { useToast } from "@/components/ui/use-toast";
 
 const ProfilePanel = ({ onClose }) => {
-  const { session, loading } = useSupabaseAuth();
+  const { session, loading, logout } = useSupabaseAuth();
   const userId = session?.user?.id;
   const { data: profile, isLoading, error } = useUserProfile(userId);
   const addProfile = useAddUserProfile();
   const updateProfile = useUpdateUserProfile();
+  const { toast } = useToast();
 
   const [formData, setFormData] = useState({
     username: '',
@@ -38,12 +40,18 @@ const ProfilePanel = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (profile) {
-      await updateProfile.mutateAsync({ id: profile.id, ...formData, user_id: userId });
-    } else {
-      await addProfile.mutateAsync({ ...formData, user_id: userId });
+    try {
+      if (profile) {
+        await updateProfile.mutateAsync({ id: profile.id, ...formData, user_id: userId });
+        toast({ title: "Profile updated successfully", type: "success" });
+      } else {
+        await addProfile.mutateAsync({ ...formData, user_id: userId });
+        toast({ title: "Profile created successfully", type: "success" });
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast({ title: "Error saving profile", description: error.message, type: "error" });
     }
-    onClose();
   };
 
   if (loading) return <div>Loading...</div>;
@@ -104,6 +112,9 @@ const ProfilePanel = ({ onClose }) => {
             </div>
             <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
               {profile ? 'Update Profile' : 'Create Profile'}
+            </Button>
+            <Button onClick={logout} className="w-full bg-red-600 hover:bg-red-700 text-white mt-4">
+              Sign Out
             </Button>
           </form>
         )}
