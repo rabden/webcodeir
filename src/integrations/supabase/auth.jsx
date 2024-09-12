@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Github } from "lucide-react";
 
 const SupabaseAuthContext = createContext();
 
@@ -102,93 +102,67 @@ export const SupabaseAuthUI = () => {
     }
   };
 
-  if (isSignUp) {
-    return (
-      <div className="space-y-4">
-        <form onSubmit={handleSignUp} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <Button type="submit" className="w-full">Sign Up</Button>
-        </form>
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        {signUpSuccess && (
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Success</AlertTitle>
-            <AlertDescription>
-              Please check your Gmail inbox for a confirmation link to complete the sign-up process.
-            </AlertDescription>
-          </Alert>
-        )}
-        <p className="text-center">
-          Already have an account?{' '}
-          <Button variant="link" onClick={() => setIsSignUp(false)}>
-            Sign In
-          </Button>
-        </p>
+  const handleGitHubSignIn = async () => {
+    setError(null);
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+    });
+    if (error) setError(error.message);
+    else {
+      console.log('GitHub sign in initiated', data);
+    }
+  };
+
+  const renderForm = () => (
+    <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
+      {isSignUp && (
+        <div>
+          <Label htmlFor="name">Name</Label>
+          <Input
+            id="name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
+      )}
+      <div>
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
       </div>
-    );
-  }
+      <div>
+        <Label htmlFor="password">Password</Label>
+        <Input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+      </div>
+      <Button type="submit" className="w-full">{isSignUp ? 'Sign Up' : 'Sign In'}</Button>
+    </form>
+  );
 
   return (
     <div className="space-y-4">
-      <form onSubmit={handleSignIn} className="space-y-4">
-        <div>
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <Button type="submit" className="w-full">Sign In</Button>
-      </form>
+      {renderForm()}
+      <div className="flex items-center justify-between">
+        <hr className="w-full" />
+        <span className="px-2 text-gray-500">or</span>
+        <hr className="w-full" />
+      </div>
+      <Button onClick={handleGitHubSignIn} className="w-full flex items-center justify-center" variant="outline">
+        <Github className="mr-2 h-4 w-4" />
+        Sign {isSignUp ? 'up' : 'in'} with GitHub
+      </Button>
       {error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -196,10 +170,19 @@ export const SupabaseAuthUI = () => {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+      {signUpSuccess && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Success</AlertTitle>
+          <AlertDescription>
+            Please check your email for a confirmation link to complete the sign-up process.
+          </AlertDescription>
+        </Alert>
+      )}
       <p className="text-center">
-        Don't have an account?{' '}
-        <Button variant="link" onClick={() => setIsSignUp(true)}>
-          Sign Up
+        {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+        <Button variant="link" onClick={() => setIsSignUp(!isSignUp)}>
+          {isSignUp ? 'Sign In' : 'Sign Up'}
         </Button>
       </p>
     </div>
