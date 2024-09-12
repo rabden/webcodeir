@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Settings as SettingsIcon, Save, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Keyboard, Library, Wrench, BookOpen, Type, Image, Code, Terminal, Palette, User } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import ProfilePanel from './ProfilePanel';
 import { useSupabaseAuth } from '../integrations/supabase';
 
 const Header = ({
@@ -32,7 +31,6 @@ const Header = ({
   setShowAIImageGeneratorPanel,
   setShowProfilePanel,
 }) => {
-  const [showProfilePanel, setShowProfilePanel] = useState(false);
   const { session } = useSupabaseAuth();
 
   const getLayoutIcon = () => {
@@ -163,7 +161,6 @@ const Header = ({
           </TooltipProvider>
         </div>
       )}
-      {showProfilePanel && <ProfilePanel onClose={() => setShowProfilePanel(false)} />}
     </header>
   );
 };
