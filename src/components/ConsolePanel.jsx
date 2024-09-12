@@ -71,7 +71,7 @@ const ConsolePanel = ({ onClose, isMobile }) => {
   };
 
   return (
-    <div className={`fixed ${isMobile ? 'inset-0' : 'inset-y-4 right-4 w-96'} bg-gray-800 shadow-lg z-50 flex flex-col rounded-lg overflow-hidden`}>
+    <div className={`fixed ${isMobile ? 'inset-0' : 'inset-y-4 right-4 w-96'} bg-gray-800 shadow-lg z-50 flex flex-col ${isMobile ? '' : 'rounded-lg'}`}>
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h3 className="text-lg font-semibold text-white">Console</h3>
         <div className="flex space-x-2">
