@@ -9,11 +9,8 @@ import { SupabaseAuthProvider } from './integrations/supabase';
 
 const queryClient = new QueryClient();
 
-const LazyCodeEditor = lazy(() => new Promise(resolve => {
-  setTimeout(() => {
-    resolve(import('./components/CodeEditor'));
-  }, 1500);
-}));
+const LazyCodeEditor = lazy(() => import('./components/CodeEditor'));
+const LazyHome = lazy(() => import('./pages/Home'));
 
 const App = () => (
   <React.StrictMode>
@@ -24,6 +21,9 @@ const App = () => (
           <BrowserRouter>
             <Suspense fallback={<LoadingAnimation />}>
               <Routes>
+                <Route path="/" element={<LazyHome />} />
+                <Route path="/editor" element={<LazyCodeEditor />} />
+                <Route path="/editor/:id" element={<LazyCodeEditor />} />
                 {navItems.map(({ to, page }) => (
                   <Route key={to} path={to} element={
                     <Suspense fallback={<LoadingAnimation />}>
