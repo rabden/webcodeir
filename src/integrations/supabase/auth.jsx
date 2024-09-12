@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Github } from "lucide-react";
+import { AlertCircle, Github, Mail } from "lucide-react";
 
 const SupabaseAuthContext = createContext();
 
@@ -102,14 +102,14 @@ export const SupabaseAuthUI = () => {
     }
   };
 
-  const handleGitHubSignIn = async () => {
+  const handleOAuthSignIn = async (provider) => {
     setError(null);
     const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
+      provider: provider,
     });
     if (error) setError(error.message);
     else {
-      console.log('GitHub sign in initiated', data);
+      console.log(`${provider} sign in initiated`, data);
     }
   };
 
@@ -159,10 +159,16 @@ export const SupabaseAuthUI = () => {
         <span className="px-2 text-gray-500">or</span>
         <hr className="w-full" />
       </div>
-      <Button onClick={handleGitHubSignIn} className="w-full flex items-center justify-center" variant="outline">
-        <Github className="mr-2 h-4 w-4" />
-        Sign {isSignUp ? 'up' : 'in'} with GitHub
-      </Button>
+      <div className="space-y-2">
+        <Button onClick={() => handleOAuthSignIn('github')} className="w-full flex items-center justify-center" variant="outline">
+          <Github className="mr-2 h-4 w-4" />
+          Sign {isSignUp ? 'up' : 'in'} with GitHub
+        </Button>
+        <Button onClick={() => handleOAuthSignIn('google')} className="w-full flex items-center justify-center" variant="outline">
+          <Mail className="mr-2 h-4 w-4" />
+          Sign {isSignUp ? 'up' : 'in'} with Google
+        </Button>
+      </div>
       {error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
