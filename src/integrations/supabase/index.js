@@ -8,6 +8,12 @@ import {
     useUpdateCodeSnippet,
     useDeleteCodeSnippet
 } from './hooks/useCodeSnippets.js';
+import {
+    useUserProfile,
+    useAddUserProfile,
+    useUpdateUserProfile,
+    useDeleteUserProfile
+} from './hooks/useUserProfiles.js';
 
 // Export all the imported functions and objects
 export {
@@ -19,5 +25,9 @@ export {
     useCodeSnippet,
     useAddCodeSnippet,
     useUpdateCodeSnippet,
-    useDeleteCodeSnippet
+    useDeleteCodeSnippet,
+    useUserProfile,
+    useAddUserProfile,
+    useUpdateUserProfile,
+    useDeleteUserProfile
 };

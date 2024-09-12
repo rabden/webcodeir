@@ -1,9 +1,10 @@
-import React from 'react';
-import { Settings as SettingsIcon, Save, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Keyboard, Library, Wrench, BookOpen, Type, Image, Code, Terminal, Palette } from 'lucide-react';
+import React, { useState } from 'react';
+import { Settings as SettingsIcon, Save, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Keyboard, Library, Wrench, BookOpen, Type, Image, Code, Terminal, Palette, User } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import ProfilePanel from './ProfilePanel';
 
 const Header = ({
   currentCodeName,
@@ -29,6 +30,8 @@ const Header = ({
   setCodeToolsInitialTab,
   setShowAIImageGeneratorPanel,
 }) => {
+  const [showProfilePanel, setShowProfilePanel] = useState(false);
+
   const getLayoutIcon = () => {
     switch (layout) {
       case 'horizontal':
@@ -149,9 +152,11 @@ const Header = ({
             {renderButton(getLayoutIcon(), toggleLayout, "Toggle Layout (Ctrl + L)")}
             {renderButton(<Keyboard className="w-5 h-5" />, () => setShowKeyboardShortcuts(true), "Keyboard Shortcuts (Ctrl + /)")}
             {renderButton(<SettingsIcon className="w-5 h-5" />, () => setShowSettings(true), "Settings (Ctrl + ,)")}
+            {renderButton(<User className="w-5 h-5" />, () => setShowProfilePanel(true), "User Profile")}
           </TooltipProvider>
         </div>
       )}
+      {showProfilePanel && <ProfilePanel onClose={() => setShowProfilePanel(false)} />}
     </header>
   );
 };
