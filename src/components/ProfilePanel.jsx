@@ -71,6 +71,15 @@ const ProfilePanel = ({ onClose }) => {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
+              <Label htmlFor="email" className="text-white">Email</Label>
+              <Input
+                id="email"
+                value={session.user.email}
+                readOnly
+                className="bg-gray-800 text-white border-gray-700"
+              />
+            </div>
+            <div>
               <Label htmlFor="username" className="text-white">Username</Label>
               <Input
                 id="username"
