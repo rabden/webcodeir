@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, Check, MoreVertical, Copy } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { X, MoreVertical, Copy, Wand2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import AIImageGeneratorSettings from './AIImageGeneratorSettings';
 import AIImageGeneratorResult from './AIImageGeneratorResult';
 import ImageCollection from './ImageCollection';
@@ -42,17 +40,31 @@ const AIImageGenerator = ({ onClose }) => {
       num_inference_steps: 4
     },
     isFluxSettingsOpen: false,
-    isCollectionOpen: false
+    isCollectionOpen: false,
+    savedImages: []
   });
-  const [savedImages, setSavedImages] = useState([]);
   const { toast } = useToast();
   const { session } = useSupabaseAuth();
-  const { generationCount, canGenerate, incrementCount } = useImageGenerationLimit(session?.user?.id);
+  const { generationCount, canGenerate, incrementCount, lastResetTime } = useImageGenerationLimit(session?.user?.id);
+  const [timeUntilRefresh, setTimeUntilRefresh] = useState(0);
 
   useEffect(() => {
     const savedImagesFromStorage = JSON.parse(localStorage.getItem('savedImages') || '[]');
-    setSavedImages(savedImagesFromStorage);
+    setState(prev => ({ ...prev, savedImages: savedImagesFromStorage }));
   }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (lastResetTime) {
+        const now = new Date().getTime();
+        const timePassed = now - lastResetTime;
+        const timeLeft = Math.max(6 * 60 * 60 * 1000 - timePassed, 0);
+        setTimeUntilRefresh(timeLeft);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [lastResetTime]);
 
   const generateImage = async (model) => {
     if (!canGenerate) {
@@ -74,38 +86,34 @@ const AIImageGenerator = ({ onClose }) => {
       return;
     }
 
-    setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true } }));
-    let data = { inputs: state.prompts[model] };
-    if (model === 'FLUX') {
-      const { width, height } = aspectRatios[state.fluxParams.aspectRatio];
-      data.parameters = {
-        seed: state.fluxParams.randomize_seed ? Math.floor(Math.random() * MAX_SEED) : state.fluxParams.seed,
-        width,
-        height,
-        num_inference_steps: state.fluxParams.num_inference_steps
-      };
-    }
-    
-    setState(prev => ({
-      ...prev,
+    setState(prev => ({ 
+      ...prev, 
+      loading: { ...prev.loading, [model]: true },
       results: {
         ...prev.results,
-        [model]: [{ loading: true, seed: data.parameters?.seed, prompt: state.prompts[model] }, ...prev.results[model]]
+        [model]: [{ loading: true, seed: prev.fluxParams.seed, prompt: prev.prompts[model] }, ...prev.results[model]]
       }
     }));
 
     try {
-      const response = await queryModel(model, data);
+      const response = await queryModel(model, {
+        inputs: state.prompts[model],
+        parameters: {
+          seed: state.fluxParams.randomize_seed ? Math.floor(Math.random() * MAX_SEED) : state.fluxParams.seed,
+          ...aspectRatios[state.fluxParams.aspectRatio],
+          num_inference_steps: state.fluxParams.num_inference_steps
+        }
+      });
       const imageUrl = URL.createObjectURL(response[0]);
       setState(prev => ({ 
         ...prev, 
         results: { 
           ...prev.results, 
           [model]: prev.results[model].map((item, index) => 
-            index === 0 ? { imageUrl, seed: response[1], prompt: state.prompts[model] } : item
+            index === 0 ? { imageUrl, seed: response[1], prompt: prev.prompts[model] } : item
           )
         },
-        fluxParams: model === 'FLUX' ? { ...prev.fluxParams, seed: response[1] } : prev.fluxParams
+        fluxParams: { ...prev.fluxParams, seed: response[1] }
       }));
     } catch (error) {
       console.error('Error:', error);
@@ -114,7 +122,7 @@ const AIImageGenerator = ({ onClose }) => {
         results: { 
           ...prev.results, 
           [model]: prev.results[model].map((item, index) => 
-            index === 0 ? { error: 'Error generating image. Please try again.', seed: data.parameters?.seed, prompt: state.prompts[model] } : item
+            index === 0 ? { error: 'Error generating image. Please try again.', seed: prev.fluxParams.seed, prompt: prev.prompts[model] } : item
           )
         }
       }));
@@ -135,33 +143,12 @@ const AIImageGenerator = ({ onClose }) => {
     return [result, data.parameters?.seed];
   };
 
-  const renderInputs = (model) => (
-    <div className="flex space-x-2 mb-4">
-      <Input
-        value={state.prompts[model]}
-        onChange={(e) => setState(prev => ({ ...prev, prompts: { ...prev.prompts, [model]: e.target.value } }))}
-        placeholder="Enter prompt"
-        className="flex-grow"
-      />
-      <Button
-        onClick={() => generateImage(model)}
-        disabled={state.loading[model]}
-        size="icon"
-        className="bg-blue-600 hover:bg-blue-700"
-      >
-        {state.loading[model] ? <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div> : <Search className="h-4 w-4" />}
-      </Button>
-    </div>
-  );
-
-  const toggleCollection = () => {
-    setState(prev => ({ ...prev, isCollectionOpen: !prev.isCollectionOpen }));
-  };
-
   const saveImage = (image) => {
-    const updatedSavedImages = [...savedImages, image];
-    setSavedImages(updatedSavedImages);
-    localStorage.setItem('savedImages', JSON.stringify(updatedSavedImages));
+    setState(prev => {
+      const updatedSavedImages = [...prev.savedImages, image];
+      localStorage.setItem('savedImages', JSON.stringify(updatedSavedImages));
+      return { ...prev, savedImages: updatedSavedImages };
+    });
     toast({
       title: "Image Saved",
       description: "The image has been added to your collection.",
@@ -169,13 +156,21 @@ const AIImageGenerator = ({ onClose }) => {
   };
 
   const removeImage = (index) => {
-    const updatedSavedImages = savedImages.filter((_, i) => i !== index);
-    setSavedImages(updatedSavedImages);
-    localStorage.setItem('savedImages', JSON.stringify(updatedSavedImages));
+    setState(prev => {
+      const updatedSavedImages = prev.savedImages.filter((_, i) => i !== index);
+      localStorage.setItem('savedImages', JSON.stringify(updatedSavedImages));
+      return { ...prev, savedImages: updatedSavedImages };
+    });
     toast({
       title: "Image Removed",
       description: "The image has been removed from your collection.",
     });
+  };
+
+  const formatTimeLeft = (ms) => {
+    const hours = Math.floor(ms / 3600000);
+    const minutes = Math.floor((ms % 3600000) / 60000);
+    return `${hours}h ${minutes}m`;
   };
 
   return (
@@ -183,7 +178,7 @@ const AIImageGenerator = ({ onClose }) => {
       <div className="p-4 border-b border-gray-700 flex justify-between items-center">
         <h2 className="text-xl font-bold text-white">AI Image Generator</h2>
         <div className="flex space-x-2">
-          <Button variant="ghost" size="icon" onClick={toggleCollection}>
+          <Button variant="ghost" size="icon" onClick={() => setState(prev => ({ ...prev, isCollectionOpen: !prev.isCollectionOpen }))}>
             <Copy className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" onClick={onClose}>
@@ -194,7 +189,10 @@ const AIImageGenerator = ({ onClose }) => {
       <ScrollArea className="flex-grow">
         <div className="p-4 space-y-4">
           <div className="text-sm text-white">
-            Available generations: {20 - generationCount} / 20
+            {canGenerate 
+              ? `Available generations: ${20 - generationCount} / 20`
+              : `Will refresh in: ${formatTimeLeft(timeUntilRefresh)}`
+            }
           </div>
           <AIImageGeneratorSettings
             fluxParams={state.fluxParams}
@@ -203,7 +201,22 @@ const AIImageGenerator = ({ onClose }) => {
             setIsFluxSettingsOpen={(isOpen) => setState(prev => ({ ...prev, isFluxSettingsOpen: isOpen }))}
             aspectRatios={aspectRatios}
           />
-          {renderInputs('FLUX')}
+          <div className="flex space-x-2 mb-4">
+            <Input
+              value={state.prompts.FLUX}
+              onChange={(e) => setState(prev => ({ ...prev, prompts: { ...prev.prompts, FLUX: e.target.value } }))}
+              placeholder="Enter prompt"
+              className="flex-grow"
+            />
+            <Button
+              onClick={() => generateImage('FLUX')}
+              disabled={state.loading.FLUX}
+              size="icon"
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {state.loading.FLUX ? <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div> : <Wand2 className="h-4 w-4" />}
+            </Button>
+          </div>
           <AIImageGeneratorResult 
             results={state.results.FLUX} 
             toast={toast} 
@@ -213,8 +226,8 @@ const AIImageGenerator = ({ onClose }) => {
       </ScrollArea>
       {state.isCollectionOpen && (
         <ImageCollection
-          onClose={toggleCollection}
-          savedImages={savedImages}
+          onClose={() => setState(prev => ({ ...prev, isCollectionOpen: false }))}
+          savedImages={state.savedImages}
           onRemoveImage={removeImage}
         />
       )}
