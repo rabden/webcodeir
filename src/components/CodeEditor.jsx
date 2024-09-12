@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect, useCallback, useMemo, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useCallback, useMemo } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import Header from './Header';
 import EditorPanel from './EditorPanel';
@@ -9,7 +9,7 @@ import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import LoadingAnimation from './LoadingAnimation';
 import { useSupabaseAuth } from '../integrations/supabase';
-import { useAddCodeSnippet, useUpdateCodeSnippet } from '../integrations/supabase';
+import { useAddCodeSnippet } from '../integrations/supabase';
 import { useToast } from "@/components/ui/use-toast";
 
 const LazyComponents = lazy(() => import('./LazyComponents'));
@@ -17,15 +17,13 @@ const LazyComponents = lazy(() => import('./LazyComponents'));
 const CodeEditor = () => {
   const [state, setState] = useCodeEditorState();
   const { saveToLocalStorage, loadFromLocalStorage } = useLocalStorage(setState);
-  const [activeTab, setActiveTab] = useState('html');
-  const [showConsole, setShowConsole] = useState(false);
-  const [showSnippetLibrary, setShowSnippetLibrary] = useState(false);
-  const [showCodeToolsPanel, setShowCodeToolsPanel] = useState(false);
-  const [codeToolsInitialTab, setCodeToolsInitialTab] = useState('html');
-  const [currentLoadedCode, setCurrentLoadedCode] = useState(null);
+  const [activeTab, setActiveTab] = React.useState('html');
+  const [showConsole, setShowConsole] = React.useState(false);
+  const [showSnippetLibrary, setShowSnippetLibrary] = React.useState(false);
+  const [showCodeToolsPanel, setShowCodeToolsPanel] = React.useState(false);
+  const [codeToolsInitialTab, setCodeToolsInitialTab] = React.useState('html');
   const authContext = useSupabaseAuth();
   const addCodeSnippet = useAddCodeSnippet();
-  const updateCodeSnippet = useUpdateCodeSnippet();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -55,7 +53,7 @@ const CodeEditor = () => {
     }));
   }, [setState]);
 
-  const saveOrUpdateCode = useCallback(async () => {
+  const saveCurrentCode = useCallback(async () => {
     if (!authContext || !authContext.session) {
       toast({
         title: "Error",
@@ -65,37 +63,27 @@ const CodeEditor = () => {
       return;
     }
 
-    const codeData = {
-      user_id: authContext.session.user.id,
-      title: state.currentCodeName,
-      html_code: state.htmlCode,
-      css_code: state.cssCode,
-      js_code: state.jsCode,
-    };
-
     try {
-      if (currentLoadedCode) {
-        await updateCodeSnippet.mutateAsync({ id: currentLoadedCode.id, ...codeData });
-        toast({
-          title: "Success",
-          description: "Code updated successfully!",
-        });
-      } else {
-        await addCodeSnippet.mutateAsync(codeData);
-        toast({
-          title: "Success",
-          description: "Code saved successfully!",
-        });
-      }
+      await addCodeSnippet.mutateAsync({
+        user_id: authContext.session.user.id,
+        title: state.currentCodeName,
+        html_code: state.htmlCode,
+        css_code: state.cssCode,
+        js_code: state.jsCode,
+      });
+      toast({
+        title: "Success",
+        description: "Code saved successfully!",
+      });
     } catch (error) {
-      console.error('Error saving/updating code:', error);
+      console.error('Error saving code:', error);
       toast({
         title: "Error",
-        description: "Failed to save/update code. Please try again.",
+        description: "Failed to save code. Please try again.",
         variant: "destructive",
       });
     }
-  }, [authContext, addCodeSnippet, updateCodeSnippet, state.currentCodeName, state.htmlCode, state.cssCode, state.jsCode, currentLoadedCode, toast]);
+  }, [authContext, addCodeSnippet, state.currentCodeName, state.htmlCode, state.cssCode, state.jsCode, toast]);
 
   const toggleLayout = useCallback(() => {
     setState(s => ({
@@ -158,8 +146,7 @@ const CodeEditor = () => {
         currentCodeName={state.currentCodeName}
         setCurrentCodeName={(name) => setState(s => ({ ...s, currentCodeName: name }))}
         isMobile={state.isMobile}
-        saveOrUpdateCode={saveOrUpdateCode}
-        isUpdateMode={!!currentLoadedCode}
+        saveCurrentCode={saveCurrentCode}
         setShowSavedCodes={() => setState(s => ({ ...s, showSavedCodes: true }))}
         setShowFontPanel={() => setState(s => ({ ...s, showFontPanel: true }))}
         setShowIconPanel={() => setState(s => ({ ...s, showIconPanel: true }))}
@@ -195,7 +182,6 @@ const CodeEditor = () => {
           showCodeToolsPanel={showCodeToolsPanel}
           setShowCodeToolsPanel={setShowCodeToolsPanel}
           codeToolsInitialTab={codeToolsInitialTab}
-          setCurrentLoadedCode={setCurrentLoadedCode}
         />
       </Suspense>
       <MobileMenu
@@ -209,8 +195,7 @@ const CodeEditor = () => {
         setShowAIImageGeneratorPanel={() => setState(s => ({ ...s, showAIImageGeneratorPanel: true, isMenuOpen: false }))}
         setShowKeyboardShortcuts={() => setState(s => ({ ...s, showKeyboardShortcuts: true, isMenuOpen: false }))}
         setShowPexelsPanel={() => setState(s => ({ ...s, showPexelsPanel: true, isMenuOpen: false }))}
-        saveOrUpdateCode={() => { saveOrUpdateCode(); setState(s => ({ ...s, isMenuOpen: false })); }}
-        isUpdateMode={!!currentLoadedCode}
+        saveCurrentCode={() => { saveCurrentCode(); setState(s => ({ ...s, isMenuOpen: false })); }}
         toggleConsole={() => { setShowConsole(s => !s); setState(s => ({ ...s, isMenuOpen: false })); }}
         showConsole={showConsole}
         toggleSnippetLibrary={() => { setShowSnippetLibrary(s => !s); setState(s => ({ ...s, isMenuOpen: false })); }}
