@@ -1,8 +1,6 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { supabase } from './supabase.js';
 import { useQueryClient } from '@tanstack/react-query';
-import { Auth } from '@supabase/auth-ui-react';
-import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -80,7 +78,7 @@ export const SupabaseAuthUI = () => {
       password,
       options: {
         data: {
-          name: name,
+          display_name: name,
         },
       },
     });

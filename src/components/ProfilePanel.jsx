@@ -67,6 +67,7 @@ const ProfilePanel = ({ onClose }) => {
         ) : (
           <div className="space-y-4">
             <p className="text-white">Email: {session.user.email}</p>
+            <p className="text-white">Name: {session.user.user_metadata.display_name || 'N/A'}</p>
             <Button onClick={handleSignOut} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
               Sign Out
             </Button>
