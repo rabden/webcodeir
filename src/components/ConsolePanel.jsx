@@ -4,10 +4,17 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { X, Download, Trash } from 'lucide-react';
 
-const ConsolePanel = ({ onClose, isMobile }) => {
+const ConsolePanel = ({ onClose }) => {
   const [logs, setLogs] = useState([]);
   const [input, setInput] = useState('');
   const scrollAreaRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const originalConsoleLog = console.log;
@@ -53,9 +60,7 @@ const ConsolePanel = ({ onClose, isMobile }) => {
     setInput('');
   };
 
-  const clearLogs = () => {
-    setLogs([]);
-  };
+  const clearLogs = () => setLogs([]);
 
   const downloadLogs = () => {
     const logContent = logs.map(log => `[${log.type}] ${log.content}`).join('\n');
@@ -71,7 +76,7 @@ const ConsolePanel = ({ onClose, isMobile }) => {
   };
 
   return (
-    <div className={`fixed ${isMobile ? 'inset-0' : 'inset-y-4 right-4 w-96'} bg-gray-800 shadow-lg z-50 flex flex-col ${isMobile ? '' : 'rounded-lg'}`}>
+    <div className={`fixed ${isMobile ? 'inset-0' : 'inset-y-4 right-4 w-96'} bg-gray-800 z-50 flex flex-col ${isMobile ? '' : 'rounded-lg'} overflow-hidden`}>
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h3 className="text-lg font-semibold text-white">Console</h3>
         <div className="flex space-x-2">
