@@ -100,7 +100,6 @@ const AIImageGenerator = ({ onClose }) => {
         },
         fluxParams: { ...prev.fluxParams, seed: response[1] }
       }));
-      await saveGeneratedImage(newImage);
     } catch (error) {
       console.error('Error:', error);
       setState(prev => ({ 
@@ -136,8 +135,17 @@ const AIImageGenerator = ({ onClose }) => {
           seed: image.seed,
           prompt: image.prompt
         });
+        toast({
+          title: "Success",
+          description: "Image saved to collection successfully!",
+        });
       } catch (error) {
         console.error('Error saving generated image:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save image to collection. Please try again.",
+          variant: "destructive",
+        });
       }
     }
   };
@@ -182,7 +190,8 @@ const AIImageGenerator = ({ onClose }) => {
           </div>
           <AIImageGeneratorResult 
             results={state.results.FLUX} 
-            toast={toast} 
+            toast={toast}
+            onSave={saveGeneratedImage}
           />
         </div>
       </ScrollArea>
