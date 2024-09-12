@@ -8,8 +8,6 @@ import { useToast } from "@/components/ui/use-toast";
 import AIImageGeneratorSettings from './AIImageGeneratorSettings';
 import AIImageGeneratorResult from './AIImageGeneratorResult';
 import ImageCollection from './ImageCollection';
-import { useSupabaseAuth } from '../integrations/supabase';
-import { useSaveImage, useUserImages } from '../integrations/supabase/hooks/useImageCollections';
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -43,17 +41,15 @@ const AIImageGenerator = ({ onClose }) => {
     isFluxSettingsOpen: false
   });
   const [isCollectionOpen, setIsCollectionOpen] = useState(false);
+  const [savedImages, setSavedImages] = useState([]);
   const { toast } = useToast();
-  const { session } = useSupabaseAuth();
-  const saveImage = useSaveImage();
-  const { data: savedImages, refetch: refetchSavedImages } = useUserImages(session?.user?.id);
+
+  useEffect(() => {
+    const savedImagesFromStorage = JSON.parse(localStorage.getItem('savedImages') || '[]');
+    setSavedImages(savedImagesFromStorage);
+  }, []);
 
   const generateImage = async (model) => {
-    if (!session) {
-      toast({ title: "Error", description: "Please sign in to generate images.", variant: "destructive" });
-      return;
-    }
-
     setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true } }));
     let data = { inputs: state.prompts[model] };
     if (model === 'FLUX') {
@@ -115,40 +111,6 @@ const AIImageGenerator = ({ onClose }) => {
     return [result, data.parameters?.seed];
   };
 
-  const handleSaveImage = async (image) => {
-    if (!session?.user?.id) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to save images.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      await saveImage.mutateAsync({
-        user_id: session.user.id,
-        image_url: image.imageUrl,
-        prompt: image.prompt,
-        seed: image.seed,
-      });
-      refetchSavedImages();
-      toast({
-        title: "Image Saved",
-        description: "The image has been added to your collection.",
-      });
-    } catch (error) {
-      console.error('Error saving image:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save the image. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const toggleCollection = () => setIsCollectionOpen(!isCollectionOpen);
-
   const renderInputs = (model) => (
     <div className="flex space-x-2 mb-4">
       <Input
@@ -167,6 +129,30 @@ const AIImageGenerator = ({ onClose }) => {
       </Button>
     </div>
   );
+
+  const toggleCollection = () => {
+    setIsCollectionOpen(!isCollectionOpen);
+  };
+
+  const saveImage = (image) => {
+    const updatedSavedImages = [...savedImages, image];
+    setSavedImages(updatedSavedImages);
+    localStorage.setItem('savedImages', JSON.stringify(updatedSavedImages));
+    toast({
+      title: "Image Saved",
+      description: "The image has been added to your collection.",
+    });
+  };
+
+  const removeImage = (index) => {
+    const updatedSavedImages = savedImages.filter((_, i) => i !== index);
+    setSavedImages(updatedSavedImages);
+    localStorage.setItem('savedImages', JSON.stringify(updatedSavedImages));
+    toast({
+      title: "Image Removed",
+      description: "The image has been removed from your collection.",
+    });
+  };
 
   return (
     <div className="fixed inset-0 bg-gray-800 z-50 flex flex-col md:inset-y-4 md:right-4 md:left-auto md:w-96 md:rounded-lg overflow-hidden">
@@ -206,7 +192,7 @@ const AIImageGenerator = ({ onClose }) => {
                     <AIImageGeneratorResult 
                       results={state.results[model]} 
                       toast={toast} 
-                      onSave={handleSaveImage}
+                      onSave={saveImage}
                     />
                   </div>
                 </div>
@@ -218,8 +204,8 @@ const AIImageGenerator = ({ onClose }) => {
       {isCollectionOpen && (
         <ImageCollection
           onClose={toggleCollection}
-          savedImages={savedImages || []}
-          onRemoveImage={refetchSavedImages}
+          savedImages={savedImages}
+          onRemoveImage={removeImage}
         />
       )}
     </div>

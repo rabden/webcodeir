@@ -14,11 +14,6 @@ import {
     useUpdateUserProfile,
     useDeleteUserProfile
 } from './hooks/useUserProfiles.js';
-import {
-    useUserImages,
-    useSaveImage,
-    useDeleteImage
-} from './hooks/useImageCollections.js';
 
 // Export all the imported functions and objects
 export {
@@ -34,8 +29,5 @@ export {
     useUserProfile,
     useAddUserProfile,
     useUpdateUserProfile,
-    useDeleteUserProfile,
-    useUserImages,
-    useSaveImage,
-    useDeleteImage
+    useDeleteUserProfile
 };
