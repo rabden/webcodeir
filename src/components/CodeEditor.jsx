@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect, useCallback, useMemo } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import Header from './Header';
 import EditorPanel from './EditorPanel';
@@ -12,7 +12,17 @@ import { useSupabaseAuth } from '../integrations/supabase';
 import { useAddCodeSnippet } from '../integrations/supabase';
 import { useToast } from "@/components/ui/use-toast";
 
-const LazyComponents = lazy(() => import('./LazyComponents'));
+const Settings = lazy(() => import('./Settings'));
+const SavedCodes = lazy(() => import('./SavedCodes'));
+const FontPanel = lazy(() => import('./FontPanel'));
+const IconPanel = lazy(() => import('./IconPanel'));
+const CodeToolsPanel = lazy(() => import('./CodeToolsPanel'));
+const KeyboardShortcutsPanel = lazy(() => import('./KeyboardShortcutsPanel'));
+const PexelsImagePanel = lazy(() => import('./PexelsImagePanel'));
+const ConsolePanel = lazy(() => import('./ConsolePanel'));
+const CodeSnippetLibrary = lazy(() => import('./CodeSnippetLibrary'));
+const AIImageGenerator = lazy(() => import('./AIImageGenerator'));
+const ProfilePanel = lazy(() => import('./ProfilePanel'));
 
 const CodeEditor = () => {
   const [state, setState] = useCodeEditorState();
@@ -41,7 +51,7 @@ const CodeEditor = () => {
     return () => clearTimeout(debounce);
   }, [state.htmlCode, state.cssCode, state.jsCode, state.settings.autoSave]);
 
-  const updatePreview = useCallback(() => {
+  const updatePreview = () => {
     setState(s => ({
       ...s,
       preview: `
@@ -51,9 +61,9 @@ const CodeEditor = () => {
         </html>
       `
     }));
-  }, [setState]);
+  };
 
-  const saveCurrentCode = useCallback(async () => {
+  const saveCurrentCode = async () => {
     if (!authContext || !authContext.session) {
       toast({
         title: "Error",
@@ -83,9 +93,9 @@ const CodeEditor = () => {
         variant: "destructive",
       });
     }
-  }, [authContext, addCodeSnippet, state.currentCodeName, state.htmlCode, state.cssCode, state.jsCode, toast]);
+  };
 
-  const toggleLayout = useCallback(() => {
+  const toggleLayout = () => {
     setState(s => ({
       ...s,
       settings: {
@@ -93,22 +103,30 @@ const CodeEditor = () => {
         layout: s.settings.layout === 'horizontal' ? 'vertical' : s.settings.layout === 'vertical' ? 'stacked' : 'horizontal'
       }
     }));
-  }, [setState]);
+  };
 
-  const renderLayout = useMemo(() => {
+  const renderLayout = () => {
     const editorPanel = (
-      <EditorPanel
-        htmlCode={state.htmlCode}
-        cssCode={state.cssCode}
-        jsCode={state.jsCode}
-        setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
-        setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
-        setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
-        settings={state.settings}
-        isMobile={state.isMobile}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
+      <div className="relative h-full">
+        <EditorPanel
+          htmlCode={state.htmlCode}
+          cssCode={state.cssCode}
+          jsCode={state.jsCode}
+          setHtmlCode={(code) => setState(s => ({ ...s, htmlCode: code }))}
+          setCssCode={(code) => setState(s => ({ ...s, cssCode: code }))}
+          setJsCode={(code) => setState(s => ({ ...s, jsCode: code }))}
+          settings={state.settings}
+          isMobile={state.isMobile}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+        {state.isMobile && (
+          <MobilePreviewButton
+            onClick={() => setState(s => ({ ...s, showMobilePreview: !s.showMobilePreview }))}
+            isPreviewVisible={state.showMobilePreview}
+          />
+        )}
+      </div>
     );
     const previewPanel = <PreviewPanel preview={state.preview} />;
 
@@ -138,7 +156,7 @@ const CodeEditor = () => {
         </PanelGroup>
       );
     }
-  }, [state.htmlCode, state.cssCode, state.jsCode, state.settings, state.isMobile, state.showMobilePreview, state.preview, activeTab, setActiveTab]);
+  };
 
   return (
     <div className="h-screen flex flex-col bg-gray-900 text-gray-300">
@@ -169,20 +187,20 @@ const CodeEditor = () => {
         session={authContext?.session}
       />
       <div className="flex-grow overflow-hidden">
-        {renderLayout}
+        {renderLayout()}
       </div>
       <Suspense fallback={<LoadingAnimation />}>
-        <LazyComponents
-          state={state}
-          setState={setState}
-          showConsole={showConsole}
-          setShowConsole={setShowConsole}
-          showSnippetLibrary={showSnippetLibrary}
-          setShowSnippetLibrary={setShowSnippetLibrary}
-          showCodeToolsPanel={showCodeToolsPanel}
-          setShowCodeToolsPanel={setShowCodeToolsPanel}
-          codeToolsInitialTab={codeToolsInitialTab}
-        />
+        {state.showSettings && <Settings settings={state.settings} setSettings={(newSettings) => setState(s => ({ ...s, settings: newSettings }))} onClose={() => setState(s => ({ ...s, showSettings: false }))} isMobile={state.iMobile} />}
+        {state.showSavedCodes && authContext?.session && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html_code, cssCode: code.css_code, jsCode: code.js_code, currentCodeName: code.title, showSavedCodes: false }))} isMobile={state.iMobile} />}
+        {state.showFontPanel && <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.iMobile} />}
+        {state.showIconPanel && <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} iMobile={state.iMobile} />}
+        {showCodeToolsPanel && <CodeToolsPanel onClose={() => setShowCodeToolsPanel(false)} initialTab={codeToolsInitialTab} />}
+        {state.showAIImageGeneratorPanel && authContext?.session && <AIImageGenerator onClose={() => setState(s => ({ ...s, showAIImageGeneratorPanel: false }))} />}
+        {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
+        {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
+        {showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.iMobile} />}
+        {showSnippetLibrary && <CodeSnippetLibrary onClose={() => setShowSnippetLibrary(false)} isMobile={state.iMobile} />}
+        {state.showProfilePanel && <ProfilePanel onClose={() => setState(s => ({ ...s, showProfilePanel: false }))} />}
       </Suspense>
       <MobileMenu
         isOpen={state.isMenuOpen}
@@ -207,4 +225,4 @@ const CodeEditor = () => {
   );
 };
 
-export default React.memo(CodeEditor);
+export default CodeEditor;
