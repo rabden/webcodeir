@@ -1,6 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Settings as SettingsIcon, Save, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Keyboard, Library, Wrench, BookOpen, Type, Image, Code, Terminal, Palette, User, Home } from 'lucide-react';
+import { Settings as SettingsIcon, Save, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Keyboard, Library, Wrench, BookOpen, Type, Image, Code, Terminal, Palette, User } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -73,14 +72,12 @@ const Header = ({
             <Menu className="h-6 w-6" />
           </Button>
         )}
-        <div className="flex items-center">
-          <input
-            type="text"
-            value={currentCodeName}
-            onChange={(e) => setCurrentCodeName(e.target.value)}
-            className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white max-w-[150px] sm:max-w-none"
-          />
-        </div>
+        <input
+          type="text"
+          value={currentCodeName}
+          onChange={(e) => setCurrentCodeName(e.target.value)}
+          className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white max-w-[150px] sm:max-w-none"
+        />
       </div>
       {isMobile && (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-grow mx-2">
@@ -161,9 +158,6 @@ const Header = ({
             {renderButton(<Keyboard className="w-5 h-5" />, () => setShowKeyboardShortcuts(true), "Keyboard Shortcuts (Ctrl + /)")}
             {renderButton(<SettingsIcon className="w-5 h-5" />, () => setShowSettings(true), "Settings (Ctrl + ,)")}
             {renderButton(<User className="w-5 h-5" />, () => setShowProfilePanel(true), "User Profile")}
-            <Link to="/">
-              {renderButton(<Home className="w-5 h-5" />, null, "Go to Home")}
-            </Link>
           </TooltipProvider>
         </div>
       )}
