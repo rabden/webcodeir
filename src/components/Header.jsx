@@ -30,6 +30,7 @@ const Header = ({
   setShowCodeToolsPanel,
   setCodeToolsInitialTab,
   setShowAIImageGeneratorPanel,
+  setShowProfilePanel,
 }) => {
   const [showProfilePanel, setShowProfilePanel] = useState(false);
   const { session } = useSupabaseAuth();
@@ -147,10 +148,12 @@ const Header = ({
                   <Code className="w-4 h-4 mr-2" />
                   <span>JS Tools</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowAIImageGeneratorPanel(true)}>
-                  <Image className="w-4 h-4 mr-2" />
-                  <span>AI Image Generator</span>
-                </DropdownMenuItem>
+                {session && (
+                  <DropdownMenuItem onSelect={() => setShowAIImageGeneratorPanel(true)}>
+                    <Image className="w-4 h-4 mr-2" />
+                    <span>AI Image Generator</span>
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
             {renderButton(getLayoutIcon(), toggleLayout, "Toggle Layout (Ctrl + L)")}

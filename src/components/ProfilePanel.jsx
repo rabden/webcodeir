@@ -33,8 +33,9 @@ const ProfilePanel = ({ onClose }) => {
   const handleDeleteAccount = async () => {
     if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
       try {
-        const { error } = await supabase.auth.admin.deleteUser(session.user.id);
+        const { error } = await supabase.rpc('delete_user');
         if (error) throw error;
+        await logout();
         toast({
           title: "Account deleted successfully",
           type: "success"
