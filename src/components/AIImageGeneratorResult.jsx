@@ -1,16 +1,16 @@
 import React from 'react';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Download, Link, Image, Loader2 } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 
-const AIImageGeneratorResult = ({ results, toast }) => {
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Copied!",
-      description: "Copied to clipboard",
-    });
+const AIImageGeneratorResult = ({ results }) => {
+  const handleDownload = (imageUrl) => {
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = 'generated-image.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return results.map((result, index) => (
@@ -33,31 +33,16 @@ const AIImageGeneratorResult = ({ results, toast }) => {
           <p className="text-sm text-gray-400">Seed: {result.seed}</p>
           <p className="text-sm text-gray-400">Prompt: {result.prompt}</p>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-gray-800 text-white border-gray-700">
-            {!result.loading && !result.error && (
-              <>
-                <DropdownMenuItem onClick={() => window.open(result.imageUrl, '_blank')} className="hover:bg-gray-700">
-                  <Download className="mr-2 h-4 w-4" />
-                  <span>Download</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => copyToClipboard(result.imageUrl)} className="hover:bg-gray-700">
-                  <Link className="mr-2 h-4 w-4" />
-                  <span>Copy Link</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => copyToClipboard(`<img src="${result.imageUrl}" alt="Generated image" />`)} className="hover:bg-gray-700">
-                  <Image className="mr-2 h-4 w-4" />
-                  <span>Copy Image Tag</span>
-                </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {!result.loading && !result.error && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleDownload(result.imageUrl)}
+            className="text-white hover:bg-gray-700"
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+        )}
       </CardFooter>
     </Card>
   ));
