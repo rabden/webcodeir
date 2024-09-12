@@ -8,6 +8,8 @@ import { useToast } from "@/components/ui/use-toast";
 import AIImageGeneratorSettings from './AIImageGeneratorSettings';
 import AIImageGeneratorResult from './AIImageGeneratorResult';
 import ImageCollection from './ImageCollection';
+import { useSupabaseAuth } from '../integrations/supabase';
+import { useSaveImage, useUserImages } from '../integrations/supabase/hooks/useImageCollections';
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -41,13 +43,10 @@ const AIImageGenerator = ({ onClose }) => {
     isFluxSettingsOpen: false
   });
   const [isCollectionOpen, setIsCollectionOpen] = useState(false);
-  const [savedImages, setSavedImages] = useState([]);
   const { toast } = useToast();
-
-  useEffect(() => {
-    const savedImagesFromStorage = JSON.parse(localStorage.getItem('savedImages') || '[]');
-    setSavedImages(savedImagesFromStorage);
-  }, []);
+  const { session } = useSupabaseAuth();
+  const saveImage = useSaveImage();
+  const { data: savedImages, refetch: refetchSavedImages } = useUserImages(session?.user?.id);
 
   const generateImage = async (model) => {
     setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true } }));
@@ -134,24 +133,36 @@ const AIImageGenerator = ({ onClose }) => {
     setIsCollectionOpen(!isCollectionOpen);
   };
 
-  const saveImage = (image) => {
-    const updatedSavedImages = [...savedImages, image];
-    setSavedImages(updatedSavedImages);
-    localStorage.setItem('savedImages', JSON.stringify(updatedSavedImages));
-    toast({
-      title: "Image Saved",
-      description: "The image has been added to your collection.",
-    });
-  };
+  const handleSaveImage = async (image) => {
+    if (!session?.user?.id) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to save images.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  const removeImage = (index) => {
-    const updatedSavedImages = savedImages.filter((_, i) => i !== index);
-    setSavedImages(updatedSavedImages);
-    localStorage.setItem('savedImages', JSON.stringify(updatedSavedImages));
-    toast({
-      title: "Image Removed",
-      description: "The image has been removed from your collection.",
-    });
+    try {
+      await saveImage.mutateAsync({
+        user_id: session.user.id,
+        image_url: image.imageUrl,
+        prompt: image.prompt,
+        seed: image.seed,
+      });
+      refetchSavedImages();
+      toast({
+        title: "Image Saved",
+        description: "The image has been added to your collection.",
+      });
+    } catch (error) {
+      console.error('Error saving image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save the image. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -192,7 +203,7 @@ const AIImageGenerator = ({ onClose }) => {
                     <AIImageGeneratorResult 
                       results={state.results[model]} 
                       toast={toast} 
-                      onSave={saveImage}
+                      onSave={handleSaveImage}
                     />
                   </div>
                 </div>
@@ -204,8 +215,8 @@ const AIImageGenerator = ({ onClose }) => {
       {isCollectionOpen && (
         <ImageCollection
           onClose={toggleCollection}
-          savedImages={savedImages}
-          onRemoveImage={removeImage}
+          savedImages={savedImages || []}
+          onRemoveImage={refetchSavedImages}
         />
       )}
     </div>
