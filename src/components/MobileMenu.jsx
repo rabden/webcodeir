@@ -3,7 +3,7 @@ import { X, Save, BookOpen, Settings as SettingsIcon, ChevronDown, ChevronUp, Li
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCodeToolsPanel, setShowKeyboardShortcuts, setShowPexelsPanel, saveCurrentCode, toggleConsole, showConsole, toggleSnippetLibrary, showSnippetLibrary, setShowAIImageGeneratorPanel }) => {
+const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, setShowFontPanel, setShowIconPanel, setShowCodeToolsPanel, setShowKeyboardShortcuts, setShowPexelsPanel, saveCurrentCode, toggleConsole, showConsole, toggleSnippetLibrary, showSnippetLibrary, setShowAIImageGeneratorPanel, session }) => {
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
 
@@ -16,8 +16,7 @@ const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, set
         </Button>
       </div>
       <nav className="p-4 space-y-2">
-        <MenuButton icon={<Save className="w-4 h-4" />} label="Save Current Code" onClick={() => { saveCurrentCode(); setIsOpen(false); }} />
-        <MenuButton icon={<BookOpen className="w-4 h-4" />} label="Saved Codes" onClick={() => { setShowSavedCodes(true); setIsOpen(false); }} />
+        {session && <MenuButton icon={<Save className="w-4 h-4" />} label="Save Current Code" onClick={() => { saveCurrentCode(); setIsOpen(false); }} />}
         
         <Collapsible open={isLibraryOpen} onOpenChange={setIsLibraryOpen}>
           <CollapsibleTrigger asChild>
@@ -30,6 +29,7 @@ const MobileMenu = ({ isOpen, setIsOpen, setShowSettings, setShowSavedCodes, set
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2 mt-2 ml-4">
+            {session && <MenuButton label="Saved Codes" onClick={() => { setShowSavedCodes(true); setIsOpen(false); }} />}
             <MenuButton label="Font Library" onClick={() => { setShowFontPanel(true); setIsOpen(false); }} />
             <MenuButton label="Icon Library" onClick={() => { setShowIconPanel(true); setIsOpen(false); }} />
             <MenuButton label="Pexels Images" onClick={() => { setShowPexelsPanel(true); setIsOpen(false); }} />

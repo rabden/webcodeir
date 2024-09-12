@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import ProfilePanel from './ProfilePanel';
+import { useSupabaseAuth } from '../integrations/supabase';
 
 const Header = ({
   currentCodeName,
@@ -31,6 +32,7 @@ const Header = ({
   setShowAIImageGeneratorPanel,
 }) => {
   const [showProfilePanel, setShowProfilePanel] = useState(false);
+  const { session } = useSupabaseAuth();
 
   const getLayoutIcon = () => {
     switch (layout) {
@@ -90,7 +92,7 @@ const Header = ({
       {!isMobile && (
         <div className="flex items-center space-x-2">
           <TooltipProvider>
-            {renderButton(<Save className="w-5 h-5" />, saveCurrentCode, "Save current code (Ctrl + S)")}
+            {session && renderButton(<Save className="w-5 h-5" />, saveCurrentCode, "Save current code (Ctrl + S)")}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-white hover:bg-gray-700">
@@ -98,10 +100,12 @@ const Header = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-gray-700 text-white">
-                <DropdownMenuItem onSelect={() => setShowSavedCodes(true)}>
-                  <BookOpen className="w-4 h-4 mr-2" />
-                  <span>Saved Codes</span>
-                </DropdownMenuItem>
+                {session && (
+                  <DropdownMenuItem onSelect={() => setShowSavedCodes(true)}>
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    <span>Saved Codes</span>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onSelect={() => setShowFontPanel(true)}>
                   <Type className="w-4 h-4 mr-2" />
                   <span>Font Library</span>

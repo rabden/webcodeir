@@ -188,7 +188,7 @@ const CodeEditor = () => {
       </div>
       <Suspense fallback={<LoadingAnimation />}>
         {state.showSettings && <Settings settings={state.settings} setSettings={(newSettings) => setState(s => ({ ...s, settings: newSettings }))} onClose={() => setState(s => ({ ...s, showSettings: false }))} isMobile={state.iMobile} />}
-        {state.showSavedCodes && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html_code, cssCode: code.css_code, jsCode: code.js_code, currentCodeName: code.title, showSavedCodes: false }))} isMobile={state.iMobile} />}
+        {state.showSavedCodes && session && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html_code, cssCode: code.css_code, jsCode: code.js_code, currentCodeName: code.title, showSavedCodes: false }))} isMobile={state.iMobile} />}
         {state.showFontPanel && <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.iMobile} />}
         {state.showIconPanel && <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} isMobile={state.iMobile} />}
         {showCodeToolsPanel && <CodeToolsPanel onClose={() => setShowCodeToolsPanel(false)} initialTab={codeToolsInitialTab} />}
@@ -214,6 +214,7 @@ const CodeEditor = () => {
         showConsole={showConsole}
         toggleSnippetLibrary={() => { setShowSnippetLibrary(s => !s); setState(s => ({ ...s, isMenuOpen: false })); }}
         showSnippetLibrary={showSnippetLibrary}
+        session={session}
       />
     </div>
   );
