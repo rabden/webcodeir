@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { X, Trash2, ChevronDown, ChevronUp, Play, Eye, EyeOff } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { useCodeSnippets, useDeleteCodeSnippet } from '../integrations/supabase';
+import { useSupabaseAuth } from '../integrations/supabase';
+import { useToast } from "@/components/ui/use-toast";
 
 const SavedCodes = ({ onClose, onLoad }) => {
-  const [savedCodes, setSavedCodes] = useState([]);
   const [expandedCode, setExpandedCode] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const { session } = useSupabaseAuth();
+  const { data: savedCodes, isLoading, error } = useCodeSnippets(session?.user?.id);
+  const deleteCodeSnippet = useDeleteCodeSnippet();
+  const { toast } = useToast();
 
   useEffect(() => {
-    const codes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
-    setSavedCodes(codes);
-
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
@@ -18,18 +21,27 @@ const SavedCodes = ({ onClose, onLoad }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleDelete = (id) => {
-    const updatedCodes = savedCodes.filter(code => code.id !== id);
-    setSavedCodes(updatedCodes);
-    localStorage.setItem('savedCodes', JSON.stringify(updatedCodes));
+  const handleDelete = async (id) => {
+    try {
+      await deleteCodeSnippet.mutateAsync(id);
+      toast({
+        title: "Success",
+        description: "Code deleted successfully!",
+      });
+    } catch (error) {
+      console.error('Error deleting code:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete code. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleRename = (id, newName) => {
-    const updatedCodes = savedCodes.map(code => 
-      code.id === id ? { ...code, name: newName } : code
-    );
-    setSavedCodes(updatedCodes);
-    localStorage.setItem('savedCodes', JSON.stringify(updatedCodes));
+    // Implement rename functionality using Supabase
+    // This will require creating a new mutation in the useCodeSnippets hook
+    console.log('Rename functionality not implemented yet');
   };
 
   const toggleExpand = (id) => {
@@ -50,6 +62,9 @@ const SavedCodes = ({ onClose, onLoad }) => {
     `;
   };
 
+  if (isLoading) return <div className="text-center text-white">Loading...</div>;
+  if (error) return <div className="text-center text-red-500">Error: {error.message}</div>;
+
   return (
     <div className={`fixed ${isMobile ? 'inset-0' : 'inset-y-4 right-4 w-[700px]'} bg-gray-800 shadow-lg z-50 flex flex-col ${isMobile ? '' : 'rounded-lg'} overflow-hidden`}>
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
@@ -68,7 +83,7 @@ const SavedCodes = ({ onClose, onLoad }) => {
                 <div className="flex items-center justify-between mb-2">
                   <input
                     type="text"
-                    value={code.name}
+                    value={code.title}
                     onChange={(e) => handleRename(code.id, e.target.value)}
                     className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold mr-2 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                   />
@@ -104,8 +119,8 @@ const SavedCodes = ({ onClose, onLoad }) => {
                 {!isMobile && expandedCode === code.id && (
                   <div className="mt-2">
                     <iframe
-                      srcDoc={generatePreviewCode(code.html, code.css, code.js)}
-                      title={`Preview of ${code.name}`}
+                      srcDoc={generatePreviewCode(code.html_code, code.css_code, code.js_code)}
+                      title={`Preview of ${code.title}`}
                       className="w-full h-[400px] rounded border border-gray-600"
                       sandbox="allow-scripts"
                     />

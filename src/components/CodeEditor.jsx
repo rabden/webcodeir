@@ -8,6 +8,9 @@ import MobilePreviewButton from './MobilePreviewButton';
 import { useCodeEditorState } from '../hooks/useCodeEditorState';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import LoadingAnimation from './LoadingAnimation';
+import { useSupabaseAuth } from '../integrations/supabase';
+import { useAddCodeSnippet } from '../integrations/supabase';
+import { useToast } from "@/components/ui/use-toast";
 
 const Settings = lazy(() => import('./Settings'));
 const SavedCodes = lazy(() => import('./SavedCodes'));
@@ -28,6 +31,9 @@ const CodeEditor = () => {
   const [showSnippetLibrary, setShowSnippetLibrary] = React.useState(false);
   const [showCodeToolsPanel, setShowCodeToolsPanel] = React.useState(false);
   const [codeToolsInitialTab, setCodeToolsInitialTab] = React.useState('html');
+  const { session } = useSupabaseAuth();
+  const addCodeSnippet = useAddCodeSnippet();
+  const { toast } = useToast();
 
   React.useEffect(() => {
     loadFromLocalStorage();
@@ -56,19 +62,36 @@ const CodeEditor = () => {
     }));
   };
 
-  const saveCurrentCode = () => {
-    const savedCodes = JSON.parse(localStorage.getItem('savedCodes') || '[]');
-    const newSavedCode = {
-      id: Date.now(),
-      name: state.currentCodeName,
-      html: state.htmlCode,
-      css: state.cssCode,
-      js: state.jsCode,
-      date: new Date().toISOString(),
-    };
-    savedCodes.push(newSavedCode);
-    localStorage.setItem('savedCodes', JSON.stringify(savedCodes));
-    alert('Code saved successfully!');
+  const saveCurrentCode = async () => {
+    if (!session) {
+      toast({
+        title: "Error",
+        description: "You must be signed in to save codes.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await addCodeSnippet.mutateAsync({
+        user_id: session.user.id,
+        title: state.currentCodeName,
+        html_code: state.htmlCode,
+        css_code: state.cssCode,
+        js_code: state.jsCode,
+      });
+      toast({
+        title: "Success",
+        description: "Code saved successfully!",
+      });
+    } catch (error) {
+      console.error('Error saving code:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save code. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const toggleLayout = () => {
@@ -165,7 +188,7 @@ const CodeEditor = () => {
       </div>
       <Suspense fallback={<LoadingAnimation />}>
         {state.showSettings && <Settings settings={state.settings} setSettings={(newSettings) => setState(s => ({ ...s, settings: newSettings }))} onClose={() => setState(s => ({ ...s, showSettings: false }))} isMobile={state.iMobile} />}
-        {state.showSavedCodes && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html, cssCode: code.css, jsCode: code.js, currentCodeName: code.name, showSavedCodes: false }))} isMobile={state.iMobile} />}
+        {state.showSavedCodes && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html_code, cssCode: code.css_code, jsCode: code.js_code, currentCodeName: code.title, showSavedCodes: false }))} isMobile={state.iMobile} />}
         {state.showFontPanel && <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.iMobile} />}
         {state.showIconPanel && <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} isMobile={state.iMobile} />}
         {showCodeToolsPanel && <CodeToolsPanel onClose={() => setShowCodeToolsPanel(false)} initialTab={codeToolsInitialTab} />}
