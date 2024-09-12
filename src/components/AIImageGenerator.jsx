@@ -49,6 +49,11 @@ const AIImageGenerator = ({ onClose }) => {
   const { data: savedImages, refetch: refetchSavedImages } = useUserImages(session?.user?.id);
 
   const generateImage = async (model) => {
+    if (!session) {
+      toast({ title: "Error", description: "Please sign in to generate images.", variant: "destructive" });
+      return;
+    }
+
     setState(prev => ({ ...prev, loading: { ...prev.loading, [model]: true } }));
     let data = { inputs: state.prompts[model] };
     if (model === 'FLUX') {
@@ -110,29 +115,6 @@ const AIImageGenerator = ({ onClose }) => {
     return [result, data.parameters?.seed];
   };
 
-  const renderInputs = (model) => (
-    <div className="flex space-x-2 mb-4">
-      <Input
-        value={state.prompts[model]}
-        onChange={(e) => setState(prev => ({ ...prev, prompts: { ...prev.prompts, [model]: e.target.value } }))}
-        placeholder="Enter prompt"
-        className="flex-grow"
-      />
-      <Button
-        onClick={() => generateImage(model)}
-        disabled={state.loading[model]}
-        size="icon"
-        className="bg-blue-600 hover:bg-blue-700"
-      >
-        {state.loading[model] ? <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div> : <Wand2 className="h-4 w-4" />}
-      </Button>
-    </div>
-  );
-
-  const toggleCollection = () => {
-    setIsCollectionOpen(!isCollectionOpen);
-  };
-
   const handleSaveImage = async (image) => {
     if (!session?.user?.id) {
       toast({
@@ -164,6 +146,27 @@ const AIImageGenerator = ({ onClose }) => {
       });
     }
   };
+
+  const toggleCollection = () => setIsCollectionOpen(!isCollectionOpen);
+
+  const renderInputs = (model) => (
+    <div className="flex space-x-2 mb-4">
+      <Input
+        value={state.prompts[model]}
+        onChange={(e) => setState(prev => ({ ...prev, prompts: { ...prev.prompts, [model]: e.target.value } }))}
+        placeholder="Enter prompt"
+        className="flex-grow"
+      />
+      <Button
+        onClick={() => generateImage(model)}
+        disabled={state.loading[model]}
+        size="icon"
+        className="bg-blue-600 hover:bg-blue-700"
+      >
+        {state.loading[model] ? <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div> : <Wand2 className="h-4 w-4" />}
+      </Button>
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 bg-gray-800 z-50 flex flex-col md:inset-y-4 md:right-4 md:left-auto md:w-96 md:rounded-lg overflow-hidden">

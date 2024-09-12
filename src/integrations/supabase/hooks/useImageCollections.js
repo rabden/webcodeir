@@ -9,14 +9,14 @@ const fromSupabase = async (query) => {
 
 export const useUserImages = (userId) => useQuery({
     queryKey: ['user_images', userId],
-    queryFn: () => fromSupabase(supabase.from('user_images').select('*').eq('user_id', userId)),
+    queryFn: () => fromSupabase(supabase.from('generated_images').select('*').eq('user_id', userId)),
     enabled: !!userId,
 });
 
 export const useSaveImage = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newImage) => fromSupabase(supabase.from('user_images').insert([newImage])),
+        mutationFn: (newImage) => fromSupabase(supabase.from('generated_images').insert([newImage])),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries(['user_images', variables.user_id]);
         },
@@ -26,8 +26,8 @@ export const useSaveImage = () => {
 export const useDeleteImage = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (id) => fromSupabase(supabase.from('user_images').delete().eq('id', id)),
-        onSuccess: (_, variables) => {
+        mutationFn: (id) => fromSupabase(supabase.from('generated_images').delete().eq('id', id)),
+        onSuccess: () => {
             queryClient.invalidateQueries(['user_images']);
         },
     });
