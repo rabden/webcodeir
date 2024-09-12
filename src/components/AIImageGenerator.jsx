@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X, MoreVertical, Copy, Wand2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import AIImageGeneratorResult from './AIImageGeneratorResult';
 import ImageCollection from './ImageCollection';
 import { useSupabaseAuth } from '../integrations/supabase';
 import { useImageGenerationLimit } from '../hooks/useImageGenerationLimit';
+import { useAddGeneratedImage } from '../integrations/supabase/hooks/useGeneratedImages';
 
 const MAX_SEED = 4294967295;
 const API_KEY = "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";
@@ -41,30 +42,11 @@ const AIImageGenerator = ({ onClose }) => {
     },
     isFluxSettingsOpen: false,
     isCollectionOpen: false,
-    savedImages: []
   });
   const { toast } = useToast();
   const { session } = useSupabaseAuth();
   const { generationCount, canGenerate, incrementCount, lastResetTime } = useImageGenerationLimit(session?.user?.id);
-  const [timeUntilRefresh, setTimeUntilRefresh] = useState(0);
-
-  useEffect(() => {
-    const savedImagesFromStorage = JSON.parse(localStorage.getItem('savedImages') || '[]');
-    setState(prev => ({ ...prev, savedImages: savedImagesFromStorage }));
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (lastResetTime) {
-        const now = new Date().getTime();
-        const timePassed = now - lastResetTime;
-        const timeLeft = Math.max(6 * 60 * 60 * 1000 - timePassed, 0);
-        setTimeUntilRefresh(timeLeft);
-      }
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [lastResetTime]);
+  const addGeneratedImage = useAddGeneratedImage();
 
   const generateImage = async (model) => {
     if (!canGenerate) {
@@ -105,25 +87,27 @@ const AIImageGenerator = ({ onClose }) => {
         }
       });
       const imageUrl = URL.createObjectURL(response[0]);
+      const newImage = { 
+        imageUrl, 
+        seed: response[1], 
+        prompt: state.prompts[model] 
+      };
       setState(prev => ({ 
         ...prev, 
         results: { 
           ...prev.results, 
-          [model]: prev.results[model].map((item, index) => 
-            index === 0 ? { imageUrl, seed: response[1], prompt: prev.prompts[model] } : item
-          )
+          [model]: [newImage, ...prev.results[model].slice(1)]
         },
         fluxParams: { ...prev.fluxParams, seed: response[1] }
       }));
+      await saveGeneratedImage(newImage);
     } catch (error) {
       console.error('Error:', error);
       setState(prev => ({ 
         ...prev, 
         results: { 
           ...prev.results, 
-          [model]: prev.results[model].map((item, index) => 
-            index === 0 ? { error: 'Error generating image. Please try again.', seed: prev.fluxParams.seed, prompt: prev.prompts[model] } : item
-          )
+          [model]: [{ error: 'Error generating image. Please try again.', seed: prev.fluxParams.seed, prompt: prev.prompts[model] }, ...prev.results[model].slice(1)]
         }
       }));
     }
@@ -143,34 +127,19 @@ const AIImageGenerator = ({ onClose }) => {
     return [result, data.parameters?.seed];
   };
 
-  const saveImage = (image) => {
-    setState(prev => {
-      const updatedSavedImages = [...prev.savedImages, image];
-      localStorage.setItem('savedImages', JSON.stringify(updatedSavedImages));
-      return { ...prev, savedImages: updatedSavedImages };
-    });
-    toast({
-      title: "Image Saved",
-      description: "The image has been added to your collection.",
-    });
-  };
-
-  const removeImage = (index) => {
-    setState(prev => {
-      const updatedSavedImages = prev.savedImages.filter((_, i) => i !== index);
-      localStorage.setItem('savedImages', JSON.stringify(updatedSavedImages));
-      return { ...prev, savedImages: updatedSavedImages };
-    });
-    toast({
-      title: "Image Removed",
-      description: "The image has been removed from your collection.",
-    });
-  };
-
-  const formatTimeLeft = (ms) => {
-    const hours = Math.floor(ms / 3600000);
-    const minutes = Math.floor((ms % 3600000) / 60000);
-    return `${hours}h ${minutes}m`;
+  const saveGeneratedImage = async (image) => {
+    if (session?.user?.id) {
+      try {
+        await addGeneratedImage.mutateAsync({
+          user_id: session.user.id,
+          image_url: image.imageUrl,
+          seed: image.seed,
+          prompt: image.prompt
+        });
+      } catch (error) {
+        console.error('Error saving generated image:', error);
+      }
+    }
   };
 
   return (
@@ -188,12 +157,6 @@ const AIImageGenerator = ({ onClose }) => {
       </div>
       <ScrollArea className="flex-grow">
         <div className="p-4 space-y-4">
-          <div className="text-sm text-white">
-            {canGenerate 
-              ? `Available generations: ${20 - generationCount} / 20`
-              : `Will refresh in: ${formatTimeLeft(timeUntilRefresh)}`
-            }
-          </div>
           <AIImageGeneratorSettings
             fluxParams={state.fluxParams}
             setFluxParams={(params) => setState(prev => ({ ...prev, fluxParams: params }))}
@@ -220,15 +183,13 @@ const AIImageGenerator = ({ onClose }) => {
           <AIImageGeneratorResult 
             results={state.results.FLUX} 
             toast={toast} 
-            onSave={saveImage}
           />
         </div>
       </ScrollArea>
       {state.isCollectionOpen && (
         <ImageCollection
           onClose={() => setState(prev => ({ ...prev, isCollectionOpen: false }))}
-          savedImages={state.savedImages}
-          onRemoveImage={removeImage}
+          userId={session?.user?.id}
         />
       )}
     </div>
