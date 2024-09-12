@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { X } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from '../integrations/supabase/supabase';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const ProfilePanel = ({ onClose }) => {
   const { session, logout } = useSupabaseAuth();
@@ -70,6 +72,14 @@ const ProfilePanel = ({ onClose }) => {
             <Button onClick={handleDeleteAccount} className="w-full bg-red-600 hover:bg-red-700 text-white">
               Delete Account
             </Button>
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Email Rate Limit</AlertTitle>
+              <AlertDescription>
+                If you see an "email rate limit exceeded" error, it means too many emails have been sent recently. 
+                Please wait a few minutes before trying again or contact support if the issue persists.
+              </AlertDescription>
+            </Alert>
           </div>
         )}
       </div>
