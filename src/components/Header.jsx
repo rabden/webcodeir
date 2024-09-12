@@ -1,5 +1,6 @@
 import React from 'react';
-import { Settings as SettingsIcon, Save, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Keyboard, Library, Wrench, BookOpen, Type, Image, Code, Terminal, Palette, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Settings as SettingsIcon, Save, Menu, LayoutPanelLeft, LayoutPanelTop, Layout, Keyboard, Library, Wrench, BookOpen, Type, Image, Code, Terminal, Palette, User, Home } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -78,6 +79,11 @@ const Header = ({
           onChange={(e) => setCurrentCodeName(e.target.value)}
           className="text-lg font-semibold bg-transparent border-none focus:outline-none text-white max-w-[150px] sm:max-w-none"
         />
+        <Link to="/">
+          <Button variant="ghost" size="icon" className="text-white hover:bg-gray-700">
+            <Home className="h-5 w-5" />
+          </Button>
+        </Link>
       </div>
       {isMobile && (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-grow mx-2">

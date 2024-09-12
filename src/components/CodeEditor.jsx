@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import Header from './Header';
 import EditorPanel from './EditorPanel';
@@ -36,14 +36,14 @@ const CodeEditor = () => {
   const addCodeSnippet = useAddCodeSnippet();
   const { toast } = useToast();
 
-  useEffect(() => {
+  React.useEffect(() => {
     loadFromLocalStorage();
     const handleResize = () => setState(s => ({ ...s, isMobile: window.innerWidth < 768 }));
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const debounce = setTimeout(() => {
       updatePreview();
       if (state.settings.autoSave) saveToLocalStorage(state);
@@ -184,7 +184,6 @@ const CodeEditor = () => {
         setCodeToolsInitialTab={setCodeToolsInitialTab}
         setShowAIImageGeneratorPanel={() => setState(s => ({ ...s, showAIImageGeneratorPanel: true }))}
         setShowProfilePanel={() => setState(s => ({ ...s, showProfilePanel: true }))}
-        session={authContext?.session}
       />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
