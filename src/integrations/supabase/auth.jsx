@@ -27,13 +27,8 @@ export const SupabaseAuthProviderInner = ({ children }) => {
       setLoading(false);
     };
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
-      if (event === 'SIGNED_IN') {
-        // Automatically confirm the user's email
-        const { error } = await supabase.auth.updateUser({ email_confirm: true });
-        if (error) console.error('Error confirming email:', error);
-      }
       queryClient.invalidateQueries('user');
     });
 
@@ -69,9 +64,5 @@ export const SupabaseAuthUI = () => (
     appearance={{ theme: ThemeSupa }}
     theme="default"
     providers={[]}
-    redirectTo={window.location.origin}
-    onlyThirdPartyProviders={false}
-    magicLink={false}
-    view="sign_up"
   />
 );
