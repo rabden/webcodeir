@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import Header from './Header';
 import EditorPanel from './EditorPanel';
@@ -32,18 +32,18 @@ const CodeEditor = () => {
   const [showSnippetLibrary, setShowSnippetLibrary] = React.useState(false);
   const [showCodeToolsPanel, setShowCodeToolsPanel] = React.useState(false);
   const [codeToolsInitialTab, setCodeToolsInitialTab] = React.useState('html');
-  const { session } = useSupabaseAuth();
+  const authContext = useSupabaseAuth();
   const addCodeSnippet = useAddCodeSnippet();
   const { toast } = useToast();
 
-  React.useEffect(() => {
+  useEffect(() => {
     loadFromLocalStorage();
     const handleResize = () => setState(s => ({ ...s, isMobile: window.innerWidth < 768 }));
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const debounce = setTimeout(() => {
       updatePreview();
       if (state.settings.autoSave) saveToLocalStorage(state);
@@ -64,7 +64,7 @@ const CodeEditor = () => {
   };
 
   const saveCurrentCode = async () => {
-    if (!session) {
+    if (!authContext || !authContext.session) {
       toast({
         title: "Error",
         description: "You must be signed in to save codes.",
@@ -75,7 +75,7 @@ const CodeEditor = () => {
 
     try {
       await addCodeSnippet.mutateAsync({
-        user_id: session.user.id,
+        user_id: authContext.session.user.id,
         title: state.currentCodeName,
         html_code: state.htmlCode,
         css_code: state.cssCode,
@@ -184,18 +184,18 @@ const CodeEditor = () => {
         setCodeToolsInitialTab={setCodeToolsInitialTab}
         setShowAIImageGeneratorPanel={() => setState(s => ({ ...s, showAIImageGeneratorPanel: true }))}
         setShowProfilePanel={() => setState(s => ({ ...s, showProfilePanel: true }))}
-        session={session}
+        session={authContext?.session}
       />
       <div className="flex-grow overflow-hidden">
         {renderLayout()}
       </div>
       <Suspense fallback={<LoadingAnimation />}>
         {state.showSettings && <Settings settings={state.settings} setSettings={(newSettings) => setState(s => ({ ...s, settings: newSettings }))} onClose={() => setState(s => ({ ...s, showSettings: false }))} isMobile={state.iMobile} />}
-        {state.showSavedCodes && session && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html_code, cssCode: code.css_code, jsCode: code.js_code, currentCodeName: code.title, showSavedCodes: false }))} isMobile={state.iMobile} />}
+        {state.showSavedCodes && authContext?.session && <SavedCodes onClose={() => setState(s => ({ ...s, showSavedCodes: false }))} onLoad={(code) => setState(s => ({ ...s, htmlCode: code.html_code, cssCode: code.css_code, jsCode: code.js_code, currentCodeName: code.title, showSavedCodes: false }))} isMobile={state.iMobile} />}
         {state.showFontPanel && <FontPanel onClose={() => setState(s => ({ ...s, showFontPanel: false }))} isMobile={state.iMobile} />}
         {state.showIconPanel && <IconPanel onClose={() => setState(s => ({ ...s, showIconPanel: false }))} iMobile={state.iMobile} />}
         {showCodeToolsPanel && <CodeToolsPanel onClose={() => setShowCodeToolsPanel(false)} initialTab={codeToolsInitialTab} />}
-        {state.showAIImageGeneratorPanel && session && <AIImageGenerator onClose={() => setState(s => ({ ...s, showAIImageGeneratorPanel: false }))} />}
+        {state.showAIImageGeneratorPanel && authContext?.session && <AIImageGenerator onClose={() => setState(s => ({ ...s, showAIImageGeneratorPanel: false }))} />}
         {state.showKeyboardShortcuts && <KeyboardShortcutsPanel onClose={() => setState(s => ({ ...s, showKeyboardShortcuts: false }))} />}
         {state.showPexelsPanel && <PexelsImagePanel onClose={() => setState(s => ({ ...s, showPexelsPanel: false }))} />}
         {showConsole && <ConsolePanel onClose={() => setShowConsole(false)} isMobile={state.iMobile} />}
@@ -218,7 +218,7 @@ const CodeEditor = () => {
         showConsole={showConsole}
         toggleSnippetLibrary={() => { setShowSnippetLibrary(s => !s); setState(s => ({ ...s, isMenuOpen: false })); }}
         showSnippetLibrary={showSnippetLibrary}
-        session={session}
+        session={authContext?.session}
         setShowProfilePanel={() => setState(s => ({ ...s, showProfilePanel: true, isMenuOpen: false }))}
       />
     </div>
